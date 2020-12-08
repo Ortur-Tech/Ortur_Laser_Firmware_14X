@@ -41,6 +41,13 @@ uint8_t spindle_get_state();
 // Called by spindle_sync() after sync and parking motion/spindle stop override during restore.
 #ifdef VARIABLE_SPINDLE
 
+	#ifdef STM32
+		#define SPINDLE_PWM_TYPE    uint16_t
+	#else
+		#define SPINDLE_PWM_TYPE    uint8_t
+	#endif
+
+
   // Called by g-code parser when setting spindle state and requires a buffer sync.
   void spindle_sync(uint8_t state, float rpm);
 
@@ -49,10 +56,10 @@ uint8_t spindle_get_state();
   
   // Sets spindle PWM quickly for stepper ISR. Also called by spindle_set_state().
   // NOTE: 328p PWM register is 8-bit.
-  void spindle_set_speed(uint8_t pwm_value);
+  void spindle_set_speed(SPINDLE_PWM_TYPE pwm_value);
   
   // Computes 328p-specific PWM register value for the given RPM for quick updating.
-  uint8_t spindle_compute_pwm_value(float rpm);
+  SPINDLE_PWM_TYPE  spindle_compute_pwm_value(float rpm);
   
 #else
   
