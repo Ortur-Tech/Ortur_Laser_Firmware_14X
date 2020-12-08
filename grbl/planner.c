@@ -374,7 +374,14 @@ uint8_t plan_buffer_line(float *target, plan_line_data_t *pl_data)
     unit_vec[idx] = delta_mm; // Store unit vector numerator
 
     // Set direction bits. Bit enabled always means direction is negative.
-    if (delta_mm < 0.0 ) { block->direction_bits |= get_direction_pin_mask(idx); }
+    if (delta_mm < 0.0 )
+    {
+      #ifdef STM32
+        block->direction_bits |= direction_pin_mask[idx];
+      #elif ATMEGA328P
+      block->direction_bits |= get_direction_pin_mask(idx);
+      #endif
+    }
   }
 
   // Bail if this is a zero-length block. Highly unlikely to occur.
@@ -385,7 +392,11 @@ uint8_t plan_buffer_line(float *target, plan_line_data_t *pl_data)
   // NOTE: This calculation assumes all axes are orthogonal (Cartesian) and works with ABC-axes,
   // if they are also orthogonal/independent. Operates on the absolute value of the unit vector.
   block->millimeters = convert_delta_vector_to_unit_vector(unit_vec);
+#ifdef ENABLE_ACCEL_SCALING
+  block->acceleration = limit_value_by_axis_maximum(adjustments.accel_adjusted, unit_vec);
+#else
   block->acceleration = limit_value_by_axis_maximum(settings.acceleration, unit_vec);
+#endif
   block->rapid_rate = limit_value_by_axis_maximum(settings.max_rate, unit_vec);
 
   // Store programmed rate.
@@ -443,8 +454,14 @@ uint8_t plan_buffer_line(float *target, plan_line_data_t *pl_data)
         block->max_junction_speed_sqr = SOME_LARGE_VALUE;
       } else {
         convert_delta_vector_to_unit_vector(junction_unit_vec);
-        float junction_acceleration = limit_value_by_axis_maximum(settings.acceleration, junction_unit_vec);
-        float sin_theta_d2 = sqrt(0.5*(1.0-junction_cos_theta)); // Trig half angle identity. Always positive.
+
+				#ifdef ENABLE_ACCEL_SCALING
+        	float junction_acceleration = limit_value_by_axis_maximum(adjustments.accel_adjusted, junction_unit_vec);
+				#else
+        	float junction_acceleration = limit_value_by_axis_maximum(settings.acceleration, junction_unit_vec);
+				#endif
+
+        	float sin_theta_d2 = sqrtf(0.5*(1.0-junction_cos_theta)); // Trig half angle identity. Always positive.
         block->max_junction_speed_sqr = max( MINIMUM_JUNCTION_SPEED*MINIMUM_JUNCTION_SPEED,
                        (junction_acceleration * settings.junction_deviation * sin_theta_d2)/(1.0-sin_theta_d2) );
       }
