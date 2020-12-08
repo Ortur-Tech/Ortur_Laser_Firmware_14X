@@ -20,15 +20,21 @@
 */
 
 #include "grbl.h"
-
+#ifdef USE_USB
+#include "usbd_cdc_if.h"
+#endif
 
 void printString(const char *s)
 {
+#ifdef USE_USB11
+	CDC_Transmit_FS(s,strlen(s));
+#else
   while (*s)
     serial_write(*s++);
+#endif
 }
 
-
+#ifdef ATMEGA328P
 // Print a string stored in PGM-memory
 void printPgmString(const char *s)
 {
@@ -36,7 +42,7 @@ void printPgmString(const char *s)
   while ((c = pgm_read_byte_near(s++)))
     serial_write(c);
 }
-
+#endif
 
 // void printIntegerInBase(unsigned long n, unsigned long base)
 // {
