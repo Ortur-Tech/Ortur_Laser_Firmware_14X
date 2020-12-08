@@ -22,42 +22,10 @@
 #include "grbl.h"
 
 settings_t settings;
+#ifdef ENABLE_ACCEL_SCALING
+adjustments_t adjustments;
+#endif
 
-const __flash settings_t defaults = {\
-    .pulse_microseconds = DEFAULT_STEP_PULSE_MICROSECONDS,
-    .stepper_idle_lock_time = DEFAULT_STEPPER_IDLE_LOCK_TIME,
-    .step_invert_mask = DEFAULT_STEPPING_INVERT_MASK,
-    .dir_invert_mask = DEFAULT_DIRECTION_INVERT_MASK,
-    .status_report_mask = DEFAULT_STATUS_REPORT_MASK,
-    .junction_deviation = DEFAULT_JUNCTION_DEVIATION,
-    .arc_tolerance = DEFAULT_ARC_TOLERANCE,
-    .rpm_max = DEFAULT_SPINDLE_RPM_MAX,
-    .rpm_min = DEFAULT_SPINDLE_RPM_MIN,
-    .homing_dir_mask = DEFAULT_HOMING_DIR_MASK,
-    .homing_feed_rate = DEFAULT_HOMING_FEED_RATE,
-    .homing_seek_rate = DEFAULT_HOMING_SEEK_RATE,
-    .homing_debounce_delay = DEFAULT_HOMING_DEBOUNCE_DELAY,
-    .homing_pulloff = DEFAULT_HOMING_PULLOFF,
-    .flags = (DEFAULT_REPORT_INCHES << BIT_REPORT_INCHES) | \
-             (DEFAULT_LASER_MODE << BIT_LASER_MODE) | \
-             (DEFAULT_INVERT_ST_ENABLE << BIT_INVERT_ST_ENABLE) | \
-             (DEFAULT_HARD_LIMIT_ENABLE << BIT_HARD_LIMIT_ENABLE) | \
-             (DEFAULT_HOMING_ENABLE << BIT_HOMING_ENABLE) | \
-             (DEFAULT_SOFT_LIMIT_ENABLE << BIT_SOFT_LIMIT_ENABLE) | \
-             (DEFAULT_INVERT_LIMIT_PINS << BIT_INVERT_LIMIT_PINS) | \
-             (DEFAULT_INVERT_PROBE_PIN << BIT_INVERT_PROBE_PIN),
-    .steps_per_mm[X_AXIS] = DEFAULT_X_STEPS_PER_MM,
-    .steps_per_mm[Y_AXIS] = DEFAULT_Y_STEPS_PER_MM,
-    .steps_per_mm[Z_AXIS] = DEFAULT_Z_STEPS_PER_MM,
-    .max_rate[X_AXIS] = DEFAULT_X_MAX_RATE,
-    .max_rate[Y_AXIS] = DEFAULT_Y_MAX_RATE,
-    .max_rate[Z_AXIS] = DEFAULT_Z_MAX_RATE,
-    .acceleration[X_AXIS] = DEFAULT_X_ACCELERATION,
-    .acceleration[Y_AXIS] = DEFAULT_Y_ACCELERATION,
-    .acceleration[Z_AXIS] = DEFAULT_Z_ACCELERATION,
-    .max_travel[X_AXIS] = (-DEFAULT_X_MAX_TRAVEL),
-    .max_travel[Y_AXIS] = (-DEFAULT_Y_MAX_TRAVEL),
-    .max_travel[Z_AXIS] = (-DEFAULT_Z_MAX_TRAVEL)};
 
 
 // Method to store startup lines into EEPROM
@@ -102,8 +70,84 @@ void write_global_settings()
 
 // Method to restore EEPROM-saved Grbl global settings back to defaults.
 void settings_restore(uint8_t restore_flag) {
-  if (restore_flag & SETTINGS_RESTORE_DEFAULTS) {    
-    settings = defaults;
+  if (restore_flag & SETTINGS_RESTORE_DEFAULTS) {
+//    settings.pulse_microseconds = DEFAULT_STEP_PULSE_MICROSECONDS;
+    settings.fpulse_microseconds = DEFAULT_STEP_PULSE_MICROSECONDS;
+    settings.stepper_idle_lock_time = DEFAULT_STEPPER_IDLE_LOCK_TIME;
+    settings.step_invert_mask = DEFAULT_STEPPING_INVERT_MASK;
+    settings.dir_invert_mask = DEFAULT_DIRECTION_INVERT_MASK;
+    settings.status_report_mask = DEFAULT_STATUS_REPORT_MASK;
+    settings.junction_deviation = DEFAULT_JUNCTION_DEVIATION;
+    settings.arc_tolerance = DEFAULT_ARC_TOLERANCE;
+
+    settings.rpm_max = DEFAULT_SPINDLE_RPM_MAX;
+    settings.rpm_min = DEFAULT_SPINDLE_RPM_MIN;
+
+    settings.homing_dir_mask = DEFAULT_HOMING_DIR_MASK;
+    settings.homing_feed_rate = DEFAULT_HOMING_FEED_RATE;
+    settings.homing_seek_rate = DEFAULT_HOMING_SEEK_RATE;
+    settings.homing_debounce_delay = DEFAULT_HOMING_DEBOUNCE_DELAY;
+    settings.homing_pulloff = DEFAULT_HOMING_PULLOFF;
+
+    settings.analog_max = DEFAULT_ANALOG_MAX;
+    settings.spindle_enable_pin_mode = DEFAULT_VARIABLE_SPINDLE_ENABLE_PIN;
+
+    settings.flags = 0;
+    settings.accel_sensitivity = DEFAULT_ACCEL_SENSITIVITY;
+    if (DEFAULT_REPORT_INCHES) { settings.flags |= BITFLAG_REPORT_INCHES; }
+    if (DEFAULT_LASER_MODE) { settings.flags |= BITFLAG_LASER_MODE; }
+    if (DEFAULT_INVERT_ST_ENABLE) { settings.flags |= BITFLAG_INVERT_ST_ENABLE; }
+    if (DEFAULT_HARD_LIMIT_ENABLE) { settings.flags |= BITFLAG_HARD_LIMIT_ENABLE; }
+    if (DEFAULT_HOMING_ENABLE) { settings.flags |= BITFLAG_HOMING_ENABLE; }
+    if (DEFAULT_SOFT_LIMIT_ENABLE) { settings.flags |= BITFLAG_SOFT_LIMIT_ENABLE; }
+    if (DEFAULT_INVERT_LIMIT_PINS) { settings.flags |= BITFLAG_INVERT_LIMIT_PINS; }
+    if (DEFAULT_INVERT_PROBE_PIN) { settings.flags |= BITFLAG_INVERT_PROBE_PIN; }
+
+    settings.steps_per_mm[X_AXIS] = DEFAULT_X_STEPS_PER_MM;
+    settings.steps_per_mm[Y_AXIS] = DEFAULT_Y_STEPS_PER_MM;
+    settings.steps_per_mm[Z_AXIS] = DEFAULT_Z_STEPS_PER_MM;
+    settings.max_rate[X_AXIS] = DEFAULT_X_MAX_RATE;
+    settings.max_rate[Y_AXIS] = DEFAULT_Y_MAX_RATE;
+    settings.max_rate[Z_AXIS] = DEFAULT_Z_MAX_RATE;
+    settings.acceleration[X_AXIS] = DEFAULT_X_ACCELERATION;
+    settings.acceleration[Y_AXIS] = DEFAULT_Y_ACCELERATION;
+    settings.acceleration[Z_AXIS] = DEFAULT_Z_ACCELERATION;
+    settings.max_travel[X_AXIS] = (-DEFAULT_X_MAX_TRAVEL);
+    settings.max_travel[Y_AXIS] = (-DEFAULT_Y_MAX_TRAVEL);
+    settings.max_travel[Z_AXIS] = (-DEFAULT_Z_MAX_TRAVEL);
+
+
+    #if ( defined(STM32F1_4) || defined(STM32F4_4) )
+      settings.steps_per_mm[A_AXIS] = DEFAULT_A_STEPS_PER_MM;
+      settings.max_rate[A_AXIS] = DEFAULT_A_MAX_RATE;
+      settings.eeacceleration[A_AXIS] = DEFAULT_A_ACCELERATION;
+      settings.max_travel[A_AXIS] = (-DEFAULT_A_MAX_TRAVEL);
+    #endif
+    #if ( defined(STM32F1_5) || defined(STM32F4_5) )
+      settings.steps_per_mm[A_AXIS] = DEFAULT_A_STEPS_PER_MM;
+      settings.steps_per_mm[B_AXIS] = DEFAULT_B_STEPS_PER_MM;
+      settings.max_rate[A_AXIS] = DEFAULT_A_MAX_RATE;
+      settings.max_rate[B_AXIS] = DEFAULT_B_MAX_RATE;
+      settings.eeacceleration[A_AXIS] = DEFAULT_A_ACCELERATION;
+      settings.eeacceleration[B_AXIS] = DEFAULT_B_ACCELERATION;
+      settings.max_travel[A_AXIS] = (-DEFAULT_A_MAX_TRAVEL);
+      settings.max_travel[B_AXIS] = (-DEFAULT_B_MAX_TRAVEL);
+    #endif
+    #if ( defined(STM32F1_6) || defined(STM32F4_6) )
+      settings.steps_per_mm[A_AXIS] = DEFAULT_A_STEPS_PER_MM;
+      settings.steps_per_mm[B_AXIS] = DEFAULT_B_STEPS_PER_MM;
+      settings.steps_per_mm[C_AXIS] = DEFAULT_C_STEPS_PER_MM;
+      settings.max_rate[A_AXIS] = DEFAULT_A_MAX_RATE;
+      settings.max_rate[B_AXIS] = DEFAULT_B_MAX_RATE;
+      settings.max_rate[C_AXIS] = DEFAULT_C_MAX_RATE;
+      settings.eeacceleration[A_AXIS] = DEFAULT_A_ACCELERATION;
+      settings.eeacceleration[B_AXIS] = DEFAULT_B_ACCELERATION;
+      settings.eeacceleration[C_AXIS] = DEFAULT_C_ACCELERATION;
+      settings.max_travel[A_AXIS] = (-DEFAULT_A_MAX_TRAVEL);
+      settings.max_travel[B_AXIS] = (-DEFAULT_B_MAX_TRAVEL);
+      settings.max_travel[C_AXIS] = (-DEFAULT_C_MAX_TRAVEL);
+    #endif
+
     write_global_settings();
   }
 
@@ -165,7 +209,22 @@ uint8_t settings_read_coord_data(uint8_t coord_select, float *coord_data)
   uint32_t addr = coord_select*(sizeof(float)*N_AXIS+1) + EEPROM_ADDR_PARAMETERS;
   if (!(memcpy_from_eeprom_with_checksum((char*)coord_data, addr, sizeof(float)*N_AXIS))) {
     // Reset with default zero vector
-    clear_vector_float(coord_data);
+    //clear_vector_float(coord_data);
+		coord_data[X_AXIS] = 0.0f;
+		coord_data[Y_AXIS] = 0.0f;
+		coord_data[Z_AXIS] = 0.0f;
+    #if ( defined(STM32F1_4) || defined(STM32F4_4) )
+      coord_data[A_AXIS] = 0.0f;
+    #endif
+    #if ( defined(STM32F1_5) || defined(STM32F4_5) )
+      coord_data[A_AXIS] = 0.0f;
+      coord_data[B_AXIS] = 0.0f;
+    #endif
+    #if ( defined(STM32F1_6) || defined(STM32F4_6) )
+      coord_data[A_AXIS] = 0.0f;
+      coord_data[B_AXIS] = 0.0f;
+      coord_data[C_AXIS] = 0.0f;
+    #endif
     settings_write_coord_data(coord_select,coord_data);
     return(false);
   }
@@ -229,8 +288,10 @@ uint8_t settings_store_global_setting(uint8_t parameter, float value) {
     uint8_t int_value = trunc(value);
     switch(parameter) {
       case 0:
-        if (int_value < 3) { return(STATUS_SETTING_STEP_PULSE_MIN); }
-        settings.pulse_microseconds = int_value; break;
+//        if (int_value < STATUS_SETTING_STEP_PULSE_MIN_LIMIT) { return(STATUS_SETTING_STEP_PULSE_MIN); }
+//        settings.pulse_microseconds = int_value; break;
+        if (value < STATUS_SETTING_STEP_PULSE_MIN_LIMIT) { return(STATUS_SETTING_STEP_PULSE_MIN); }
+        settings.fpulse_microseconds = value; break;
       case 1: settings.stepper_idle_lock_time = int_value; break;
       case 2:
         settings.step_invert_mask = int_value;
@@ -294,6 +355,21 @@ uint8_t settings_store_global_setting(uint8_t parameter, float value) {
           return(STATUS_SETTING_DISABLED_LASER);
         #endif
         break;
+      case 33:
+    	  settings.accel_sensitivity = value;break;
+      #ifdef ENABLE_ANALOG_OUTPUT
+      case 40:
+        settings.analog_max = value;
+        outputs_analog_init(); // Re-initialize analog outputs calibration
+        break;
+	  #endif
+
+      #ifdef VARIABLE_SPINDLE_ENABLE_PIN
+      case 50:
+        settings.spindle_enable_pin_mode = int_value;
+        break;
+      #endif
+
       default:
         return(STATUS_INVALID_STATEMENT);
     }
@@ -303,6 +379,35 @@ uint8_t settings_store_global_setting(uint8_t parameter, float value) {
 }
 
 
+#ifdef ENABLE_ACCEL_SCALING
+void acceleration_scaling(uint8_t axis_index, float *pQscale)
+{
+  uint8_t i;
+	float scale = *pQscale;
+
+	protocol_buffer_synchronize();
+
+	if (scale <= 0.0f) return;
+	if (scale > 1.0f) scale = 1.0f;
+
+	if (axis_index == 0xFF) //all axis
+	{
+	  for (i=0; i<N_AXIS; i++)
+	  {
+	  	adjustments.accel_scaling[i] = scale;
+	  	adjustments.accel_adjusted[i] = settings.acceleration[i] * scale;
+	  }
+	}
+	else if (axis_index < N_AXIS)
+	{
+  	adjustments.accel_scaling[axis_index] = scale;
+  	adjustments.accel_adjusted[axis_index] = settings.acceleration[axis_index] * scale;
+	}
+}
+#endif
+
+
+
 // Initialize the config subsystem
 void settings_init() {
   if(!read_global_settings()) {
@@ -310,10 +415,19 @@ void settings_init() {
     settings_restore(SETTINGS_RESTORE_ALL); // Force restore all EEPROM data.
     report_grbl_settings();
   }
+#ifdef ENABLE_ACCEL_SCALING
+  uint8_t i;
+  for (i=0; i<N_AXIS; i++)
+  {
+  	adjustments.accel_scaling[i] = 1.0f;
+  	adjustments.accel_adjusted[i] = settings.acceleration[i];
+  }
+#endif
 }
 
 
 // Returns step pin mask according to Grbl internal axis indexing.
+#ifdef ATMEGA328P
 uint8_t get_step_pin_mask(uint8_t axis_idx)
 {
   if ( axis_idx == X_AXIS ) { return((1<<X_STEP_BIT)); }
@@ -338,3 +452,4 @@ uint8_t get_limit_pin_mask(uint8_t axis_idx)
   if ( axis_idx == Y_AXIS ) { return((1<<Y_LIMIT_BIT)); }
   return((1<<Z_LIMIT_BIT));
 }
+#endif

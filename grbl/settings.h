@@ -4,6 +4,7 @@
 
   Copyright (c) 2011-2016 Sungeun K. Jeon for Gnea Research LLC
   Copyright (c) 2009-2011 Simen Svale Skogsrud
+  Copyright (c) 2018-2019 Thomas Truong
 
   Grbl is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -27,7 +28,19 @@
 
 // Version of the EEPROM data. Will be used to migrate existing data from older versions of Grbl
 // when firmware is upgraded. Always stored in byte 0 of eeprom
-#define SETTINGS_VERSION 10  // NOTE: Check settings_reset() when moving to next version.
+#if ( defined(STM32F1_3) || defined(STM32F4_3) )
+	#define SETTINGS_VERSION 13  // NOTE: Check settings_reset() when moving to next version.
+#endif
+#if ( defined(STM32F1_4) || defined(STM32F4_4) )
+	#define SETTINGS_VERSION 12
+#endif
+#if ( defined(STM32F1_5) || defined(STM32F4_5) )
+	#define SETTINGS_VERSION 11
+#endif
+#if ( defined(STM32F1_6) || defined(STM32F4_6) )
+	#define SETTINGS_VERSION 10
+#endif
+
 
 // Define bit flag masks for the boolean settings in settings.flag.
 #define BIT_REPORT_INCHES      0
@@ -92,7 +105,8 @@ typedef struct {
   float max_travel[N_AXIS];
 
   // Remaining Grbl settings
-  uint8_t pulse_microseconds;
+//  uint8_t pulse_microseconds;
+  float fpulse_microseconds;			// changed to float for STM32F4 500KHz rate
   uint8_t step_invert_mask;
   uint8_t dir_invert_mask;
   uint8_t stepper_idle_lock_time; // If max value 255, steppers do not disable.
@@ -110,9 +124,22 @@ typedef struct {
   float homing_seek_rate;
   uint16_t homing_debounce_delay;
   float homing_pulloff;
+  //-- GRBL32 Customs
+  float analog_max;                 //-- $40
+  uint8_t spindle_enable_pin_mode;  //-- $50  0: default behavior, nothing.  1: call set enable pin normal.  2: call set enable pin inverted
+  uint16_t  accel_sensitivity; //NOTE:加速度敏感度(0~1000)
 } settings_t;
 extern settings_t settings;
+#ifdef ENABLE_ACCEL_SCALING
+	typedef struct
+	{
+		float accel_scaling[N_AXIS];
+		float accel_adjusted[N_AXIS];
+	} adjustments_t;
+	extern adjustments_t adjustments;
 
+	void acceleration_scaling (uint8_t axis_index, float *pQscale);
+#endif
 // Initialize the configuration subsystem (load settings from EEPROM)
 void settings_init();
 
@@ -140,6 +167,7 @@ void settings_write_coord_data(uint8_t coord_select, float *coord_data);
 // Reads selected coordinate data from EEPROM
 uint8_t settings_read_coord_data(uint8_t coord_select, float *coord_data);
 
+#ifdef ATMEGA328P
 // Returns the step pin mask according to Grbl's internal axis numbering
 uint8_t get_step_pin_mask(uint8_t i);
 
@@ -148,6 +176,6 @@ uint8_t get_direction_pin_mask(uint8_t i);
 
 // Returns the limit pin mask according to Grbl's internal axis numbering
 uint8_t get_limit_pin_mask(uint8_t i);
-
+#endif
 
 #endif
