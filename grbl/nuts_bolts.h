@@ -22,10 +22,12 @@
 #ifndef nuts_bolts_h
 #define nuts_bolts_h
 
+#include "g32core.h"
+
 #define false 0
 #define true 1
 
-#define SOME_LARGE_VALUE 1.0E+38
+//#define SOME_LARGE_VALUE 1.0E+38
 
 // Axis array index values. Must start with 0 and be continuous.
 #define N_AXIS 3 // Number of axes
@@ -42,6 +44,10 @@
 #endif
 
 // Conversions
+#ifdef STM32
+#define F_CPU SystemCoreClock
+#endif
+
 #define MM_PER_INCH (25.40)
 #define INCH_PER_MM (0.0393701)
 #define TICKS_PER_MICROSECOND (F_CPU/1000000)

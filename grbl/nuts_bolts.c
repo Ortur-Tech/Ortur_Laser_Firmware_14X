@@ -107,6 +107,31 @@ uint8_t read_float(char *line, uint8_t *char_counter, float *float_ptr)
   return(true);
 }
 
+#ifdef STM32
+void _delay_ms(uint32_t x)
+{
+/*
+  uint32_t temp;
+  SysTick->LOAD = SystemCoreClock / 8000;                     // Loading time
+
+  SysTick->VAL = 0x00;                                            // Empty the counter
+  SysTick->CTRL = 0x01;                                           // Start from bottom
+  do
+  {
+    temp = SysTick->CTRL;
+  } while ( (temp & 0x01) && !(temp&(1 << 16)) );                             // Wait time arrive
+  SysTick->CTRL = 0x00;                                            // Close the counter
+  SysTick->VAL = 0X00;                                            // Empty the counter
+*/
+	//HAL_Delay(x);
+
+	uint32_t mililoop = SystemCoreClock/1000;
+	for (uint32_t i=0; i< mililoop; i++)
+		__asm__ __volatile__("nop\n\t":::"memory");
+
+
+}
+#endif
 
 // Non-blocking delay function used for general operation and suspend features.
 void delay_sec(float seconds, uint8_t mode)
@@ -121,7 +146,8 @@ void delay_sec(float seconds, uint8_t mode)
 		  protocol_exec_rt_system();
 		  if (sys.suspend & SUSPEND_RESTART_RETRACT) { return; } // Bail, if safety door reopens.
 		}
-		_delay_ms(DWELL_TIME_STEP); // Delay DWELL_TIME_STEP increment
+//		_delay_ms(DWELL_TIME_STEP); // Delay DWELL_TIME_STEP increment
+		HAL_Delay(DWELL_TIME_STEP);
 	}
 }
 
@@ -158,7 +184,7 @@ void delay_us(uint32_t us)
 
 
 // Simple hypotenuse computation function.
-float hypot_f(float x, float y) { return(sqrt(x*x + y*y)); }
+float hypot_f(float x, float y) { return(sqrtf(x*x + y*y)); }
 
 
 float convert_delta_vector_to_unit_vector(float *vector)
@@ -170,7 +196,7 @@ float convert_delta_vector_to_unit_vector(float *vector)
       magnitude += vector[idx]*vector[idx];
     }
   }
-  magnitude = sqrt(magnitude);
+  magnitude = sqrtf(magnitude);
   float inv_magnitude = 1.0/magnitude;
   for (idx=0; idx<N_AXIS; idx++) { vector[idx] *= inv_magnitude; }
   return(magnitude);
