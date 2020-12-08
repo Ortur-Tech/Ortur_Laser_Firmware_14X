@@ -32,6 +32,18 @@
 #define HOMING_CYCLE_Y    bit(Y_AXIS)
 #define HOMING_CYCLE_Z    bit(Z_AXIS)
 
+#if ( defined(STM32F1_4) || defined(STM32F4_4) )
+	#define HOMING_CYCLE_A    bit(A_AXIS)
+#endif
+#if ( defined(STM32F1_5) || defined(STM32F4_5) )
+	#define HOMING_CYCLE_A    bit(A_AXIS)
+	#define HOMING_CYCLE_B    bit(B_AXIS)
+#endif
+#if ( defined(STM32F1_6) || defined(STM32F4_6) )
+	#define HOMING_CYCLE_A    bit(A_AXIS)
+	#define HOMING_CYCLE_B    bit(B_AXIS)
+	#define HOMING_CYCLE_C    bit(C_AXIS)
+#endif
 
 // Execute linear motion in absolute millimeter coordinates. Feed rate given in millimeters/second
 // unless invert_feed_rate is true. Then the feed_rate means that the motion should be completed in
