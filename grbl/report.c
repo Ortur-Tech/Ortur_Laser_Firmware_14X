@@ -182,7 +182,8 @@ void report_grbl_help() {
 // NOTE: The numbering scheme here must correlate to storing in settings.c
 void report_grbl_settings() {
   // Print Grbl settings.
-  report_util_uint8_setting(0,settings.pulse_microseconds);
+//  report_util_uint8_setting(0,settings.pulse_microseconds);
+	report_util_float_setting(0,settings.fpulse_microseconds,N_DECIMAL_SETTINGVALUE);
   report_util_uint8_setting(1,settings.stepper_idle_lock_time);
   report_util_uint8_setting(2,settings.step_invert_mask);
   report_util_uint8_setting(3,settings.dir_invert_mask);
@@ -208,6 +209,18 @@ void report_grbl_settings() {
   #else
     report_util_uint8_setting(32,0);
   #endif
+  report_util_float_setting(33,settings.accel_sensitivity,N_DECIMAL_SETTINGVALUE); //NOTE: 加速度设置
+  #ifdef ENABLE_ANALOG_OUTPUT
+    report_util_float_setting(40,settings.analog_max,N_DECIMAL_SETTINGVALUE);
+  #endif
+
+  #ifdef VARIABLE_SPINDLE_ENABLE_PIN
+    report_util_uint8_setting(50,settings.spindle_enable_pin_mode);
+  #endif
+
+
+
+
   // Print axis settings
   uint8_t idx, set_idx;
   uint8_t val = AXIS_SETTINGS_START_VAL;
@@ -436,9 +449,13 @@ void report_build_info(char *line)
   #ifndef FORCE_BUFFER_SYNC_DURING_WCO_CHANGE // NOTE: Shown when disabled.
     serial_write('W');
   #endif
-  #ifdef ENABLE_DUAL_AXIS
+   #ifdef ENABLE_DUAL_AXIS
     serial_write('2');
   #endif
+  #ifndef HOMING_INIT_LOCK
+    serial_write('L');
+  #endif
+
   // NOTE: Compiled values, like override increments/max/min values, may be added at some point later.
   serial_write(',');
   print_uint8_base10(BLOCK_BUFFER_SIZE-1);
@@ -481,8 +498,8 @@ void report_realtime_status()
         printPgmString(PSTR("Hold:"));
         if (sys.suspend & SUSPEND_HOLD_COMPLETE) { serial_write('0'); } // Ready to resume
         else { serial_write('1'); } // Actively holding
-        break;
       } // Continues to print jog state during jog cancel.
+      break;
     case STATE_JOG: printPgmString(PSTR("Jog")); break;
     case STATE_HOMING: printPgmString(PSTR("Home")); break;
     case STATE_ALARM: printPgmString(PSTR("Alarm")); break;
@@ -572,13 +589,16 @@ void report_realtime_status()
       printPgmString(PSTR("|Pn:"));
       if (prb_pin_state) { serial_write('P'); }
       if (lim_pin_state) {
+//        if (bit_istrue(lim_pin_state,bit(X_AXIS))) { serial_write('X'); }
+//        if (bit_istrue(lim_pin_state,bit(Y_AXIS))) { serial_write('Y'); }
+ //       if (bit_istrue(lim_pin_state,bit(Z_AXIS))) { serial_write('Z'); }
         #ifdef ENABLE_DUAL_AXIS
           #if (DUAL_AXIS_SELECT == X_AXIS)
             if (bit_istrue(lim_pin_state,(bit(X_AXIS)|bit(N_AXIS)))) { serial_write('X'); }
             if (bit_istrue(lim_pin_state,bit(Y_AXIS))) { serial_write('Y'); }
           #endif
           #if (DUAL_AXIS_SELECT == Y_AXIS)
-            if (bit_istrue(lim_pin_state,bit(X_AXIS))) { serial_write('X'); 
+            if (bit_istrue(lim_pin_state,bit(X_AXIS))) { serial_write('X'); }
             if (bit_istrue(lim_pin_state,(bit(Y_AXIS)|bit(N_AXIS)))) { serial_write('Y'); }
           #endif
           if (bit_istrue(lim_pin_state,bit(Z_AXIS))) { serial_write('Z'); }
@@ -586,6 +606,18 @@ void report_realtime_status()
           if (bit_istrue(lim_pin_state,bit(X_AXIS))) { serial_write('X'); }
           if (bit_istrue(lim_pin_state,bit(Y_AXIS))) { serial_write('Y'); }
           if (bit_istrue(lim_pin_state,bit(Z_AXIS))) { serial_write('Z'); }
+        #endif
+        #if ( defined(STM32F1_4) || defined(STM32F4_4) )
+          if (bit_istrue(lim_pin_state, bit(A_AXIS))) { serial_write('A'); }
+        #endif
+        #if ( defined(STM32F1_5) || defined(STM32F4_5) )
+          if (bit_istrue(lim_pin_state, bit(A_AXIS))) { serial_write('A'); }
+          if (bit_istrue(lim_pin_state, bit(B_AXIS))) { serial_write('B'); }
+        #endif
+        #if ( defined(STM32F1_6) || defined(STM32F4_6) )
+          if (bit_istrue(lim_pin_state, bit(A_AXIS))) { serial_write('A'); }
+          if (bit_istrue(lim_pin_state, bit(B_AXIS))) { serial_write('B'); }
+          if (bit_istrue(lim_pin_state, bit(C_AXIS))) { serial_write('C'); }
         #endif
       }
       if (ctrl_pin_state) {
