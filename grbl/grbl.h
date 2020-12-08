@@ -22,16 +22,28 @@
 #define grbl_h
 
 // Grbl versioning system
-#define GRBL_VERSION "1.1h"
-#define GRBL_VERSION_BUILD "20190825"
+#define GRBL_VERSION "1.1f:0.03"
+//#define GRBL_VERSION_BUILD "20170801"
+#define GRBL_VERSION_BUILD "20190903"
 
 // Define standard libraries used by Grbl.
-#include <avr/io.h>
-#include <avr/pgmspace.h>
-#include <avr/interrupt.h>
-#include <avr/wdt.h>
-#include <util/delay.h>
 #include <math.h>
+#ifdef STM32
+  #include "main.h"
+  #include "stm32utilities.h"
+  #include "inoutputs.h"
+  //#define PSTR(x) x
+	#define PSTR(x) (char*)x
+  #define pgm_read_byte_near(x) *(x)
+  void _delay_ms(uint32_t x);
+  void _delay_us(uint32_t x);
+  #define false 0
+  #define true 1
+  typedef int bool;
+  //#define NOEEPROMSUPPORT
+  #define printPgmString printString
+#endif
+
 #include <inttypes.h>
 #include <string.h>
 #include <stdlib.h>
@@ -60,8 +72,9 @@
 #include "spindle_control.h"
 #include "stepper.h"
 #include "jog.h"
-
 // ---------------------------------------------------------------------------------------
+//加速度震动检测
+void accel_detection_limit();
 // COMPILE-TIME ERROR CHECKING OF DEFINE VALUES:
 
 #ifndef HOMING_CYCLE_0
