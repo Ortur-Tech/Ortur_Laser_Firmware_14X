@@ -28,6 +28,8 @@ void limits_init();
 
 // Disables hard limits.
 void limits_disable();
+// Enables hard limits.
+void limits_enable();
 
 // Returns limit state as a bit-wise uint8 variable.
 uint8_t limits_get_state();
@@ -37,5 +39,9 @@ void limits_go_home(uint8_t cycle_mask);
 
 // Check for soft limit violations
 void limits_soft_check(float *target);
+
+#ifdef STM32
+	void HandleLimitIT(void);
+#endif
 
 #endif

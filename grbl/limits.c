@@ -40,6 +40,17 @@
 
 void limits_init()
 {
+#ifdef STM32
+  if (bit_isfalse(settings.flags, BITFLAG_HARD_LIMIT_ENABLE))
+  {
+  	limits_disable();
+  }
+  else
+  {
+  	limits_enable();
+  }
+
+#elif ATMEGA328P
   LIMIT_DDR &= ~(LIMIT_MASK); // Set as input pins
 
   #ifdef DISABLE_LIMIT_PIN_PULL_UP
@@ -60,14 +71,38 @@ void limits_init()
     WDTCSR |= (1<<WDCE) | (1<<WDE);
     WDTCSR = (1<<WDP0); // Set time-out at ~32msec.
   #endif
+#endif
 }
 
 
 // Disables hard limits.
 void limits_disable()
 {
+
+#ifdef STM32F1
+  NVIC_DisableIRQ(EXTI15_10_IRQn);
+#endif
+
+#ifdef STM32F4
+  NVIC_DisableIRQ(EXTI15_10_IRQn);
+//  HAL_NVIC_DisableIRQ(EXTI15_10_IRQn);
+#endif
+
+
+#ifdef ATMEGA328P
   LIMIT_PCMSK &= ~LIMIT_MASK;  // Disable specific pins of the Pin Change Interrupt
   PCICR &= ~(1 << LIMIT_INT);  // Disable Pin Change Interrupt
+#endif
+}
+
+// Disables hard limits.
+void limits_enable()
+{
+
+#ifdef STM32F4
+  NVIC_EnableIRQ(EXTI15_10_IRQn);
+  EnableLimitsINT();
+#endif
 }
 
 
@@ -77,6 +112,32 @@ void limits_disable()
 uint8_t limits_get_state()
 {
   uint8_t limit_state = 0;
+#ifdef STM32
+  uint16_t pin = 0;
+	#ifdef STM32F1
+    pin = GPIO_ReadInputData(LIM_GPIO_Port);
+	#endif
+	#ifdef STM32F4
+		pin = GetLimitsState();
+	#endif
+
+	#ifdef INVERT_LIMIT_PIN_MASK
+		pin ^= INVERT_LIMIT_PIN_MASK;
+	#endif
+	if (bit_isfalse(settings.flags,BITFLAG_INVERT_LIMIT_PINS)) { pin ^= LIM_MASK; }
+	if (pin)
+	{
+		uint8_t idx;
+		for (idx=0; idx<N_AXIS; idx++)
+		{
+			if (pin & limit_pin_mask[idx]) { limit_state |= (1 << idx); }
+		}
+		#ifdef ENABLE_DUAL_AXIS
+      	if (pin & (1<<DUAL_LIMIT_BIT)) { limit_state |= (1 << N_AXIS); }
+    	#endif
+	}
+
+#elif ATMEGA328P
   uint8_t pin = (LIMIT_PIN & LIMIT_MASK);
   #ifdef INVERT_LIMIT_PIN_MASK
     pin ^= INVERT_LIMIT_PIN_MASK;
@@ -91,6 +152,7 @@ uint8_t limits_get_state()
       if (pin & (1<<DUAL_LIMIT_BIT)) { limit_state |= (1 << N_AXIS); }
     #endif
   }
+#endif
   return(limit_state);
 }
 
@@ -106,6 +168,40 @@ uint8_t limits_get_state()
 // homing cycles and will not respond correctly. Upon user request or need, there may be a
 // special pinout for an e-stop, but it is generally recommended to just directly connect
 // your e-stop switch to the Arduino reset pin, since it is the most correct way to do this.
+
+
+#ifdef STM32
+
+void HandleLimitIT(void)
+{
+	// Ignore limit switches if already in an alarm state or in-process of executing an alarm.
+	// When in the alarm state, Grbl should have been reset or will force a reset, so any pending
+	// moves in the planner and serial buffers are all cleared and newly sent blocks will be
+	// locked out until a homing cycle or a kill lock command. Allows the user to disable the hard
+	// limit setting if their limits are constantly triggering after a reset and move their axes.
+	if (sys.state != STATE_ALARM)
+	{
+		if (!(sys_rt_exec_alarm))
+		{
+#ifdef HARD_LIMIT_FORCE_STATE_CHECK
+			// Check limit pin state.
+			if (limits_get_state())
+			{
+				mc_reset(); // Initiate system kill.
+				system_set_exec_alarm(EXEC_ALARM_HARD_LIMIT); // Indicate hard limit critical event
+			}
+#else
+			mc_reset(); // Initiate system kill.
+			system_set_exec_alarm(EXEC_ALARM_HARD_LIMIT); // Indicate hard limit critical event
+#endif //HARD_LIMIT_FORCE_STATE_CHECK
+		}
+	}
+
+}
+
+#endif
+
+#ifdef ATMEGA328P
 #ifndef ENABLE_SOFTWARE_DEBOUNCE
   ISR(LIMIT_INT_vect) // DEFAULT: Limit pin change interrupt process.
   {
@@ -147,6 +243,8 @@ uint8_t limits_get_state()
   }
 #endif
 
+#endif //-- elif ATMEGA328P
+
 // Homes the specified cycle axes, sets the machine position, and performs a pull-off motion after
 // completing. Homing is a special motion case, which involves rapid uncontrolled stops to locate
 // the trigger point of the limit switches. The rapid stops are handled by a system level axis lock
@@ -169,7 +267,7 @@ void limits_go_home(uint8_t cycle_mask)
 
   // Initialize variables used for homing computations.
   uint8_t n_cycle = (2*N_HOMING_LOCATE_CYCLE+1);
-  uint8_t step_pin[N_AXIS];
+  uint16_t step_pin[N_AXIS];
   #ifdef ENABLE_DUAL_AXIS
     uint8_t step_pin_dual;
     uint8_t dual_axis_async_check;
@@ -189,7 +287,11 @@ void limits_go_home(uint8_t cycle_mask)
   uint8_t idx;
   for (idx=0; idx<N_AXIS; idx++) {
     // Initialize step pin masks
-    step_pin[idx] = get_step_pin_mask(idx);
+    #ifdef STM32
+      step_pin[idx] = step_pin_mask[idx];
+    #elif ATMEGA328P
+      step_pin[idx] = get_step_pin_mask(idx);
+    #endif
     #ifdef COREXY
       if ((idx==A_MOTOR)||(idx==B_MOTOR)) { step_pin[idx] = (get_step_pin_mask(X_AXIS)|get_step_pin_mask(Y_AXIS)); }
     #endif
@@ -207,8 +309,9 @@ void limits_go_home(uint8_t cycle_mask)
   // Set search mode with approach at seek rate to quickly engage the specified cycle_mask limit switches.
   bool approach = true;
   float homing_rate = settings.homing_seek_rate;
+  uint8_t limit_state, n_active_axis;
+  uint16_t axislock;
 
-  uint8_t limit_state, axislock, n_active_axis;
   do {
 
     system_convert_array_steps_to_mpos(target,sys_position);
@@ -256,7 +359,7 @@ void limits_go_home(uint8_t cycle_mask)
       }
 
     }
-    homing_rate *= sqrt(n_active_axis); // [sqrt(N_AXIS)] Adjust so individual axes all move at homing rate.
+    homing_rate *= sqrtf(n_active_axis); // [sqrt(N_AXIS)] Adjust so individual axes all move at homing rate.
     sys.homing_axis_lock = axislock;
 
     // Perform homing cycle. Planner buffer should be empty, as required to initiate the homing cycle.
