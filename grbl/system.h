@@ -131,9 +131,9 @@ typedef struct {
   uint8_t soft_limit;          // Tracks soft limit errors for the state machine. (boolean)
   uint8_t step_control;        // Governs the step segment generator depending on system state.
   uint8_t probe_succeeded;     // Tracks if last probing cycle was successful.
-  uint8_t homing_axis_lock;    // Locks axes when limits engage. Used as an axis motion mask in the stepper ISR.
+  uint16_t homing_axis_lock;    // Locks axes when limits engage. Used as an axis motion mask in the stepper ISR.
   #ifdef ENABLE_DUAL_AXIS
-    uint8_t homing_axis_lock_dual;
+    uint16_t homing_axis_lock_dual;
   #endif
   uint8_t f_override;          // Feed rate override value in percent
   uint8_t r_override;          // Rapids override value in percent
@@ -207,6 +207,11 @@ void system_set_exec_motion_override_flag(uint8_t mask);
 void system_set_exec_accessory_override_flag(uint8_t mask);
 void system_clear_exec_motion_overrides();
 void system_clear_exec_accessory_overrides();
+
+
+#ifdef STM32
+	void HandleControlIT(uint16_t Control_Pin);
+#endif
 
 
 #endif

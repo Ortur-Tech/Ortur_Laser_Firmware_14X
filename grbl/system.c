@@ -23,6 +23,7 @@
 
 void system_init()
 {
+#ifdef ATMEGA328P
   CONTROL_DDR &= ~(CONTROL_MASK); // Configure as input pins
   #ifdef DISABLE_CONTROL_PIN_PULL_UP
     CONTROL_PORT &= ~(CONTROL_MASK); // Normal low operation. Requires external pull-down.
@@ -31,6 +32,7 @@ void system_init()
   #endif
   CONTROL_PCMSK |= CONTROL_MASK;  // Enable specific pins of the Pin Change Interrupt
   PCICR |= (1 << CONTROL_INT);   // Enable Pin Change Interrupt
+#endif
 }
 
 
@@ -40,19 +42,23 @@ void system_init()
 uint8_t system_control_get_state()
 {
   uint8_t control_state = 0;
+#ifdef STM32
+  uint16_t pin= ((GPIO_ReadInputData(CON_GPIO_Port))&CONTROL_MASK)^ CONTROL_MASK;
+#elif ATMEGA328P
   uint8_t pin = (CONTROL_PIN & CONTROL_MASK) ^ CONTROL_MASK;
+#endif
+
   #ifdef INVERT_CONTROL_PIN_MASK
     pin ^= INVERT_CONTROL_PIN_MASK;
   #endif
-  if (pin) {
-    #ifdef ENABLE_SAFETY_DOOR_INPUT_PIN
-      if (bit_istrue(pin,(1<<CONTROL_SAFETY_DOOR_BIT))) { control_state |= CONTROL_PIN_INDEX_SAFETY_DOOR; }
-    #else
-      if (bit_istrue(pin,(1<<CONTROL_FEED_HOLD_BIT))) { control_state |= CONTROL_PIN_INDEX_FEED_HOLD; }
-    #endif
-    if (bit_istrue(pin,(1<<CONTROL_RESET_BIT))) { control_state |= CONTROL_PIN_INDEX_RESET; }
-    if (bit_istrue(pin,(1<<CONTROL_CYCLE_START_BIT))) { control_state |= CONTROL_PIN_INDEX_CYCLE_START; }
-  }
+    if (pin) {
+      #ifdef ENABLE_SAFETY_DOOR_INPUT_PIN
+        if (bit_isfalse(pin,CON_SAFETY_DOOR_Pin)) { control_state |= CONTROL_PIN_INDEX_SAFETY_DOOR; }
+      #endif
+      if (bit_isfalse(pin,CON_RESET_Pin)) { control_state |= CONTROL_PIN_INDEX_RESET; }
+      if (bit_isfalse(pin,CON_FEED_HOLD_Pin)) { control_state |= CONTROL_PIN_INDEX_FEED_HOLD; }
+      if (bit_isfalse(pin,CON_CYCLE_START_Pin)) { control_state |= CONTROL_PIN_INDEX_CYCLE_START; }
+    }
   return(control_state);
 }
 
@@ -61,7 +67,11 @@ uint8_t system_control_get_state()
 // only the realtime command execute variable to have the main program execute these when
 // its ready. This works exactly like the character-based realtime commands when picked off
 // directly from the incoming serial data stream.
+#ifdef STM32
+  void HandleControlIT(uint16_t Control_Pin)
+#elif ATMEGA328P
 ISR(CONTROL_INT_vect)
+#endif
 {
   uint8_t pin = system_control_get_state();
   if (pin) {
@@ -188,6 +198,20 @@ uint8_t system_execute_line(char *line)
                 case 'X': mc_homing_cycle(HOMING_CYCLE_X); break;
                 case 'Y': mc_homing_cycle(HOMING_CYCLE_Y); break;
                 case 'Z': mc_homing_cycle(HOMING_CYCLE_Z); break;
+
+#if ( defined(STM32F1_4) || defined(STM32F4_4) )
+                case 'A': mc_homing_cycle(HOMING_CYCLE_A); break;
+#endif
+#if ( defined(STM32F1_5) || defined(STM32F4_5) )
+                case 'A': mc_homing_cycle(HOMING_CYCLE_A); break;
+                case 'B': mc_homing_cycle(HOMING_CYCLE_B); break;
+#endif
+#if ( defined(STM32F1_6) || defined(STM32F4_6) )
+                case 'A': mc_homing_cycle(HOMING_CYCLE_A); break;
+                case 'B': mc_homing_cycle(HOMING_CYCLE_B); break;
+                case 'C': mc_homing_cycle(HOMING_CYCLE_C); break;
+#endif
+
                 default: return(STATUS_INVALID_STATEMENT);
               }
           #endif
@@ -353,58 +377,114 @@ uint8_t system_check_travel_limits(float *target)
 
 
 // Special handlers for setting and clearing Grbl's real-time execution flags.
-void system_set_exec_state_flag(uint8_t mask) {
+void system_set_exec_state_flag(uint8_t mask)
+{
+#ifdef STM32
+  __disable_irq();
+  sys_rt_exec_state |= (mask);
+  __enable_irq();
+#elif ATMEGA328P
   uint8_t sreg = SREG;
   cli();
   sys_rt_exec_state |= (mask);
   SREG = sreg;
+#endif
 }
 
-void system_clear_exec_state_flag(uint8_t mask) {
+void system_clear_exec_state_flag(uint8_t mask)
+{
+#ifdef STM32
+  __disable_irq();
+  sys_rt_exec_state &= ~(mask);
+  __enable_irq();
+#elif ATMEGA328P
   uint8_t sreg = SREG;
   cli();
   sys_rt_exec_state &= ~(mask);
   SREG = sreg;
+#endif
 }
 
-void system_set_exec_alarm(uint8_t code) {
+void system_set_exec_alarm(uint8_t code)
+{
+#ifdef STM32
+  __disable_irq();
+  sys_rt_exec_alarm |= (code);
+  __enable_irq();
+#elif ATMEGA328P
   uint8_t sreg = SREG;
   cli();
   sys_rt_exec_alarm = code;
   SREG = sreg;
+#endif
 }
 
-void system_clear_exec_alarm() {
+void system_clear_exec_alarm()
+{
+#ifdef STM32
+  __disable_irq();
+  sys_rt_exec_alarm = 0;
+  __enable_irq();
+#elif ATMEGA328P
   uint8_t sreg = SREG;
   cli();
   sys_rt_exec_alarm = 0;
   SREG = sreg;
+#endif
 }
 
-void system_set_exec_motion_override_flag(uint8_t mask) {
+void system_set_exec_motion_override_flag(uint8_t mask)
+{
+#ifdef STM32
+  __disable_irq();
+  sys_rt_exec_motion_override |= (mask);
+  __enable_irq();
+#elif ATMEGA328P
   uint8_t sreg = SREG;
   cli();
   sys_rt_exec_motion_override |= (mask);
   SREG = sreg;
+#endif
 }
 
-void system_set_exec_accessory_override_flag(uint8_t mask) {
+void system_set_exec_accessory_override_flag(uint8_t mask)
+{
+#ifdef STM32
+  __disable_irq();
+  sys_rt_exec_accessory_override |= (mask);
+  __enable_irq();
+#elif ATMEGA328P
   uint8_t sreg = SREG;
   cli();
   sys_rt_exec_accessory_override |= (mask);
   SREG = sreg;
+#endif
 }
 
-void system_clear_exec_motion_overrides() {
+void system_clear_exec_motion_overrides()
+{
+#ifdef STM32
+  __disable_irq();
+  sys_rt_exec_motion_override = 0;
+  __enable_irq();
+#elif ATMEGA328P
   uint8_t sreg = SREG;
   cli();
   sys_rt_exec_motion_override = 0;
   SREG = sreg;
+#endif
 }
 
-void system_clear_exec_accessory_overrides() {
+void system_clear_exec_accessory_overrides()
+{
+#ifdef STM32
+  __disable_irq();
+  sys_rt_exec_accessory_override = 0;
+  __enable_irq();
+#elif ATMEGA328P
   uint8_t sreg = SREG;
   cli();
   sys_rt_exec_accessory_override = 0;
   SREG = sreg;
+#endif
 }
