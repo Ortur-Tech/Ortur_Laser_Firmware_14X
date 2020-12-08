@@ -21,6 +21,10 @@
 #ifndef eeprom_h
 #define eeprom_h
 
+#ifdef STM32
+  void eeprom_init();
+#endif
+
 unsigned char eeprom_get_char(unsigned int addr);
 void eeprom_put_char(unsigned int addr, unsigned char new_value);
 void memcpy_to_eeprom_with_checksum(unsigned int destination, char *source, unsigned int size);

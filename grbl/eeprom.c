@@ -1,3 +1,4 @@
+
 // This file has been prepared for Doxygen automatic documentation generation.
 /*! \file ********************************************************************
 *
@@ -20,22 +21,111 @@
 *
 *                         $Revision: 1.6 $
 *                         $Date: Friday, February 11, 2005 07:16:44 UTC $
+*
 ****************************************************************************/
-#include <avr/io.h>
-#include <avr/interrupt.h>
+/*
+ *	  Copyright (c) 2018-2019 Thomas Truong
+ *	  										EEPROM Simulation using Flash on STM32F103 and STM32F407
+ *
+ *
+ *
+ *
+ */
 
-/* These EEPROM bits have different names on different devices. */
-#ifndef EEPE
-		#define EEPE  EEWE  //!< EEPROM program/write enable.
-		#define EEMPE EEMWE //!< EEPROM master program/write enable.
+
+#ifdef STM32
+	#include <string.h>
+  #include "stm32eeprom.h"
+  #include "settings.h"
+	unsigned char EE_Buffer[PAGE_SIZE];
+#elif ATMEGA328P
+  #include <avr/io.h>
+  #include <avr/interrupt.h>
+
+  /* These EEPROM bits have different names on different devices. */
+  #ifndef EEPE
+      #define EEPE  EEWE  //!< EEPROM program/write enable.
+      #define EEMPE EEMWE //!< EEPROM master program/write enable.
+  #endif
+
+  /* These two are unfortunately not defined in the device include files. */
+  #define EEPM1 5 //!< EEPROM Programming Mode Bit 1.
+  #define EEPM0 4 //!< EEPROM Programming Mode Bit 0.
+
+  /* Define to reduce code size. */
+  #define EEPROM_IGNORE_SELFPROG //!< Remove SPM flag polling.
 #endif
 
-/* These two are unfortunately not defined in the device include files. */
-#define EEPM1 5 //!< EEPROM Programming Mode Bit 1.
-#define EEPM0 4 //!< EEPROM Programming Mode Bit 0.
 
-/* Define to reduce code size. */
-#define EEPROM_IGNORE_SELFPROG //!< Remove SPM flag polling.
+#ifdef STM32
+void eeprom_flush()
+{
+  uint32_t nAddress = EEPROM_START_ADDRESS;
+  uint16_t *pBuffer = (uint16_t *)EE_Buffer;
+  uint16_t nSize = PAGE_SIZE;
+
+  HAL_FLASH_Unlock();
+
+#ifdef STM32F1
+  //__HAL_FLASH_CLEAR_FLAG (FLASH_FLAG_EOP | FLASH_FLAG_WRPERR FLASH | FLASH_FLAG_PGERR  FLASH | FLASH_FLAG_OPTVERR);
+  FLASH_PageErase(EEPROM_START_ADDRESS);
+  FLASH_WaitForLastOperation((uint32_t)FLASH_TIMEOUT_VALUE); //-- !!
+  CLEAR_BIT(FLASH->CR, FLASH_CR_PER);
+#endif
+#ifdef STM32F4
+  __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_EOP | FLASH_FLAG_OPERR | FLASH_FLAG_WRPERR | FLASH_FLAG_PGAERR | FLASH_FLAG_PGPERR | FLASH_FLAG_PGSERR);
+  FLASH_Erase_Sector(EEPROM_START_SECTOR, VOLTAGE_RANGE_3);
+  FLASH_WaitForLastOperation((uint32_t)FLASH_TIMEOUT_VALUE);
+  CLEAR_BIT(FLASH->CR, (FLASH_CR_SER | FLASH_CR_SNB));
+#endif
+
+  while (nSize > 0)
+  {
+    if (*pBuffer != 0xffff)
+    {
+    	HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, nAddress, *pBuffer++);
+    }
+    else
+    {
+      pBuffer++;
+    }
+    if (*pBuffer != 0xffff)
+    {
+    	HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, nAddress+2, *pBuffer++);
+    }
+    else
+    {
+      pBuffer++;
+    }
+    nSize -= 4;
+    nAddress += 4;
+  }
+
+  HAL_FLASH_Lock();
+
+}
+
+void eeprom_init()
+{
+  uint16_t VarIdx = 0;
+  uint8_t *pTmp = EE_Buffer;
+
+  for (VarIdx = 0; VarIdx < PAGE_SIZE; VarIdx++)
+  {
+    *pTmp++ = (*(__IO uint8_t*)(EEPROM_START_ADDRESS + VarIdx));
+  }
+
+  if (EE_Buffer[0] != SETTINGS_VERSION)
+  {
+    pTmp = EE_Buffer;
+
+    for (VarIdx = 0; VarIdx < PAGE_SIZE; VarIdx++)
+    {
+      *pTmp++ = 0xFF;
+    }
+  }
+}
+#endif
 
 /*! \brief  Read byte from EEPROM.
  *
@@ -48,10 +138,14 @@
  */
 unsigned char eeprom_get_char( unsigned int addr )
 {
+#ifdef STM32
+  return EE_Buffer[addr];
+#elif ATMEGA328P
 	do {} while( EECR & (1<<EEPE) ); // Wait for completion of previous write.
 	EEAR = addr; // Set EEPROM address register.
 	EECR = (1<<EERE); // Start EEPROM read operation.
 	return EEDR; // Return the byte read from EEPROM.
+#endif
 }
 
 /*! \brief  Write byte to EEPROM.
@@ -73,6 +167,10 @@ unsigned char eeprom_get_char( unsigned int addr )
  */
 void eeprom_put_char( unsigned int addr, unsigned char new_value )
 {
+#ifdef STM32
+  EE_Buffer[addr] = new_value;
+#elif ATMEGA328P
+
 	char old_value; // Old EEPROM value.
 	char diff_mask; // Difference mask, i.e. old value XOR new value.
 
@@ -122,6 +220,7 @@ void eeprom_put_char( unsigned int addr, unsigned char new_value )
 	}
 	
 	sei(); // Restore interrupt flag state.
+#endif
 }
 
 // Extensions added as part of Grbl 
@@ -135,6 +234,11 @@ void memcpy_to_eeprom_with_checksum(unsigned int destination, char *source, unsi
     eeprom_put_char(destination++, *(source++)); 
   }
   eeprom_put_char(destination, checksum);
+
+#ifdef STM32
+  eeprom_flush();
+#endif
+
 }
 
 int memcpy_from_eeprom_with_checksum(char *destination, unsigned int source, unsigned int size) {
