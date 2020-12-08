@@ -101,7 +101,8 @@ void protocol_main_loop()
           report_status_message(STATUS_SYSTEM_GC_LOCK);
         } else {
           // Parse and execute g-code block.
-          report_status_message(gc_execute_line(line));
+
+        	report_status_message(gc_execute_line(line));
         }
 
         // Reset tracking data for next line.
@@ -205,6 +206,8 @@ void protocol_auto_cycle_start()
 void protocol_execute_realtime()
 {
   protocol_exec_rt_system();
+  //检查加速度,侦测移动
+  accel_detection_limit();
   if (sys.suspend) { protocol_exec_rt_suspend(); }
 }
 
