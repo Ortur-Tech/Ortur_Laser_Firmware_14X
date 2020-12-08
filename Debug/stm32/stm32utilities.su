@@ -1,0 +1,16 @@
+stm32f1xx_ll_tim.h:2814:22:LL_TIM_EnableAllOutputs	16	static
+stm32f1xx_ll_tim.h:2829:22:LL_TIM_DisableAllOutputs	16	static
+stm32f1xx_ll_usart.h:1861:26:LL_USART_IsActiveFlag_TXE	16	static
+stm32f1xx_ll_usart.h:2082:22:LL_USART_EnableIT_RXNE	16	static
+stm32f1xx_ll_usart.h:2473:22:LL_USART_TransmitData8	16	static
+stm32utilities.c:106:6:timing_init	8	static
+stm32utilities.c:113:7:ByteToBin	24	static
+stm32utilities.c:125:7:Int16ToBin	24	static
+stm32utilities.c:139:6:uart_init	8	static
+stm32utilities.c:153:6:uart_sendstr	16	static
+stm32utilities.c:159:6:uart_sendch	16	static
+stm32utilities.c:171:6:Spindle_Disable	8	static
+stm32utilities.c:183:6:Spindle_Enable	8	static
+stm32utilities.c:199:6:GPIO_ResetBits	16	static
+stm32utilities.c:203:6:GPIO_SetBits	16	static
+stm32utilities.c:468:6:spi_limits_init	4	static

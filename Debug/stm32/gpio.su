@@ -1,0 +1,13 @@
+core_cm3.h:1762:34:__NVIC_SystemReset	4	static,ignoring_inline_asm
+gpio.c:46:6:MX_GPIO_Init	40	static
+gpio.c:113:6:Leds_Power	32	static
+gpio.c:157:6:PowerLed_Blink	8	static
+gpio.c:161:6:PowerLed_On	8	static
+gpio.c:165:6:PowerLed_Off	8	static
+gpio.c:171:6:StatusLed_On	8	static
+gpio.c:175:6:StatusLed_Off	8	static
+gpio.c:179:6:StatusLed_Blink	8	static
+gpio.c:183:9:Key_Scan	8	static
+gpio.c:199:6:PowerOpen_Loop	32	static
+gpio.c:241:6:PowerLed_Blink_Limit	24	static
+gpio.c:250:6:PowerClose_Check	8	static,ignoring_inline_asm

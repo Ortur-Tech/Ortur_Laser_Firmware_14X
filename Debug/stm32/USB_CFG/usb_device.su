@@ -1,0 +1,2 @@
+usb_device.c:58:6:Reset_Usb	32	static
+usb_device.c:80:6:MX_USB_DEVICE_Init	8	static

@@ -1,0 +1,14 @@
+stm32f1xx_ll_gpio.h:746:26:LL_GPIO_ReadOutputPort	16	static
+inoutputs.c:58:6:inoutputs_init	8	static
+inoutputs.c:69:6:outputs_digital_reset	16	static
+inoutputs.c:76:6:outputs_digital_set	16	static
+inoutputs.c:84:9:outputs_get_digital_state	16	static
+inoutputs.c:98:6:outputs_set_digital	16	static
+inoutputs.c:109:6:outputs_digital_action	16	static
+inoutputs.c:130:6:outputs_analog_init	4	static
+inoutputs.c:132:6:outputs_analog_set	16	static
+inoutputs.c:134:6:outputs_set_analog	16	static
+inoutputs.c:136:10:outputs_compute_pwm_value	16	static
+inoutputs.c:138:6:outputs_analog_action	16	static
+inoutputs.c:140:6:inputs_digital_init	4	static
+inoutputs.c:142:6:wait_on_input_action	16	static

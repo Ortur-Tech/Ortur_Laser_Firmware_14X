@@ -1,0 +1,9 @@
+serial.c:51:9:serial_get_rx_buffer_available	16	static
+serial.c:61:9:serial_get_rx_buffer_count	16	static
+serial.c:71:9:serial_get_tx_buffer_count	16	static
+serial.c:78:6:serial_init	4	static
+serial.c:101:6:serial_write	16	static,ignoring_inline_asm
+serial.c:165:9:serial_read	16	static
+serial.c:182:6:HandleUartIT	24	static
+serial.c:243:6:OnUsbDataRx	24	static
+serial.c:316:6:serial_reset_read_buffer	4	static

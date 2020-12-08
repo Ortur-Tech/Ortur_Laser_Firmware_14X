@@ -1,0 +1,5 @@
+sc7a20.c:13:6:Write_One_Byte_iicaddr	24	static
+sc7a20.c:28:6:Read_One_Byte	24	static
+sc7a20.c:49:6:Sc7a20_Init	8	static
+sc7a20.c:63:9:Get_GsensorType	8	static
+sc7a20.c:77:9:Read_Sc7a20_data	16	static

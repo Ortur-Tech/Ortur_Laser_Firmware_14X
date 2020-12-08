@@ -1,0 +1,10 @@
+bma2x2_support.c:183:5:bma2x2_initialization	32	static
+bma2x2_support.c:318:5:bma2x2_1de_initialization	16	static
+bma2x2_support.c:341:5:bma2x2_data_readout	32	static
+bma2x2_support.c:401:4:I2C_routine	8	static
+bma2x2_support.c:424:4:SPI_routine	4	static
+bma2x2_support.c:486:4:BMA2x2_I2C_bus_write	32	static
+bma2x2_support.c:536:4:BMA2x2_I2C_bus_read	40	static
+bma2x2_support.c:588:4:BMA2x2_SPI_bus_read	32	static
+bma2x2_support.c:630:4:BMA2x2_SPI_bus_write	40	static
+bma2x2_support.c:661:6:BMA2x2_delay_msek	16	static

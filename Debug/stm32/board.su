@@ -1,0 +1,11 @@
+stm32f1xx_ll_rcc.h:1968:26:LL_RCC_IsActiveFlag_IWDGRST	4	static
+stm32f1xx_ll_rcc.h:1978:26:LL_RCC_IsActiveFlag_LPWRRST	4	static
+stm32f1xx_ll_rcc.h:1988:26:LL_RCC_IsActiveFlag_PINRST	4	static
+stm32f1xx_ll_rcc.h:1998:26:LL_RCC_IsActiveFlag_PORRST	4	static
+stm32f1xx_ll_rcc.h:2008:26:LL_RCC_IsActiveFlag_SFTRST	4	static
+stm32f1xx_ll_rcc.h:2018:26:LL_RCC_IsActiveFlag_WWDGRST	4	static
+stm32f1xx_ll_rcc.h:2028:22:LL_RCC_ClearResetFlags	4	static
+board.c:17:1:__io_putchar	16	static
+board.c:27:6:soft_delay_us	24	static,ignoring_inline_asm
+board.c:37:6:soft_delay_ms	16	static
+board.c:46:6:Check_Rst_Source	8	static
