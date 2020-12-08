@@ -45,6 +45,8 @@
 #define MODAL_GROUP_M7 12 // [M3,M4,M5] Spindle turning
 #define MODAL_GROUP_M8 13 // [M7,M8,M9] Coolant control
 #define MODAL_GROUP_M9 14 // [M56] Override control
+#define MODAL_GROUP_MO 15 // [M62,M63] Digital Outputs, [M66] Wait for digital inputs, [M67] Analog Outputs
+
 
 // Define command actions for within execution-type modal groups (motion, stopping, non-modal). Used
 // internally by the parser to know which command to execute.
@@ -132,6 +134,21 @@
   #define OVERRIDE_DISABLED  1 // Parking disabled.
 #endif
 
+//-- for M62/M63
+#define DIGITAL_CONTROL_RESET		0
+#define DIGITAL_CONTROL_ON 			1
+#define DIGITAL_CONTROL_OFF   	2
+//-- for M66
+#define WAITONINPUT_CONTROL_RESET	0
+#define WAITONINPUT_CONTROL			1
+//-- for M67
+#define ANALOG_CONTROL_RESET		0
+#define ANALOG_CONTROL 					1
+//-- for M100
+#define ACCEL_SCALING_RESET		0
+#define ACCEL_SCALING 				1
+
+
 // Modal Group G12: Active work coordinate system
 // N/A: Stores coordinate system value (54-59) to change to.
 
@@ -149,6 +166,11 @@
 #define WORD_X  10
 #define WORD_Y  11
 #define WORD_Z  12
+#define WORD_A  13
+#define WORD_B  14
+#define WORD_C  15
+#define WORD_E	16
+#define WORD_Q	17
 
 // Define g-code parser position updating flags
 #define GC_UPDATE_POS_TARGET   0 // Must be zero
@@ -194,19 +216,25 @@ typedef struct {
   uint8_t coolant;         // {M7,M8,M9}
   uint8_t spindle;         // {M3,M4,M5}
   uint8_t override;        // {M56}
+  uint8_t digital;					// {M62,M63}
+  uint8_t waitoninput;			// {M66}
+  uint8_t analog;						// {M67}
+  uint8_t accel_scaling;		// {M100}
 } gc_modal_t;
 
 typedef struct {
   float f;         // Feed
-  float ijk[3];    // I,J,K Axis arc offsets
+  float ijk[N_AXIS];    // I,J,K Axis arc offsets
   uint8_t l;       // G10 or canned cycles parameters
   int32_t n;       // Line number
-  float p;         // G10 or dwell parameters
+  float p;         // G10 or dwell parameters; also for M62,M63 digital controls if enabled
   // float q;      // G82 peck drilling
   float r;         // Arc radius
   float s;         // Spindle speed
   uint8_t t;       // Tool selection
-  float xyz[3];    // X,Y,Z Translational axes
+  float xyz[N_AXIS];    // X,Y,Z Translational axes
+  uint8_t e;			//-- for M67 analog output, similar to LinuxCNC
+  float q;				//-- for M67 analog output, similar to LinuxCNC
 } gc_values_t;
 
 
