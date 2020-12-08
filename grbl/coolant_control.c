@@ -23,10 +23,12 @@
 
 void coolant_init()
 {
+#ifdef ATMEGA328P
   COOLANT_FLOOD_DDR |= (1 << COOLANT_FLOOD_BIT); // Configure as output pin
   #ifdef ENABLE_M7
     COOLANT_MIST_DDR |= (1 << COOLANT_MIST_BIT);
   #endif
+#endif
   coolant_stop();
 }
 
@@ -35,6 +37,21 @@ void coolant_init()
 uint8_t coolant_get_state()
 {
   uint8_t cl_state = COOLANT_STATE_DISABLE;
+
+#ifdef STM32
+  if (bit_istrue(GPIO_ReadOutputData(COOL_FLOOD_GPIO_Port),COOL_FLOOD_Pin))
+  {
+    cl_state |= COOLANT_STATE_FLOOD;
+  }
+  #ifdef ENABLE_M7
+  if (bit_istrue(GPIO_ReadOutputData(COOL_MIST_GPIO_Port),COOL_MIST_Pin))
+  {
+    cl_state |= COOLANT_STATE_MIST;
+  }
+  #endif
+
+
+#elif ATMEGA328P
   #ifdef INVERT_COOLANT_FLOOD_PIN
     if (bit_isfalse(COOLANT_FLOOD_PORT,(1 << COOLANT_FLOOD_BIT))) {
   #else
@@ -51,6 +68,8 @@ uint8_t coolant_get_state()
       cl_state |= COOLANT_STATE_MIST;
     }
   #endif
+#endif
+
   return(cl_state);
 }
 
@@ -59,6 +78,22 @@ uint8_t coolant_get_state()
 // an interrupt-level. No report flag set, but only called by routines that don't need it.
 void coolant_stop()
 {
+#ifdef STM32
+	#ifdef INVERT_COOLANT_FLOOD_PIN
+		GPIO_SetBits(COOL_FLOOD_GPIO_Port,COOL_FLOOD_Pin);
+	#else
+		GPIO_ResetBits(COOL_FLOOD_GPIO_Port,COOL_FLOOD_Pin);
+#endif
+#ifdef ENABLE_M7
+  #ifdef INVERT_COOLANT_MIST_PIN
+    GPIO_SetBits(COOL_MIST_GPIO_Port, COOL_MIST_Pin);
+  #else
+    GPIO_ResetBits(COOL_MIST_GPIO_Port, COOL_MIST_Pin);
+  #endif
+#endif //-- ENABLE_M7
+
+
+#elif ATMEGA328P
   #ifdef INVERT_COOLANT_FLOOD_PIN
     COOLANT_FLOOD_PORT |= (1 << COOLANT_FLOOD_BIT);
   #else
@@ -71,6 +106,7 @@ void coolant_stop()
       COOLANT_MIST_PORT &= ~(1 << COOLANT_MIST_BIT);
     #endif
   #endif
+#endif
 }
 
 
@@ -80,8 +116,40 @@ void coolant_stop()
 // parser program end, and g-code parser coolant_sync().
 void coolant_set_state(uint8_t mode)
 {
-  if (sys.abort) { return; } // Block during abort.  
+  if (sys.abort) { return; } // Block during abort.
   
+
+#ifdef STM32
+	if (mode & COOLANT_FLOOD_ENABLE) {
+		#ifdef INVERT_COOLANT_FLOOD_PIN
+			GPIO_ResetBits(COOL_FLOOD_GPIO_Port,COOL_FLOOD_Pin);
+		#else
+			GPIO_SetBits(COOL_FLOOD_GPIO_Port,COOL_FLOOD_Pin);
+		#endif
+	} else {
+	  #ifdef INVERT_COOLANT_FLOOD_PIN
+			GPIO_SetBits(COOL_FLOOD_GPIO_Port,COOL_FLOOD_Pin);
+		#else
+			GPIO_ResetBits(COOL_FLOOD_GPIO_Port,COOL_FLOOD_Pin);
+		#endif
+	}
+  
+	#ifdef ENABLE_M7
+		if (mode & COOLANT_MIST_ENABLE) {
+			#ifdef INVERT_COOLANT_MIST_PIN
+				GPIO_ResetBits(COOL_MIST_GPIO_Port, COOL_MIST_Pin);
+			#else
+				GPIO_SetBits(COOL_FLOOD_GPIO_Port,COOL_FLOOD_Pin);
+			#endif
+		} else {
+			#ifdef INVERT_COOLANT_MIST_PIN
+				GPIO_SetBits(COOL_FLOOD_GPIO_Port,COOL_FLOOD_Pin);
+			#else
+				GPIO_ResetBits(COOL_MIST_GPIO_Port, COOL_MIST_Pin);
+			#endif
+		}
+	#endif
+#elif ATMEGA328P
 	if (mode & COOLANT_FLOOD_ENABLE) {
 		#ifdef INVERT_COOLANT_FLOOD_PIN
 			COOLANT_FLOOD_PORT &= ~(1 << COOLANT_FLOOD_BIT);
@@ -111,7 +179,7 @@ void coolant_set_state(uint8_t mode)
 			#endif
 		}
 	#endif
-	
+#endif
   sys.report_ovr_counter = 0; // Set to report change immediately
 }
 
