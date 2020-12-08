@@ -4,6 +4,7 @@
 
   Copyright (c) 2011-2016 Sungeun K. Jeon for Gnea Research LLC
   Copyright (c) 2009-2011 Simen Svale Skogsrud
+  Copyright (c) 2018-2019 Thomas Truong
 
   Grbl is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -23,15 +24,23 @@
 #define serial_h
 
 
-#ifndef RX_BUFFER_SIZE
-  #define RX_BUFFER_SIZE 128
-#endif
-#ifndef TX_BUFFER_SIZE
-  #ifdef USE_LINE_NUMBERS
-    #define TX_BUFFER_SIZE 112
-  #else
-    #define TX_BUFFER_SIZE 104
-  #endif
+#ifdef STM32
+	#define RX_BUFFER_SIZE 254
+	#define TX_BUFFER_SIZE 128
+
+	void process_it_char(uint8_t data);
+
+#elif ATMEGA328P
+	#ifndef RX_BUFFER_SIZE
+		#define RX_BUFFER_SIZE 128
+	#endif
+	#ifndef TX_BUFFER_SIZE
+		#ifdef USE_LINE_NUMBERS
+			#define TX_BUFFER_SIZE 112
+		#else
+			#define TX_BUFFER_SIZE 104
+		#endif
+	#endif
 #endif
 
 #define SERIAL_NO_DATA 0xff
@@ -58,5 +67,10 @@ uint8_t serial_get_rx_buffer_count();
 // Returns the number of bytes used in the TX serial buffer.
 // NOTE: Not used except for debugging and ensuring no TX bottlenecks.
 uint8_t serial_get_tx_buffer_count();
+
+void OnUsbDataRx(uint8_t* dataIn, uint8_t length);
+#ifdef STM32
+void HandleUartIT(uint8_t data);
+#endif
 
 #endif
