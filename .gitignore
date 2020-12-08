@@ -1,3 +1,16 @@
+*.prefs
+*.bin
+*.list
+*.mk
+*.launch
+
+/Atollic/
+/cubeide/F13/Debug/
+/cubeide/F16/
+/cubeide/F46/
+/cubeide/F13/Release/
+
+
 *.hex
 *.o
 *.elf
