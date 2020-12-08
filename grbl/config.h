@@ -34,12 +34,14 @@
 // NOTE: OEMs can avoid the need to maintain/update the defaults.h and cpu_map.h files and use only
 // one configuration file by placing their specific defaults and pin map at the bottom of this file.
 // If doing so, simply comment out these two defines and see instructions below.
-#define DEFAULTS_GENERIC
-#define CPU_MAP_ATMEGA328P // Arduino Uno CPU
+//#define DEFAULTS_GENERIC
+//#define CPU_MAP_ATMEGA328P // Arduino Uno CPU
+#define DEFAULTS_GRBL32      // Defaults for GRBL32
 
 // Serial baud rate
 // #define BAUD_RATE 230400
 #define BAUD_RATE 115200
+// #define BAUD_RATE 1000000
 
 // Define realtime command special characters. These characters are 'picked-off' directly from the
 // serial read data stream and are not passed to the grbl line execution parser. Select characters
@@ -121,18 +123,18 @@
 // cycle is still invoked by the $H command. This is disabled by default. It's here only to address
 // users that need to switch between a two-axis and three-axis machine. This is actually very rare.
 // If you have a two-axis machine, DON'T USE THIS. Instead, just alter the homing cycle for two-axes.
-// #define HOMING_SINGLE_AXIS_COMMANDS // Default disabled. Uncomment to enable.
+#define HOMING_SINGLE_AXIS_COMMANDS // Default disabled. Uncomment to enable.
 
 // After homing, Grbl will set by default the entire machine space into negative space, as is typical
 // for professional CNC machines, regardless of where the limit switches are located. Uncomment this
 // define to force Grbl to always set the machine origin at the homed location despite switch orientation.
-// #define HOMING_FORCE_SET_ORIGIN // Uncomment to enable.
+#define HOMING_FORCE_SET_ORIGIN // Uncomment to enable.
 
 // Number of blocks Grbl executes upon startup. These blocks are stored in EEPROM, where the size
 // and addresses are defined in settings.h. With the current settings, up to 2 startup blocks may
 // be stored and executed in order. These startup blocks would typically be used to set the g-code
 // parser state depending on user preferences.
-#define N_STARTUP_LINE 2 // Integer (1-2)
+#define N_STARTUP_LINE 0 // Integer (1-2)
 
 // Number of floating decimal points printed by Grbl for certain value types. These settings are
 // determined by realistic and commonly observed values in CNC machines. For example, position
@@ -156,7 +158,7 @@
 
 // Allows GRBL to track and report gcode line numbers.  Enabling this means that the planning buffer
 // goes from 16 to 15 to make room for the additional line number data in the plan_block_t struct
-// #define USE_LINE_NUMBERS // Disabled by default. Uncomment to enable.
+ #define USE_LINE_NUMBERS // Disabled by default. Uncomment to enable.
 
 // Upon a successful probe cycle, this option provides immediately feedback of the probe coordinates
 // through an automatically generated message. If disabled, users can still access the last probe
@@ -166,13 +168,13 @@
 // Enables a second coolant control pin via the mist coolant g-code command M7 on the Arduino Uno
 // analog pin 4. Only use this option if you require a second coolant control pin.
 // NOTE: The M8 flood coolant control pin on analog pin 3 will still be functional regardless.
-// #define ENABLE_M7 // Disabled by default. Uncomment to enable.
+#define ENABLE_M7 // Disabled by default. Uncomment to enable.
 
 // This option causes the feed hold input to act as a safety door switch. A safety door, when triggered,
 // immediately forces a feed hold and then safely de-energizes the machine. Resuming is blocked until
 // the safety door is re-engaged. When it is, Grbl will re-energize the machine and then resume on the
 // previous tool path, as if nothing happened.
-// #define ENABLE_SAFETY_DOOR_INPUT_PIN // Default disabled. Uncomment to enable.
+#define ENABLE_SAFETY_DOOR_INPUT_PIN // Default disabled. Uncomment to enable.
 
 // After the safety door switch has been toggled and restored, this setting sets the power-up delay
 // between restoring the spindle and coolant and resuming the cycle.
@@ -193,7 +195,7 @@
 // NOTE: The top option will mask and invert all control pins. The bottom option is an example of
 // inverting only two control pins, the safety door and reset. See cpu_map.h for other bit definitions.
 // #define INVERT_CONTROL_PIN_MASK CONTROL_MASK // Default disabled. Uncomment to disable.
-// #define INVERT_CONTROL_PIN_MASK ((1<<CONTROL_SAFETY_DOOR_BIT)|(1<<CONTROL_RESET_BIT)) // Default disabled.
+// #define INVERT_CONTROL_PIN_MASK ((1<<CONTROL_SAFETY_DOOR_BIT)|(CONTROL_RESET_BIT)) // Default disabled.
 
 // Inverts select limit pin states based on the following mask. This effects all limit pin functions,
 // such as hard limits and homing. However, this is different from overall invert limits setting.
@@ -201,7 +203,7 @@
 // will be applied to all of them. This is useful when a user has a mixed set of limit pins with both
 // normally-open(NO) and normally-closed(NC) switches installed on their machine.
 // NOTE: PLEASE DO NOT USE THIS, unless you have a situation that needs it.
-// #define INVERT_LIMIT_PIN_MASK ((1<<X_LIMIT_BIT)|(1<<Y_LIMIT_BIT)) // Default disabled. Uncomment to enable.
+//#define INVERT_LIMIT_PIN_MASK ((1<<X_LIMIT_BIT)|(1<<Y_LIMIT_BIT)) // Default disabled. Uncomment to enable.
 
 // Inverts the spindle enable pin from low-disabled/high-enabled to low-enabled/high-disabled. Useful
 // for some pre-built electronic boards.
@@ -294,7 +296,18 @@
 // NOTE: Changing this value also changes the execution time of a segment in the step segment buffer.
 // When increasing this value, this stores less overall time in the segment buffer and vice versa. Make
 // certain the step segment buffer is increased/decreased to account for these changes.
+#ifdef ATMEGA328P
 #define ACCELERATION_TICKS_PER_SECOND 100
+#endif
+
+#ifdef STM32F1
+#define ACCELERATION_TICKS_PER_SECOND 5000
+#endif
+#ifdef STM32F4
+#define ACCELERATION_TICKS_PER_SECOND 5000
+#endif
+
+
 
 // Adaptive Multi-Axis Step Smoothing (AMASS) is an advanced feature that does what its name implies,
 // smoothing the stepping of multi-axis motions. This feature smooths motion particularly at low step
@@ -483,7 +496,7 @@
 // that the switches don't bounce, we recommend enabling this option. This will help prevent
 // triggering a hard limit when the machine disengages from the switch.
 // NOTE: This option has no effect if SOFTWARE_DEBOUNCE is enabled.
-// #define HARD_LIMIT_FORCE_STATE_CHECK // Default disabled. Uncomment to enable.
+#define HARD_LIMIT_FORCE_STATE_CHECK // Default disabled. Uncomment to enable.
 
 // Adjusts homing cycle search and locate scalars. These are the multipliers used by Grbl's
 // homing cycle to ensure the limit switches are engaged and cleared through each phase of
@@ -586,11 +599,9 @@
 // to ensure the laser doesn't inadvertently remain powered while at a stop and cause a fire.
 #define DISABLE_LASER_DURING_HOLD // Default enabled. Comment to disable.
 
-// This feature alters the spindle PWM/speed to a nonlinear output with a simple piecewise linear
-// curve. Useful for spindles that don't produce the right RPM from Grbl's standard spindle PWM 
-// linear model. Requires a solution by the 'fit_nonlinear_spindle.py' script in the /doc/script
-// folder of the repo. See file comments on how to gather spindle data and run the script to
-// generate a solution.
+// Enables a piecewise linear model of the spindle PWM/speed output. Requires a solution by the
+// 'fit_nonlinear_spindle.py' script in the /doc/script folder of the repo. See file comments 
+// on how to gather spindle data and run the script to generate a solution.
 // #define ENABLE_PIECEWISE_LINEAR_SPINDLE  // Default disabled. Uncomment to enable.
 
 // N_PIECES, RPM_MAX, RPM_MIN, RPM_POINTxx, and RPM_LINE_XX constants are all set and given by
@@ -641,7 +652,7 @@
 // #define ENABLE_DUAL_AXIS	// Default disabled. Uncomment to enable.
 
 // Select the one axis to mirror another motor. Only X and Y axis is supported at this time.
-#define DUAL_AXIS_SELECT  X_AXIS  // Must be either X_AXIS or Y_AXIS
+//#define DUAL_AXIS_SELECT  X_AXIS  // Must be either X_AXIS or Y_AXIS
 
 // To prevent the homing cycle from racking the dual axis, when one limit triggers before the
 // other due to switch failure or noise, the homing cycle will automatically abort if the second 
@@ -650,16 +661,16 @@
 // travel of the other non-dual axis, i.e. if dual axis select is X_AXIS at 5.0%, then the fail 
 // distance will be computed as 5.0% of y-axis max travel. Fail distance max and min are the 
 // limits of how far or little a valid fail distance is.
-#define DUAL_AXIS_HOMING_FAIL_AXIS_LENGTH_PERCENT  5.0  // Float (percent)
-#define DUAL_AXIS_HOMING_FAIL_DISTANCE_MAX  25.0  // Float (mm)
-#define DUAL_AXIS_HOMING_FAIL_DISTANCE_MIN  2.5  // Float (mm)
+//#define DUAL_AXIS_HOMING_FAIL_AXIS_LENGTH_PERCENT  5.0  // Float (percent)
+//#define DUAL_AXIS_HOMING_FAIL_DISTANCE_MAX  25.0  // Float (mm)
+//#define DUAL_AXIS_HOMING_FAIL_DISTANCE_MIN  2.5  // Float (mm)
 
 // Dual axis pin configuration currently supports two shields. Uncomment the shield you want,
 // and comment out the other one(s).
 // NOTE: Protoneer CNC Shield v3.51 has A.STP and A.DIR wired to pins A4 and A3 respectively.
 // The variable spindle (i.e. laser mode) build option works and may be enabled or disabled.
 // Coolant pin A3 is moved to D13, replacing spindle direction.
-#define DUAL_AXIS_CONFIG_PROTONEER_V3_51    // Uncomment to select. Comment other configs.
+//#define DUAL_AXIS_CONFIG_PROTONEER_V3_51    // Uncomment to select. Comment other configs.
 
 // NOTE: Arduino CNC Shield Clone (Originally Protoneer v3.0) has A.STP and A.DIR wired to 
 // D12 and D13, respectively. With the limit pins and stepper enable pin on this same port,
@@ -688,5 +699,97 @@
 
 // Paste default settings definitions here.
 
+#define ENABLE_DIGITAL_OUTPUT
+/* ---------------------------------------------------------------------------------------
+ * Enable M62 (turn ON/HIGH) and M63 (turn OFF/LOW) with P-word digital controls,
+ * 																Pvalue is the pin index ranging from 0 to 254, 255 will be ALL pins
+ * 																	actual implementation will be less, as little as 1 pin
+ * 																	set the number of pins N_OUTPUTS_DIG in nuts_bolts.h for err checking
+ * example: M62 P0
+ * 						to turn ON bit 0
+ * 					M63 P255
+ * 						to turn OFF ALL bits
+ *
+ * This is similar to linuxcnc implementation of M62 and M63, with the additional feature of P255 to set all pins
+ */
 
-#endif
+
+#define ENABLE_WAIT_ON_INPUT
+/* ---------------------------------------------------------------------------------------
+ * Enable M66 wait on input mode
+ * 																 Pvalue is the pin index ranging from 0 to 254
+ * 																   actual implementation will be less
+ * 																 Lvalue is the wait mode type (integer)
+ * 																   3 : wait for input to go HIGH
+ * 																   4 : wait for input to go LOW
+ * 																 Qvalue is the timeout in seconds for wating (float)
+ *
+ * 	example: M66 P0 L3 Q5.6
+ * 						wait up to 5.6 seconds for digital input 0 to turn ON (HIGH)
+ *
+ * This is a subset of the linuxcnc implementation of M66, with the implementation of digital input only
+ *    and only with the wait mode of HIGH and LOW.
+ */
+
+
+#define ENABLE_ANALOG_OUTPUT
+/* ---------------------------------------------------------------------------------------
+ * Enable M67 Analog output using PWM with E-word and Q-wor for anlog controls
+ * 																Evalue is an int representing the index for the analog pin, value=255 will be all pins
+ * 																		set the number of pins N_OUTPUTS_ANA in nuts_bolts.h for err checking
+ * 																Qvalue is a float used similar to setting spindle speed
+ * example: M67 E0 Q20.1
+ * 					 to set the analog pin0 with the analog data of 20.1
+ * 					M67 E1 Q0
+ * 					 to set the analog pin1 with the analog data of 0.0 (turn off)
+ * 					M67 E255 Q100
+ * 					 to set ALL available analog pins with the analog data of 100.0
+ * 					M67 E255 Q0
+ * 					 to turn off ALL analog pins
+ *
+ * This is slightly different from linuxcnc implementation of M67 with the use of E255 to set all analog pins
+ */
+
+
+#define ENABLE_ACCEL_SCALING
+/* ---------------------------------------------------------------------------------------
+ * Enable M100 custom Acceleration with P-word for axis, and Q-word for acceleration fraction
+ *   temporarily change the acceleration set in $120,$121,etc... the change is NOT written to the EEPROM
+ *
+ * 																Pvalue is the pin index ranging from 0 to 254, 255 will be ALL pins
+ * 																Qvalue is a float > 0.0 and <= 1.0, representing the percentage of the acceleration
+ * 																values set in $120, $121, etc...
+ *
+ * example: M100 P0 Q0.95
+ * 					 change acceleration of X axis to 95% of $120
+ * 					M100 P4 Q0.5
+ * 					 change acceleration of B axis to 50% of $124
+ * 					M100 P255 Q0.1
+ * 					 change acceleration of ALL axis to 10%
+ * 					M100 P255 Q1
+ * 					 change acceleration of ALL axis to back to 100%
+ *
+ */
+
+
+#define VARIABLE_SPINDLE_ENABLE_PIN
+/*
+ * Simple mode to enable usage of spindle enable pin while running  VARIABLE_SPINDLE
+ * the paramter is settings_t.spindle_enable_pin_mode in settings.h;
+ *
+ * this will allow usage of the spindle enable pin as a runtime parameter instead of
+ * the more complicated conditionals : USE_SPINDLE_DIR_AS_ENABLE_PIN  and INVERT_SPINDLE_ENABLE_PIN
+ *
+ * Typical usage for driving a Laser PSU enable pin in Laser Mode.
+ *
+ * saved as
+ * //-- $50     0: default behavior, nothing.
+ *              1: call set enable pin normal.
+ *              2: call set enable pin inverted
+ */
+
+
+
+
+
+#endif //-- inclusion
