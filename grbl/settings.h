@@ -29,7 +29,7 @@
 // Version of the EEPROM data. Will be used to migrate existing data from older versions of Grbl
 // when firmware is upgraded. Always stored in byte 0 of eeprom
 #if ( defined(STM32F1_3) || defined(STM32F4_3) )
-	#define SETTINGS_VERSION 13  // NOTE: Check settings_reset() when moving to next version.
+	#define SETTINGS_VERSION ORTUR_VER_NUM //13  // NOTE: Check settings_reset() when moving to next version.
 #endif
 #if ( defined(STM32F1_4) || defined(STM32F4_4) )
 	#define SETTINGS_VERSION 12
