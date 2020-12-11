@@ -110,6 +110,7 @@ void IIC_Stop(void)
 	IIC_SDA=0;  //STOP:when CLK is high DATA change form low to high
  	soft_delay_us(4);
 	IIC_SCL=1;
+	soft_delay_us(4);
 	IIC_SDA=1;  //发送I2C总线结束信号
 	soft_delay_us(4);
 }
