@@ -95,10 +95,10 @@ void IWDG_Feed(void)
 
 			if(HAL_GetTick() - last_check_timestamp >= allow_laser_time)
 			{
-				printString("Exceeding the maximum exposure time of the laser!\r\n");
-				printString("In weak laser mode, the maximum time allowed is 100 second.\r\n");
-				printString("None weak laser mode , the maximum time allowed is in the range from 10 to 60 second , according to the power .\r\n");
-				printString("Reset Grbl.\r\n");
+				//printString("Exceeding the maximum exposure time of the laser!\r\n");
+				//printString("In weak laser mode, the maximum time allowed is 100 second.\r\n");
+				//printString("None weak laser mode , the maximum time allowed is in the range from 10 to 60 second , according to the power .\r\n");
+				//printString("Reset Grbl.\r\n");
 
 				sys.state = STATE_ALARM;
 				sys.abort = 1;
@@ -110,7 +110,9 @@ void IWDG_Feed(void)
 		last_check_timestamp = HAL_GetTick();
 	}
 #endif
+#ifndef DEBUG
 	HAL_IWDG_Refresh(&hiwdg);
+#endif
 }
 /* USER CODE END 1 */
 
