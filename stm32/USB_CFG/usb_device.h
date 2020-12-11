@@ -83,6 +83,7 @@ void MX_USB_DEVICE_Init(void);
  */
 /* USER CODE BEGIN FD */
 void Reset_Usb();
+uint8_t isUSBConnect(void);
 /* USER CODE END FD */
 /**
   * @}
