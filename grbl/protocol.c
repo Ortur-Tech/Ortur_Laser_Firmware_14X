@@ -20,6 +20,9 @@
 */
 
 #include "grbl.h"
+#include "iwdg.h"
+#include "usb_device.h"
+#include "gpio.h"
 
 // Define line flags. Includes comment type tracking and line overflow detection.
 #define LINE_FLAG_OVERFLOW bit(0)
@@ -158,6 +161,20 @@ void protocol_main_loop()
     protocol_auto_cycle_start();
 
     protocol_execute_realtime();  // Runtime command check point.
+
+#ifdef USEUSB
+    //指示USB连接状态
+    if(isUSBConnect())
+    	StatusLed_On();
+    else
+    	StatusLed_Off();
+#endif
+
+#ifndef ORTUR_CNC_MODE
+    //检查关机操作
+    PowerClose_Check();
+#endif
+
     if (sys.abort) { return; } // Bail to main() program loop to reset system.
   }
 
@@ -219,6 +236,7 @@ void protocol_exec_rt_system()
 {
   uint8_t rt_exec; // Temp variable to avoid calling volatile multiple times.
   rt_exec = sys_rt_exec_alarm; // Copy volatile sys_rt_exec_alarm.
+  IWDG_Feed();
   if (rt_exec) { // Enter only if any bit flag is true
     // System alarm. Everything has shutdown by something that has gone severely wrong. Report
     // the source of the error to the user. If critical, Grbl disables by entering an infinite
@@ -235,6 +253,7 @@ void protocol_exec_rt_system()
         // the user and a GUI time to do what is needed before resetting, like killing the
         // incoming stream. The same could be said about soft limits. While the position is not
         // lost, continued streaming could cause a serious crash if by chance it gets executed.
+    	  IWDG_Feed();
       } while (bit_isfalse(sys_rt_exec_state,EXEC_RESET));
     }
     system_clear_exec_alarm(); // Clear alarm
