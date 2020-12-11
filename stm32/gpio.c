@@ -215,7 +215,7 @@ void PowerOpen_Loop()
 		if(Key_Scan() == KEY_ON)
 		{
 			++key_count;
-			if(!(key_count%10))
+			if(!(key_count%5))
 				PowerLed_Blink();
 		}
 		else
