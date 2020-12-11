@@ -145,7 +145,7 @@ void uart_init()
 	 */
 	memset(pDbgStr, 0, 80);
 	//sprintf(pDbgStr,"\r\nClk:%ld\r\nTicks_us:%ld\r\nTicks_min:%.2f",SystemCoreClock,uTICKS_PER_MICROSECOND,fTICKS_PER_MINUTE);    //-- Clock check for Overclocking case
-	sprintf(pDbgStr, "\r\nSysClk:%ld\r\n", SystemCoreClock); //-- Clock check for Overclocking case
+	//sprintf(pDbgStr, "\r\nSysClk:%ld\r\n", SystemCoreClock); //-- Clock check for Overclocking case
 	uart_sendstr(pDbgStr);
 
 }
