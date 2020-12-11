@@ -21,26 +21,43 @@ PUTCHAR_PROTOTYPE
     return ch;
 }
 
-
-//延时nus
-//nus为要延时的us数.
+/*当单片机主频为72兆赫兹时比较精准的软件延时*/
 void soft_delay_us(uint32_t nus)
 {
-	  __IO uint32_t Delay = nus * 64 / 8;//(SystemCoreClock / 8U / 1000000U)
-	  do
+	 while (nus --)
 	  {
-	    __NOP();
+	    __NOP();__NOP();__NOP();
+	    __NOP();__NOP();__NOP();
+	    __NOP();__NOP();__NOP();
+	    __NOP();__NOP();__NOP();
+	    __NOP();__NOP();__NOP();
+	    __NOP();__NOP();__NOP();
+	    __NOP();__NOP();__NOP();
+	    __NOP();__NOP();__NOP();
+	    __NOP();__NOP();__NOP();
+	    __NOP();__NOP();__NOP();
+	    __NOP();__NOP();__NOP();
+	    __NOP();__NOP();__NOP();
+	    __NOP();__NOP();__NOP();
+	    __NOP();__NOP();__NOP();
+	    __NOP();__NOP();__NOP();
+	    __NOP();__NOP();__NOP();
+	    __NOP();__NOP();__NOP();
+	    __NOP();__NOP();__NOP();
+	    __NOP();__NOP();__NOP();
+	    __NOP();__NOP();__NOP();
+	    __NOP();__NOP();__NOP();
+	    __NOP();__NOP();__NOP();
 	  }
-	  while (Delay --);
+
 }
 
 void soft_delay_ms(uint32_t nms)
 {
-	  do
-	  {
-		  soft_delay_us(1000);
-	  }
-	  while (nms --);
+	while(nms--)
+	{
+		soft_delay_us(1000);
+	}
 }
 
 void Check_Rst_Source(void)
@@ -48,28 +65,21 @@ void Check_Rst_Source(void)
 
 	  if(LL_RCC_IsActiveFlag_IWDGRST())
 	  {
-
 	  }
-
 	  if(LL_RCC_IsActiveFlag_LPWRRST())
 	  {
-
 	  }
 
 	  if(LL_RCC_IsActiveFlag_PINRST())
       {
-
 	  }
-
 
 	  if(LL_RCC_IsActiveFlag_PORRST())
       {
-
 	  }
 
 	  if(LL_RCC_IsActiveFlag_SFTRST())
       {
-
 	  }
 
 
