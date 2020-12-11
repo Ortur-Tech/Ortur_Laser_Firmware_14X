@@ -22,9 +22,78 @@
 #define grbl_h
 
 // Grbl versioning system
-#define GRBL_VERSION "1.1f:0.03"
+#define GRBL_VERSION "1.1h"
 //#define GRBL_VERSION_BUILD "20170801"
 #define GRBL_VERSION_BUILD "20190903"
+
+#define ORTUR_VER_NUM 138
+#define ORTUR_VERSION "138"
+
+//工作模式选择
+#define ORTUR_LASER_MODE //激光模式
+//#define ORTUR_PLOTTER_MODE //绘图模式
+//#define ORTUR_CNC_MODE //CNC模式
+
+//机型选择
+#define OLM            1
+#define OLM_1          2
+#define OLM_2          3
+#define C40            4
+#define OLM_MODEL_180  5
+#define OLM_MODEL_210  6
+#define OLM_MODEL_400  7
+#define OCM            8
+
+//#define ORTUR_MODEL OLM
+//#define ORTUR_MODEL_NAME "Ortur Laser Master"
+//#define DEFAULT_ORTUR_LASER_160_150
+
+//#define ORTUR_MODEL OLM_1
+//#define ORTUR_MODEL_NAME "Ortur Laser Master 1"
+//#define DEFAULT_ORTUR_LASER_210_210
+
+//#define ORTUR_MODEL OLM_2
+//#define ORTUR_MODEL_NAME "Ortur Laser Master 2"
+//#define DEFAULT_ORTUR_LASER_400_430
+//
+//#define ORTUR_MODEL C40
+//#define ORTUR_MODEL_NAME "C40"
+//#define DEFAULT_ORTUR_LASER_400_300
+//
+//#define ORTUR_MODEL OLM_MODEL_180
+//#define ORTUR_MODEL_NAME "Ortur Laser Master Model 180"
+//#define DEFAULT_ORTUR_LASER_180_180
+//
+//#define ORTUR_MODEL OLM_MODEL_210
+//#define ORTUR_MODEL_NAME "Ortur Laser Master Model 210"
+//#define DEFAULT_ORTUR_LASER_210_210
+
+#define ORTUR_MODEL OLM_MODEL_400
+#define ORTUR_MODEL_NAME "Ortur Laser Master Model 400"
+#define DEFAULT_ORTUR_LASER_400_400
+
+//#define ORTUR_MODEL OCM
+//#define ORTUR_MODEL_NAME "Ortur CNC Master"
+//#define DEFAULT_ORTUR_CNC_300_180_50
+
+//#define CONN(x,y) x##y
+////#define TOCHAR(x) #@x
+//#define TOSTRING(x) #x
+
+//#define USE_CONTROL_PANEL 1 //使用控制手柄
+
+
+
+//激光是否开启
+#define isLaserOpen() readSpindleEnable()
+//激光功率
+#define getLaserPower() spindle_get_speed()
+
+
+
+
+
+
 
 // Define standard libraries used by Grbl.
 #include <math.h>
@@ -72,6 +141,8 @@
 #include "spindle_control.h"
 #include "stepper.h"
 #include "jog.h"
+#include "nuts_bolts.h"
+
 // ---------------------------------------------------------------------------------------
 //加速度震动检测
 void accel_detection_limit();
