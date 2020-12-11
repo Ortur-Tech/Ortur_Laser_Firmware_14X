@@ -169,6 +169,8 @@ void report_feedback_message(uint8_t message_code)
 // Welcome message
 void report_init_message()
 {
+  printPgmString(PSTR(ORTUR_MODEL_NAME " Ready!\r\n"));
+  printPgmString(PSTR("OLF " ORTUR_VERSION ".\r\n"));
   printPgmString(PSTR("\r\nGrbl " GRBL_VERSION " ['$' for help]\r\n"));
 }
 
