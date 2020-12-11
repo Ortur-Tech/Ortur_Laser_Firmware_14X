@@ -20,7 +20,7 @@
 */
 
 #include "grbl.h"
-
+#include "iwdg.h"
 
 // Homing axis search distance multiplier. Computed by this value times the cycle travel.
 #ifndef HOMING_AXIS_SEARCH_SCALAR
@@ -156,7 +156,22 @@ uint8_t limits_get_state()
   return(limit_state);
 }
 
-
+//限位开关延时过滤检测
+uint8_t limits_get_state_filter(uint16_t ms,uint8_t idx)
+{
+	uint8_t ret = 1;
+	ms = ms * 10;
+	for(; ms > 0 ; --ms)
+	{
+	  delay_us(100);
+	  if(!(limits_get_state() & (1 << idx)))
+	  {
+		  ret = 0;
+		  break;
+	  }
+	}
+	return ret;
+}
 // This is the Limit Pin Change Interrupt, which handles the hard limit feature. A bouncing
 // limit switch can cause a lot of problems, like false readings and multiple interrupt calls.
 // If a switch is triggered at all, something bad has happened and treat it as such, regardless
@@ -375,7 +390,7 @@ void limits_go_home(uint8_t cycle_mask)
         limit_state = limits_get_state();
         for (idx=0; idx<N_AXIS; idx++) {
           if (axislock & step_pin[idx]) {
-            if (limit_state & (1 << idx)) {
+            if (limit_state & (1 << idx)&& limits_get_state_filter(5,idx)) {
               #ifdef COREXY
                 if (idx==Z_AXIS) { axislock &= ~(step_pin[Z_AXIS]); }
                 else { axislock &= ~(step_pin[A_MOTOR]|step_pin[B_MOTOR]); }
@@ -385,6 +400,8 @@ void limits_go_home(uint8_t cycle_mask)
                   if (idx == DUAL_AXIS_SELECT) { dual_axis_async_check |= DUAL_AXIS_CHECK_TRIGGER_1; }
                 #endif
               #endif
+			  //过滤后再次获取限位开关的状态
+			  limit_state = limits_get_state();
             }
           }
         }
@@ -441,7 +458,7 @@ void limits_go_home(uint8_t cycle_mask)
           break;
         }
       }
-
+      IWDG_Feed();
     #ifdef ENABLE_DUAL_AXIS
       } while ((STEP_MASK & axislock) || (sys.homing_axis_lock_dual));
     #else
@@ -462,7 +479,7 @@ void limits_go_home(uint8_t cycle_mask)
       max_travel = settings.homing_pulloff;
       homing_rate = settings.homing_seek_rate;
     }
-
+    IWDG_Feed();
   } while (n_cycle-- > 0);
 
   // The active cycle axes should now be homed and machine limits have been located. By
