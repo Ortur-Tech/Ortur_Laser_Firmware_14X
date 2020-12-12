@@ -24,6 +24,12 @@
 #include "usbd_cdc_if.h"
 #endif
 
+void printStringAll(const char *s)
+{
+	while (*s)
+		serial_write_all(*s++);
+}
+
 void printString(const char *s)
 {
 #ifdef USE_USB11
@@ -83,7 +89,22 @@ void print_uint8_base10(uint8_t n)
   if (digit_b) { serial_write(digit_b); }
   if (digit_a) { serial_write(digit_a); }
 }
-
+void print_uint8_base10_all(uint8_t n)
+{
+  uint8_t digit_a = 0;
+  uint8_t digit_b = 0;
+  if (n >= 100) { // 100-255
+    digit_a = '0' + n % 10;
+    n /= 10;
+  }
+  if (n >= 10) { // 10-99
+    digit_b = '0' + n % 10;
+    n /= 10;
+  }
+  serial_write_all('0' + n);
+  if (digit_b) { serial_write_all(digit_b); }
+  if (digit_a) { serial_write_all(digit_a); }
+}
 
 // Prints an uint8 variable in base 2 with desired number of desired digits.
 void print_uint8_base2_ndigit(uint8_t n, uint8_t digits) {
@@ -130,6 +151,15 @@ void printInteger(long n)
   }
 }
 
+void printIntegerAll(long n)
+{
+  if (n < 0) {
+    serial_write_all('-');
+    print_uint32_base10(-n);
+  } else {
+    print_uint32_base10(n);
+  }
+}
 
 // Convert float to string by immediately converting to a long integer, which contains
 // more digits than a float. Number of decimal places, which are tracked by a counter,
@@ -173,6 +203,42 @@ void printFloat(float n, uint8_t decimal_places)
   }
 }
 
+void printFloatAll(float n, uint8_t decimal_places)
+{
+  if (n < 0) {
+    serial_write_all('-');
+    n = -n;
+  }
+
+  uint8_t decimals = decimal_places;
+  while (decimals >= 2) { // Quickly convert values expected to be E0 to E-4.
+    n *= 100;
+    decimals -= 2;
+  }
+  if (decimals) { n *= 10; }
+  n += 0.5; // Add rounding factor. Ensures carryover through entire value.
+
+  // Generate digits backwards and store in string.
+  unsigned char buf[13];
+  uint8_t i = 0;
+  uint32_t a = (long)n;
+  while(a > 0) {
+    buf[i++] = (a % 10) + '0'; // Get digit
+    a /= 10;
+  }
+  while (i < decimal_places) {
+     buf[i++] = '0'; // Fill in zeros to decimal point for (n < 1)
+  }
+  if (i == decimal_places) { // Fill in leading zero, if needed.
+    buf[i++] = '0';
+  }
+
+  // Print the generated string.
+  for (; i > 0; i--) {
+    if (i == decimal_places) { serial_write_all('.'); } // Insert decimal point in right place.
+    serial_write_all(buf[i-1]);
+  }
+}
 
 // Floating value printing handlers for special variables types used in Grbl and are defined
 // in the config.h.
@@ -185,8 +251,22 @@ void printFloat_CoordValue(float n) {
     printFloat(n,N_DECIMAL_COORDVALUE_MM);
   }
 }
+void printFloat_CoordValue_All(float n) {
+  if (bit_istrue(settings.flags,BITFLAG_REPORT_INCHES)) {
+    printFloat(n*INCH_PER_MM,N_DECIMAL_COORDVALUE_INCH);
+  } else {
+    printFloat(n,N_DECIMAL_COORDVALUE_MM);
+  }
+}
 
 void printFloat_RateValue(float n) {
+  if (bit_istrue(settings.flags,BITFLAG_REPORT_INCHES)) {
+    printFloat(n*INCH_PER_MM,N_DECIMAL_RATEVALUE_INCH);
+  } else {
+    printFloat(n,N_DECIMAL_RATEVALUE_MM);
+  }
+}
+void printFloat_RateValue_All(float n) {
   if (bit_istrue(settings.flags,BITFLAG_REPORT_INCHES)) {
     printFloat(n*INCH_PER_MM,N_DECIMAL_RATEVALUE_INCH);
   } else {

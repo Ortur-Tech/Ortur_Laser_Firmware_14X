@@ -111,6 +111,7 @@
   typedef int bool;
   //#define NOEEPROMSUPPORT
   #define printPgmString printString
+  #define printPgmStringAll printStringAll
 #endif
 
 #include <inttypes.h>
