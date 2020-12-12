@@ -76,6 +76,21 @@ void Reset_Usb()
 
 
 }
+static uint8_t usbCdcConnectFlag=0;
+uint8_t isUsbCDCConnected(void)
+{
+	if((usbCdcConnectFlag==1)&&(isUSBConnect()==1))
+	{
+		return usbCdcConnectFlag;
+	}
+
+	return 0;
+
+}
+void setUsbCDCConnected(uint8_t status)
+{
+	usbCdcConnectFlag=status;
+}
 /* USER CODE END 1 */
 uint8_t isUSBConnect(void)
 {
