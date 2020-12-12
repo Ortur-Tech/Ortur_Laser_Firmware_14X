@@ -3,6 +3,10 @@
 *.list
 *.mk
 *.launch
+*.su
+
+/Debug/
+/Release/
 
 /Atollic/
 /cubeide/F13/Debug/
