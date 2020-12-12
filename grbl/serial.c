@@ -126,9 +126,6 @@ void serial_write(uint8_t data)
 	{
 		uart_sendch(data);
 	}
-
-
-
 #else
 	uart_sendch(data);
 #endif
@@ -152,7 +149,23 @@ void serial_write(uint8_t data)
   UCSR0B |=  (1 << UDRIE0);
 #endif
 }
+void serial_write_all(uint8_t data)
+{
+	if(isUsbCDCConnected())
+	{
+		__disable_irq();
+		// Store data and advance head
+		serial_tx_buffer[serial_tx_buffer_head++] = data;
+		__enable_irq();
+		if(serial_tx_buffer[serial_tx_buffer_head-1]=='\n')
+		{
+			while(USBD_BUSY==CDC_Transmit_FS(serial_tx_buffer,serial_tx_buffer_head));
+			serial_tx_buffer_head=0;
+		}
+	}
+	uart_sendch(data);
 
+}
 #ifdef ATMEGA328P
 // Data Register Empty Interrupt handler
 ISR(SERIAL_UDRE)
