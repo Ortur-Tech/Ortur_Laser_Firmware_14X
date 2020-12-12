@@ -1,6 +1,0 @@
-protocol.c:38:6:protocol_main_loop	16	static
-protocol.c:170:6:protocol_buffer_synchronize	8	static
-protocol.c:187:6:protocol_auto_cycle_start	8	static
-protocol.c:206:6:protocol_execute_realtime	8	static
-protocol.c:218:6:protocol_exec_rt_system	16	static
-protocol.c:514:13:protocol_exec_rt_suspend	32	static

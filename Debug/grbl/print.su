@@ -1,8 +1,0 @@
-print.c:27:6:printString	16	static
-print.c:70:6:print_uint8_base10	24	static
-print.c:89:6:print_uint8_base2_ndigit	40	dynamic
-print.c:103:6:print_uint32_base10	32	static
-print.c:123:6:printInteger	16	static
-print.c:139:6:printFloat	40	static
-print.c:181:6:printFloat_CoordValue	24	static
-print.c:189:6:printFloat_RateValue	24	static

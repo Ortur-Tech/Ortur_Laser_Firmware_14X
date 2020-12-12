@@ -1,3 +1,0 @@
-stm32f1xx_ll_gpio.h:775:26:LL_GPIO_IsOutputPinSet	16	static
-iwdg.c:30:6:MX_IWDG_Init	8	static
-iwdg.c:60:6:IWDG_Feed	24	static
