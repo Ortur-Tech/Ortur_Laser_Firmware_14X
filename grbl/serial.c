@@ -95,7 +95,12 @@ void serial_init()
   // defaults to 8-bit, no parity, 1 stop bit
 #endif
 }
+#define USBCDC 1  //USB CDC VCP
+#define HWUART 2  //HW UART
 
+uint8_t last_steam=USBCDC;
+
+uint8_t steamSwitchAble=1;
 extern USBD_HandleTypeDef hUsbDeviceFS;
 // Writes one byte to the TX serial buffer. Called by main program.
 void serial_write(uint8_t data)
@@ -105,14 +110,21 @@ void serial_write(uint8_t data)
 	//usb串口未连接时,不发送任何数据
 	//if(!isUSBConnect()){return;}
 
-	__disable_irq();
-	// Store data and advance head
-	serial_tx_buffer[serial_tx_buffer_head++] = data;
-	__enable_irq();
-	if(serial_tx_buffer[serial_tx_buffer_head-1]=='\n')
+	if((last_steam == USBCDC)&&(isUsbCDCConnected()))
 	{
-		while(USBD_BUSY==CDC_Transmit_FS(serial_tx_buffer,serial_tx_buffer_head));
-		serial_tx_buffer_head=0;
+		__disable_irq();
+		// Store data and advance head
+		serial_tx_buffer[serial_tx_buffer_head++] = data;
+		__enable_irq();
+		if(serial_tx_buffer[serial_tx_buffer_head-1]=='\n')
+		{
+			while(USBD_BUSY==CDC_Transmit_FS(serial_tx_buffer,serial_tx_buffer_head));
+			serial_tx_buffer_head=0;
+		}
+	}
+	else
+	{
+		uart_sendch(data);
 	}
 
 
@@ -239,17 +251,40 @@ void HandleUartIT(uint8_t data)
 }
 #endif
 
+uint32_t last_steam_use_time=0;
+
+void USART1_IRQHandler (void)
+{
+	uint8_t data=0;
+	if((last_steam==HWUART)||((HAL_GetTick()-last_steam_use_time)>10000))
+	{
+		last_steam=HWUART;
+		if(USART1->SR &(1<<5))  //接收到数据
+		{
+		    data = USART1->DR;
+		    HandleUartIT(data);
+		}
+		last_steam_use_time=HAL_GetTick();
+	}
+}
+
 #ifdef USE_USB
 void OnUsbDataRx(uint8_t* dataIn, uint8_t length)
 {
     uint8_t data;
-	// Write data to buffer unless it is full.
-	while (length != 0)
-	{
-        data = *dataIn ++;
-        HandleUartIT(data);
-        length--;
-   }
+    if((last_steam==USBCDC)||((HAL_GetTick()-last_steam_use_time)>10000))
+    {
+        last_steam=USBCDC;
+    	// Write data to buffer unless it is full.
+    	while (length != 0)
+    	{
+            data = *dataIn ++;
+            HandleUartIT(data);
+            length--;
+       }
+       last_steam_use_time=HAL_GetTick();
+    }
+
 }
 #endif
 
