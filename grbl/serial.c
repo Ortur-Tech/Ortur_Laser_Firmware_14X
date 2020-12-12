@@ -22,6 +22,7 @@
 #include "grbl.h"
 #include "usbd_cdc.h"
 #include "usbd_cdc_if.h"
+#include "usb_device.h"
 
 #ifdef STM32
   #ifdef STM32F1
@@ -264,13 +265,29 @@ void HandleUartIT(uint8_t data)
 }
 #endif
 
+/*当3秒内接收到不完整命令时允许串口接收切换,并将不完整的命令补'\n'*/
+#define SERIAL_SWITCH_TIME 3000
+
 uint32_t last_steam_use_time=0;
 
 void USART1_IRQHandler (void)
 {
 	uint8_t data=0;
-	if((last_steam==HWUART)||((HAL_GetTick()-last_steam_use_time)>10000))
+	if((last_steam==HWUART)||
+		(serial_rx_buffer_head==serial_rx_buffer_tail)||
+		(serial_rx_buffer[serial_rx_buffer_head-1]=='\n'))
 	{
+		last_steam=HWUART;
+		if(USART1->SR &(1<<5))  //接收到数据
+		{
+		    data = USART1->DR;
+		    HandleUartIT(data);
+		}
+		last_steam_use_time=HAL_GetTick();
+	}
+	else if((HAL_GetTick()-last_steam_use_time)>SERIAL_SWITCH_TIME)
+	{
+		HandleUartIT('\n');
 		last_steam=HWUART;
 		if(USART1->SR &(1<<5))  //接收到数据
 		{
@@ -285,7 +302,9 @@ void USART1_IRQHandler (void)
 void OnUsbDataRx(uint8_t* dataIn, uint8_t length)
 {
     uint8_t data;
-    if((last_steam==USBCDC)||((HAL_GetTick()-last_steam_use_time)>10000))
+    if((last_steam==USBCDC)||
+	(serial_rx_buffer_head==serial_rx_buffer_tail)||
+	(serial_rx_buffer[serial_rx_buffer_head-1]=='\n'))
     {
         last_steam=USBCDC;
     	// Write data to buffer unless it is full.
@@ -297,6 +316,19 @@ void OnUsbDataRx(uint8_t* dataIn, uint8_t length)
        }
        last_steam_use_time=HAL_GetTick();
     }
+    else if((HAL_GetTick()-last_steam_use_time)>SERIAL_SWITCH_TIME)
+   {
+       HandleUartIT('\n');
+	   last_steam=USBCDC;
+		// Write data to buffer unless it is full.
+		while (length != 0)
+		{
+			   data = *dataIn ++;
+			   HandleUartIT(data);
+			   length--;
+		}
+	  last_steam_use_time=HAL_GetTick();
+   }
 
 }
 #endif
