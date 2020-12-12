@@ -168,11 +168,16 @@ void spindle_stop()
 
 
 #ifdef VARIABLE_SPINDLE
+//spindle speed value, pwm value
+static SPINDLE_PWM_TYPE spindle_speed = 0;
   // Sets spindle speed PWM output and enable pin, if configured. Called by spindle_set_state()
   // and stepper ISR. Keep routine small and efficient.
   void spindle_set_speed(SPINDLE_PWM_TYPE pwm_value)
   {
   #ifdef STM32
+	//get speed value
+    spindle_speed = pwm_value;
+
   	Set_Spindle_Speed(pwm_value);
 
     #ifdef SPINDLE_ENABLE_OFF_WITH_ZERO_SPEED
@@ -224,6 +229,10 @@ void spindle_stop()
   #endif
   }
 
+  SPINDLE_PWM_TYPE spindle_get_speed()
+  {
+	  return spindle_speed;
+  }
 
   #ifdef ENABLE_PIECEWISE_LINEAR_SPINDLE
   

@@ -88,7 +88,7 @@
 
 extern void USART1_Send_Str(u8 *buf);
 
-#define debugStr(x) USART1_Send_Str(x)
+#define debugStr(x) while(0) //USART1_Send_Str(x)
 
 /*----------------------------------------------------------------------------*
 *	The following functions are used for reading and writing of
@@ -227,39 +227,39 @@ s32 bma2x2_initialization(void)
 		case 0x03:
 			V_BMA2x2RESOLUTION_U8 = BMA2x2_10_RESOLUTION;
 			sensitivity = ((float)(0x1<<10))/bma2x2_range_xg/2 ;
-			sprintf(buf,"chip_id=%d, the device is BMA250 or BMA222.\n",bma2x2.chip_id);
+			//sprintf(buf,"chip_id=%d, the device is BMA250 or BMA222.\n",bma2x2.chip_id);
 			break;
 
 		case 0xf9:
 			V_BMA2x2RESOLUTION_U8 = BMA2x2_10_RESOLUTION;
 			sensitivity = ((float)(0x1<<10))/bma2x2_range_xg/2;
-			sprintf(buf,"chip_id=%d, the device is BMA250E.\n",bma2x2.chip_id);
+			//sprintf(buf,"chip_id=%d, the device is BMA250E.\n",bma2x2.chip_id);
 			break;
 
 		case 0xfa:
 			V_BMA2x2RESOLUTION_U8 = BMA2x2_12_RESOLUTION;
 			sensitivity = ((float)(0x1<<12))/bma2x2_range_xg/2;			//FS=+/-8g
-			sprintf(buf,"chip_id=%d, the device is BMA253 or BMA255.\n",bma2x2.chip_id);
+			//sprintf(buf,"chip_id=%d, the device is BMA253 or BMA255.\n",bma2x2.chip_id);
 			break;
 
 		case 0xfb:
 			V_BMA2x2RESOLUTION_U8 = BMA2x2_14_RESOLUTION;
 			sensitivity = ((float)(0x1<<14))/bma2x2_range_xg/2;			//FS=+/-8g
-			sprintf(buf,"chip_id=%d, the device is BMA280.\n",bma2x2.chip_id);
+			//sprintf(buf,"chip_id=%d, the device is BMA280.\n",bma2x2.chip_id);
 			break;
 
 		case 0x90:
 			V_BMA2x2RESOLUTION_U8 = BMA2x2_12_RESOLUTION;
 			sensitivity = ((float)(0x1<<12))/bma2x2_range_xg/2;			//FS=+/-8g
-			sprintf(buf,"chip_id=%d, the device is BMA400.\n",bma2x2.chip_id);
+			//sprintf(buf,"chip_id=%d, the device is BMA400.\n",bma2x2.chip_id);
 			break;
 
 		default:
-			sprintf(buf,"chip_id=%d, not support device!\n",bma2x2.chip_id);
+			//sprintf(buf,"chip_id=%d, not support device!\n",bma2x2.chip_id);
 			return ERROR;
 			break;
 	}
-	debugStr(buf);
+	//debugStr(buf);
 
 /*	For initialization it is required to set the mode of
  *	the sensor as "NORMAL"
@@ -275,7 +275,7 @@ s32 bma2x2_initialization(void)
 	com_rslt += bma2x2_set_power_mode(BMA2x2_MODE_NORMAL);
 	if(!(com_rslt == 0))
 	{
-		sprintf(buf," bma2x2_set_power_mode error!\n");
+		//sprintf(buf," bma2x2_set_power_mode error!\n");
 		debugStr(buf);
 	}
 /*	Note:
@@ -292,7 +292,7 @@ s32 bma2x2_initialization(void)
 	com_rslt = bma2x2_set_range(bma2x2_range);
 	if(!(com_rslt == 0))
 	{
-		sprintf(buf," bma2x2_set_range error!\n");
+		//sprintf(buf," bma2x2_set_range error!\n");
 		debugStr(buf);
 	}
 
@@ -303,7 +303,7 @@ s32 bma2x2_initialization(void)
 	com_rslt += bma2x2_set_bw(bw_value_u8);
 	if(!(com_rslt == 0))
 	{
-		sprintf(buf," bma2x2_set_bw error!\n");
+		//sprintf(buf," bma2x2_set_bw error!\n");
 		debugStr(buf);
 	}
 

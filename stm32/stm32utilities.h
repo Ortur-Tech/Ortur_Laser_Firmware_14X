@@ -38,6 +38,7 @@
 #include "main.h"
 #include "g32core.h"
 #include "grbl.h"
+#include "nuts_bolts.h"
 
 
 extern const PIN_MASK step_pin_mask[N_AXIS];

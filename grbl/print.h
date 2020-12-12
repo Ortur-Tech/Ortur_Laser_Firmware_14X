@@ -28,17 +28,17 @@ void printString(const char *s);
 void printPgmString(const char *s);
 
 void printInteger(long n);
-
+void printIntegerAll(long n);
 void print_uint32_base10(uint32_t n);
-
+void print_uint32_base10_all(uint32_t n);
 // Prints an uint8 variable in base 10.
 void print_uint8_base10(uint8_t n);
-
+void print_uint8_base10_all(uint8_t n);
 // Prints an uint8 variable in base 2 with desired number of desired digits.
 void print_uint8_base2_ndigit(uint8_t n, uint8_t digits);
 
 void printFloat(float n, uint8_t decimal_places);
-
+void printFloatAll(float n, uint8_t decimal_places);
 // Floating value printing handlers for special variables types used in Grbl.
 //  - CoordValue: Handles all position or coordinate values in inches or mm reporting.
 //  - RateValue: Handles feed rate and current velocity in inches or mm reporting.

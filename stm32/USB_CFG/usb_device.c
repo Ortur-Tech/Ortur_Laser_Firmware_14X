@@ -57,22 +57,49 @@ USBD_HandleTypeDef hUsbDeviceFS;
 /* USER CODE BEGIN 1 */
 void Reset_Usb()
 {
-	GPIO_InitTypeDef GPIO_InitStruct = {0};
+	LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
 	__HAL_RCC_GPIOA_CLK_ENABLE();
 
 	/*Configure GPIO pin : PtPin */
-	GPIO_InitStruct.Pin = GPIO_PIN_12;
+	GPIO_InitStruct.Pin = GPIO_PIN_12|GPIO_PIN_11;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_12,GPIO_PIN_SET);
+	HAL_Delay(100);
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_12,GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_11,GPIO_PIN_RESET);
+	HAL_Delay(100);
+	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_12,GPIO_PIN_SET);
 
-	HAL_Delay(10);
+
+}
+static uint8_t usbCdcConnectFlag=0;
+uint8_t isUsbCDCConnected(void)
+{
+	if((usbCdcConnectFlag==1)&&(isUSBConnect()==1))
+	{
+		return usbCdcConnectFlag;
+	}
+
+	return 0;
+
+}
+void setUsbCDCConnected(uint8_t status)
+{
+	usbCdcConnectFlag=status;
 }
 /* USER CODE END 1 */
-
+uint8_t isUSBConnect(void)
+{
+	if(hUsbDeviceFS.dev_state== USBD_STATE_CONFIGURED)
+	{
+		return 1;
+	}
+	return 0;
+}
 /**
   * Init USB device Library, add supported class and start the library
   * @retval None

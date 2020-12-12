@@ -72,7 +72,7 @@ static void MX_NVIC_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+extern void BMA250_Init(void);
 /* USER CODE END 0 */
 
 /**
@@ -81,8 +81,17 @@ static void MX_NVIC_Init(void);
   */
 int main(void)
 {
+
   /* USER CODE BEGIN 1 */
   Check_Rst_Source();
+#ifdef USE_BACKTRACE
+	{ //Enable fault by div 0
+    volatile int * SCB_CCR = (volatile int *) 0xE000ED14; // SCB->CCR
+    *SCB_CCR |= (1 << 4); /* bit4: DIV_0_TRP. */
+	}
+	/* CmBacktrace initialize */
+	cm_backtrace_init("CmBacktrace", ORTUR_MODEL_NAME , "Grbl " GRBL_VERSION " - OLF " ORTUR_VERSION);
+#endif
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -98,23 +107,46 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-  Reset_Usb();
+
+  IIC_Init();
+  BMA250_Init();
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+
+  Reset_Usb();
+#ifndef ORTUR_CNC_MODE
+  Leds_Power(0); //给信号灯供电
+
+  //阻塞,直到电源开启
+  //BUG: PowerOpen_Loop会造成后续代码出错
+  PowerOpen_Loop();
+  //NOTE:第一批主板灯的逻辑有问题,就先不亮了
+  Leds_Power(1); //给信号灯供电
+#endif
+  //开启电源指示灯
+  PowerLed_On();
+
   MX_TIM1_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
   MX_USB_DEVICE_Init();
   MX_USART1_UART_Init();
+#ifndef DEBUG
   MX_IWDG_Init();
+#endif
 
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
   delay_ms(20);
 
+//  while(1)
+//  {
+//	  PowerLed_Blink();
+//	  delay_ms(1);
+//  }
 #ifndef DEBUG
   // Disable IWDG if core is halted,调试时冻结看门狗
   DBGMCU->CR |= DBGMCU_CR_DBG_IWDG_STOP;
@@ -202,46 +234,65 @@ int main(void)
   * @brief System Clock Configuration
   * @retval None
   */
+
 void SystemClock_Config(void)
 {
-  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
+	uint32_t temp=0;
+	uint8_t PLL=9;
 
-  /** Initializes the RCC Oscillators according to the specified parameters
-  * in the RCC_OscInitTypeDef structure.
-  */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE;
-  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
-  RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** Initializes the CPU, AHB and APB buses clocks
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
-
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USB;
-  PeriphClkInit.UsbClockSelection = RCC_USBCLKSOURCE_PLL_DIV1_5;
-  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
-  {
-    Error_Handler();
-  }
+ 	RCC->CR|=0x00010000;  //外部高速时钟使能HSEON
+	while(!(RCC->CR>>17));//等待外部时钟就绪
+	RCC->CFGR=0X00000400; //APB1=DIV2;APB2=DIV1;AHB=DIV1;
+	PLL-=2;				  //抵消2个单位（因为是从2开始的，设置0就是2）
+	RCC->CFGR|=PLL<<18;   //设置PLL值 2~16
+	RCC->CFGR|=1<<16;	  //PLLSRC ON
+	FLASH->ACR|=0x32;	  //FLASH 2个延时周期
+	RCC->CR|=0x01000000;  //PLLON
+	while(!(RCC->CR>>25));//等待PLL锁定
+	RCC->CFGR|=0x00000002;//PLL作为系统时钟
+	while(temp!=0x02)     //等待PLL作为系统时钟设置成功
+	{
+		temp=RCC->CFGR>>2;
+		temp&=0x03;
+	}
+//  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+//  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+//  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
+//
+//  /** Initializes the RCC Oscillators according to the specified parameters
+//  * in the RCC_OscInitTypeDef structure.
+//  */
+//  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE;
+//  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+//  RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
+//  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+//  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
+//  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+//  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+//  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
+//  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+//  {
+//    Error_Handler();
+//  }
+//  /** Initializes the CPU, AHB and APB buses clocks
+//  */
+//  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+//                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+//  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+//  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+//  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+//  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+//
+//  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+//  {
+//    Error_Handler();
+//  }
+//  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USB;
+//  PeriphClkInit.UsbClockSelection = RCC_USBCLKSOURCE_PLL_DIV1_5;
+//  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
+//  {
+//    Error_Handler();
+//  }
 }
 
 /**

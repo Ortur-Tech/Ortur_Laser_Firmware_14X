@@ -21,6 +21,8 @@
 
 */
 
+#if 0
+
 #include "driver.h"
 #include "serial.h"
 #include "../grbl/grbl.h"
@@ -177,3 +179,5 @@ void usbBufferInput (uint8_t *data, uint32_t length)
         data++;                                                             // next
     }
 }
+
+#endif

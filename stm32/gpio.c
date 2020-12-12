@@ -20,6 +20,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "gpio.h"
 /* USER CODE BEGIN 0 */
+#include "iwdg.h"
 #define KEY_ON 0
 #define KEY_OFF 1
 
@@ -109,7 +110,50 @@ void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 2 */
+void Leds_Power(uint8_t onoff)
+{
+	 GPIO_InitTypeDef GPIO_InitStruct = {0};
+#if !defined(ORTUR_CNC_MODE)
+	if(onoff)
+	{
+		//NOTE:新主板需要给指示灯供电
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_SET);
 
+		//将IO设置为输出模式
+	    GPIO_InitStruct.Pin = LIM_Y_Pin|LIM_X_Pin|LIM_Z_Pin;
+	    GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+	    GPIO_InitStruct.Pull = GPIO_PULLUP;
+	    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+		//启用限位开关
+		limits_init();
+
+		HAL_GPIO_WritePin(GPIOA, AMIN_Pin, GPIO_PIN_RESET); //A
+	}
+	else
+	{
+		//NOTE:新主板需要给指示灯供电
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
+
+		//禁用限位开关
+		limits_disable();
+
+		//将IO设置为输出模式
+		GPIO_InitStruct.Pin = LIM_Y_Pin|LIM_X_Pin|LIM_Z_Pin|AMIN_Pin;
+		GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+		GPIO_InitStruct.Pull = GPIO_PULLUP;
+		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+		//关闭限位开关指示灯
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET); //Y
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET); //X
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET); //Z
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET); //A
+	}
+
+#endif
+}
 void PowerLed_Blink(void)
 {
 	HAL_GPIO_TogglePin(POWER_LED_GPIO_Port, POWER_LED_Pin);
@@ -143,10 +187,10 @@ uint8_t Key_Scan(void)
 		delay_ms(20);
 		if(0==HAL_GPIO_ReadPin(KEY_GPIO_Port, KEY_Pin))
 		{
-			return 1;
+			return 0;
 		}
 	}
-	return 0;
+	return 1;
 }
 
 uint32_t key_count = 0;
@@ -154,10 +198,16 @@ uint8_t poweron_justnow = 0;
 
 void PowerOpen_Loop()
 {
+	 GPIO_InitTypeDef GPIO_InitStruct = {0};
 	//默认关机
 	key_count = 0;
 	//初始化按�?
-	//Key_GPIO_Config();
+	__HAL_RCC_GPIOC_CLK_ENABLE();
+  /*Configure GPIO pin : PtPin */
+  GPIO_InitStruct.Pin = KEY_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(KEY_GPIO_Port, &GPIO_InitStruct);
 
 	//debugStr("wait for power on.\n");
 	while(1)
@@ -165,7 +215,7 @@ void PowerOpen_Loop()
 		if(Key_Scan() == KEY_ON)
 		{
 			++key_count;
-			if(!(key_count%10))
+			if(!(key_count%5))
 				PowerLed_Blink();
 		}
 		else
@@ -182,13 +232,21 @@ void PowerOpen_Loop()
 			//打开led
 			PowerLed_On();
 			poweron_justnow = POWERON_COUNT;
-			debugStr("power on.\n");
+			//debugStr("power on.\n");
 			break;
 		}
 	}
 	key_count = 0;
 }
-
+void PowerLed_Blink_Limit(uint32_t ms)
+{
+	static int32_t last_blink_time = 0;
+	if(last_blink_time + ms <= HAL_GetTick())
+	{
+		PowerLed_Blink();
+		last_blink_time = HAL_GetTick();
+	}
+}
 void PowerClose_Check()
 {
 	//长按关机
@@ -199,7 +257,7 @@ void PowerClose_Check()
 			++key_count;
 			if(!(key_count%10))
 			{
-				debugStr("key pressed.\n");
+				//debugStr("key pressed.\n");
 				PowerLed_Blink();
 			}
 		}
@@ -247,7 +305,7 @@ void PowerClose_Check()
 		PowerLed_Off();
 		StatusLed_Off();
 
-		debugStr("power off.\n");
+		//debugStr("power off.\n");
 
 		// Immediately disables steppers
 		st_go_idle();
@@ -259,7 +317,7 @@ void PowerClose_Check()
 		coolant_stop();
 
 		//等待用户释放按钮
-		debugStr("wait for key release.\n");
+		//debugStr("wait for key release.\n");
 		key_count = 0;
 		while(1)
 		{
@@ -282,7 +340,7 @@ void PowerClose_Check()
 			{
 				//关闭led
 				PowerLed_Off();
-				debugStr("key release.\n");
+				//debugStr("key release.\n");
 				delay_ms(200);
 
 				__disable_fault_irq();

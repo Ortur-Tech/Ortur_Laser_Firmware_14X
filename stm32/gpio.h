@@ -44,8 +44,10 @@ void PowerLed_Off(void);
 void StatusLed_On(void);
 void StatusLed_Off(void);
 void StatusLed_Blink(void);
-
+void Leds_Power(uint8_t onoff);
 uint8_t Key_Scan(void);
+void PowerOpen_Loop();
+void PowerClose_Check();
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

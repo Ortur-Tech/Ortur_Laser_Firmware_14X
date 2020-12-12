@@ -83,6 +83,10 @@ void MX_USB_DEVICE_Init(void);
  */
 /* USER CODE BEGIN FD */
 void Reset_Usb();
+uint8_t isUSBConnect(void);
+uint8_t isUsbCDCConnected(void);
+void setUsbCDCConnected(uint8_t status);
+
 /* USER CODE END FD */
 /**
   * @}

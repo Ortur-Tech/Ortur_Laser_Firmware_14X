@@ -78,6 +78,8 @@
   #define SPINDLE_PWM_MIN_VALUE       1   // Must be greater than zero.
   #define SPINDLE_PWM_OFF_VALUE       0
   #define SPINDLE_PWM_RANGE           (SPINDLE_PWM_MAX_VALUE-SPINDLE_PWM_MIN_VALUE)
+
+  #define readSpindleEnable()         (!LL_GPIO_IsOutputPinSet(SPIN_EN_GPIO_Port, SPIN_EN_Pin))
   #define SetSpindleEnablebit()       GPIO_SetBits(SPIN_EN_GPIO_Port, SPIN_EN_Pin)
   #define ResetSpindleEnablebit()     GPIO_ResetBits(SPIN_EN_GPIO_Port, SPIN_EN_Pin)
   #define SetSpindleDirectionBit()    GPIO_SetBits(SPIN_DIR_GPIO_Port, SPIN_DIR_Pin)

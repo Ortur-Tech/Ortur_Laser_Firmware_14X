@@ -1,10 +1,10 @@
 /*
- * TODO: this is not done
- *
-  lcd-i2c.h - Header file for shared definitions, variables, and functions
-  Part of Grbl32
 
-  Copyright (c) 2018-2019 Thomas Truong
+  usb_serial.h - low level functions for transmitting bytes via the USB virtual serial port
+
+  Part of GrblHAL
+
+  Copyright (c) 2019-2020 Terje Io
 
   Grbl is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -18,11 +18,20 @@
 
   You should have received a copy of the GNU General Public License
   along with Grbl.  If not, see <http://www.gnu.org/licenses/>.
+
 */
-
-#ifndef LCD_I2C_H_
-#define LCD_I2C_H_
+#if 0
 
 
+#include <stdint.h>
+#include <stdbool.h>
 
-#endif /* LCD_I2C_H_ */
+void usbInit (void);
+int16_t usbGetC(void);
+void usbWriteS(const char *s);
+uint16_t usbRxFree (void);
+void usbRxFlush(void);
+void usbRxCancel(void);
+void usbBufferInput (uint8_t *data, uint32_t length);
+bool usbSuspendInput (bool suspend);
+#endif
