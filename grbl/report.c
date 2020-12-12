@@ -32,7 +32,9 @@
 // Internal report utilities to reduce flash with repetitive tasks turned into functions.
 void report_util_setting_prefix(uint8_t n) { serial_write('$'); print_uint8_base10(n); serial_write('='); }
 static void report_util_line_feed() { printPgmString(PSTR("\r\n")); }
+static void report_util_line_feed_all() { printPgmStringAll(PSTR("\r\n")); }
 static void report_util_feedback_line_feed() { serial_write(']'); report_util_line_feed(); }
+static void report_util_feedback_line_feed_all() { serial_write_all(']'); report_util_line_feed_all(); }
 static void report_util_gcode_modes_G() { printPgmString(PSTR(" G")); }
 static void report_util_gcode_modes_M() { printPgmString(PSTR(" M")); }
 // static void report_util_comment_line_feed() { serial_write(')'); report_util_line_feed(); }
@@ -44,6 +46,13 @@ static void report_util_axis_values(float *axis_value) {
   }
 }
 
+static void report_util_axis_values_all(float *axis_value) {
+  uint8_t idx;
+  for (idx=0; idx<N_AXIS; idx++) {
+	  printFloat_CoordValue_All(axis_value[idx]);
+    if (idx < (N_AXIS-1)) { serial_write_all(','); }
+  }
+}
 /*
 static void report_util_setting_string(uint8_t n) {
   serial_write(' ');
@@ -124,9 +133,9 @@ void report_status_message(uint8_t status_code)
 // Prints alarm messages.
 void report_alarm_message(uint8_t alarm_code)
 {
-  printPgmString(PSTR("ALARM:"));
-  print_uint8_base10(alarm_code);
-  report_util_line_feed();
+  printPgmStringAll(PSTR("ALARM:"));
+  print_uint8_base10_all(alarm_code);
+  report_util_line_feed_all();
   delay_ms(500); // Force delay to ensure message clears serial write buffer.
 }
 
@@ -137,41 +146,41 @@ void report_alarm_message(uint8_t alarm_code)
 // is installed, the message number codes are less than zero.
 void report_feedback_message(uint8_t message_code)
 {
-  printPgmString(PSTR("[MSG:"));
+  printPgmStringAll(PSTR("[MSG:"));
   switch(message_code) {
     case MESSAGE_CRITICAL_EVENT:
-      printPgmString(PSTR("Reset to continue")); break;
+      printPgmStringAll(PSTR("Reset to continue")); break;
     case MESSAGE_ALARM_LOCK:
-      printPgmString(PSTR("'$H'|'$X' to unlock")); break;
+      printPgmStringAll(PSTR("'$H'|'$X' to unlock")); break;
     case MESSAGE_ALARM_UNLOCK:
-      printPgmString(PSTR("Caution: Unlocked")); break;
+      printPgmStringAll(PSTR("Caution: Unlocked")); break;
     case MESSAGE_ENABLED:
-      printPgmString(PSTR("Enabled")); break;
+      printPgmStringAll(PSTR("Enabled")); break;
     case MESSAGE_DISABLED:
-      printPgmString(PSTR("Disabled")); break;
+      printPgmStringAll(PSTR("Disabled")); break;
     case MESSAGE_SAFETY_DOOR_AJAR:
-      printPgmString(PSTR("Check Door")); break;
+      printPgmStringAll(PSTR("Check Door")); break;
     case MESSAGE_CHECK_LIMITS:
-      printPgmString(PSTR("Check Limits")); break;
+      printPgmStringAll(PSTR("Check Limits")); break;
     case MESSAGE_PROGRAM_END:
-      printPgmString(PSTR("Pgm End")); break;
+      printPgmStringAll(PSTR("Pgm End")); break;
     case MESSAGE_RESTORE_DEFAULTS:
-      printPgmString(PSTR("Restoring defaults")); break;
+      printPgmStringAll(PSTR("Restoring defaults")); break;
     case MESSAGE_SPINDLE_RESTORE:
-      printPgmString(PSTR("Restoring spindle")); break;
+      printPgmStringAll(PSTR("Restoring spindle")); break;
     case MESSAGE_SLEEP_MODE:
-      printPgmString(PSTR("Sleeping")); break;
+      printPgmStringAll(PSTR("Sleeping")); break;
   }
-  report_util_feedback_line_feed();
+  report_util_feedback_line_feed_all();
 }
 
 
 // Welcome message
 void report_init_message()
 {
-  printPgmString(PSTR(ORTUR_MODEL_NAME " Ready!\r\n"));
-  printPgmString(PSTR("OLF " ORTUR_VERSION ".\r\n"));
-  printPgmString(PSTR("\r\nGrbl " GRBL_VERSION " ['$' for help]\r\n"));
+  printPgmStringAll(PSTR(ORTUR_MODEL_NAME " Ready!\r\n"));
+  printPgmStringAll(PSTR("OLF " ORTUR_VERSION ".\r\n"));
+  printPgmStringAll(PSTR("\r\nGrbl " GRBL_VERSION " ['$' for help]\r\n"));
 }
 
 // Grbl help message
@@ -491,38 +500,38 @@ void report_realtime_status()
   system_convert_array_steps_to_mpos(print_position,current_position);
 
   // Report current machine state and sub-states
-  serial_write('<');
+  serial_write_all('<');
   switch (sys.state) {
-    case STATE_IDLE: printPgmString(PSTR("Idle")); break;
-    case STATE_CYCLE: printPgmString(PSTR("Run")); break;
+    case STATE_IDLE: printPgmStringAll(PSTR("Idle")); break;
+    case STATE_CYCLE: printPgmStringAll(PSTR("Run")); break;
     case STATE_HOLD:
       if (!(sys.suspend & SUSPEND_JOG_CANCEL)) {
-        printPgmString(PSTR("Hold:"));
-        if (sys.suspend & SUSPEND_HOLD_COMPLETE) { serial_write('0'); } // Ready to resume
-        else { serial_write('1'); } // Actively holding
+    	  printPgmStringAll(PSTR("Hold:"));
+        if (sys.suspend & SUSPEND_HOLD_COMPLETE) { serial_write_all('0'); } // Ready to resume
+        else { serial_write_all('1'); } // Actively holding
       } // Continues to print jog state during jog cancel.
       break;
-    case STATE_JOG: printPgmString(PSTR("Jog")); break;
-    case STATE_HOMING: printPgmString(PSTR("Home")); break;
-    case STATE_ALARM: printPgmString(PSTR("Alarm")); break;
-    case STATE_CHECK_MODE: printPgmString(PSTR("Check")); break;
+    case STATE_JOG: printPgmStringAll(PSTR("Jog")); break;
+    case STATE_HOMING: printPgmStringAll(PSTR("Home")); break;
+    case STATE_ALARM: printPgmStringAll(PSTR("Alarm")); break;
+    case STATE_CHECK_MODE: printPgmStringAll(PSTR("Check")); break;
     case STATE_SAFETY_DOOR:
-      printPgmString(PSTR("Door:"));
+    	printPgmStringAll(PSTR("Door:"));
       if (sys.suspend & SUSPEND_INITIATE_RESTORE) {
-        serial_write('3'); // Restoring
+        serial_write_all('3'); // Restoring
       } else {
         if (sys.suspend & SUSPEND_RETRACT_COMPLETE) {
           if (sys.suspend & SUSPEND_SAFETY_DOOR_AJAR) {
-            serial_write('1'); // Door ajar
+        	  serial_write_all('1'); // Door ajar
           } else {
-            serial_write('0');
+        	  serial_write_all('0');
           } // Door closed and ready to resume
         } else {
-          serial_write('2'); // Retracting
+        	serial_write_all('2'); // Retracting
         }
       }
       break;
-    case STATE_SLEEP: printPgmString(PSTR("Sleep")); break;
+    case STATE_SLEEP: printPgmStringAll(PSTR("Sleep")); break;
   }
 
   float wco[N_AXIS];
@@ -540,19 +549,19 @@ void report_realtime_status()
 
   // Report machine position
   if (bit_istrue(settings.status_report_mask,BITFLAG_RT_STATUS_POSITION_TYPE)) {
-    printPgmString(PSTR("|MPos:"));
+    printPgmStringAll(PSTR("|MPos:"));
   } else {
-    printPgmString(PSTR("|WPos:"));
+	  printPgmStringAll(PSTR("|WPos:"));
   }
-  report_util_axis_values(print_position);
+  report_util_axis_values_all(print_position);
 
   // Returns planner and serial read buffer states.
   #ifdef REPORT_FIELD_BUFFER_STATE
     if (bit_istrue(settings.status_report_mask,BITFLAG_RT_STATUS_BUFFER_STATE)) {
-      printPgmString(PSTR("|Bf:"));
-      print_uint8_base10(plan_get_block_buffer_available());
-      serial_write(',');
-      print_uint8_base10(serial_get_rx_buffer_available());
+    	printPgmStringAll(PSTR("|Bf:"));
+      print_uint8_base10_all(plan_get_block_buffer_available());
+      serial_write_all(',');
+      print_uint8_base10_all(serial_get_rx_buffer_available());
     }
   #endif
 
@@ -563,8 +572,8 @@ void report_realtime_status()
       if (cur_block != NULL) {
         uint32_t ln = cur_block->line_number;
         if (ln > 0) {
-          printPgmString(PSTR("|Ln:"));
-          printInteger(ln);
+          printPgmStringAll(PSTR("|Ln:"));
+          printIntegerAll(ln);
         }
       }
     #endif
@@ -573,13 +582,13 @@ void report_realtime_status()
   // Report realtime feed speed
   #ifdef REPORT_FIELD_CURRENT_FEED_SPEED
     #ifdef VARIABLE_SPINDLE
-      printPgmString(PSTR("|FS:"));
-      printFloat_RateValue(st_get_realtime_rate());
-      serial_write(',');
-      printFloat(sys.spindle_speed,N_DECIMAL_RPMVALUE);
+      printPgmStringAll(PSTR("|FS:"));
+      printFloat_RateValue_All(st_get_realtime_rate());
+      serial_write_all(',');
+      printFloatAll(sys.spindle_speed,N_DECIMAL_RPMVALUE);
     #else
-      printPgmString(PSTR("|F:"));
-      printFloat_RateValue(st_get_realtime_rate());
+      printPgmStringAll(PSTR("|F:"));
+      printFloat_RateValueAll(st_get_realtime_rate());
     #endif      
   #endif
 
@@ -588,47 +597,47 @@ void report_realtime_status()
     uint8_t ctrl_pin_state = system_control_get_state();
     uint8_t prb_pin_state = probe_get_state();
     if (lim_pin_state | ctrl_pin_state | prb_pin_state) {
-      printPgmString(PSTR("|Pn:"));
-      if (prb_pin_state) { serial_write('P'); }
+      printPgmStringAll(PSTR("|Pn:"));
+      if (prb_pin_state) { serial_write_all('P'); }
       if (lim_pin_state) {
 //        if (bit_istrue(lim_pin_state,bit(X_AXIS))) { serial_write('X'); }
 //        if (bit_istrue(lim_pin_state,bit(Y_AXIS))) { serial_write('Y'); }
  //       if (bit_istrue(lim_pin_state,bit(Z_AXIS))) { serial_write('Z'); }
         #ifdef ENABLE_DUAL_AXIS
           #if (DUAL_AXIS_SELECT == X_AXIS)
-            if (bit_istrue(lim_pin_state,(bit(X_AXIS)|bit(N_AXIS)))) { serial_write('X'); }
-            if (bit_istrue(lim_pin_state,bit(Y_AXIS))) { serial_write('Y'); }
+            if (bit_istrue(lim_pin_state,(bit(X_AXIS)|bit(N_AXIS)))) { serial_write_all('X'); }
+            if (bit_istrue(lim_pin_state,bit(Y_AXIS))) { serial_write_all('Y'); }
           #endif
           #if (DUAL_AXIS_SELECT == Y_AXIS)
-            if (bit_istrue(lim_pin_state,bit(X_AXIS))) { serial_write('X'); }
-            if (bit_istrue(lim_pin_state,(bit(Y_AXIS)|bit(N_AXIS)))) { serial_write('Y'); }
+            if (bit_istrue(lim_pin_state,bit(X_AXIS))) { serial_write_all('X'); }
+            if (bit_istrue(lim_pin_state,(bit(Y_AXIS)|bit(N_AXIS)))) { serial_write_all('Y'); }
           #endif
-          if (bit_istrue(lim_pin_state,bit(Z_AXIS))) { serial_write('Z'); }
+          if (bit_istrue(lim_pin_state,bit(Z_AXIS))) { serial_write_all('Z'); }
         #else
-          if (bit_istrue(lim_pin_state,bit(X_AXIS))) { serial_write('X'); }
-          if (bit_istrue(lim_pin_state,bit(Y_AXIS))) { serial_write('Y'); }
-          if (bit_istrue(lim_pin_state,bit(Z_AXIS))) { serial_write('Z'); }
+          if (bit_istrue(lim_pin_state,bit(X_AXIS))) { serial_write_all('X'); }
+          if (bit_istrue(lim_pin_state,bit(Y_AXIS))) { serial_write_all('Y'); }
+          if (bit_istrue(lim_pin_state,bit(Z_AXIS))) { serial_write_all('Z'); }
         #endif
         #if ( defined(STM32F1_4) || defined(STM32F4_4) )
-          if (bit_istrue(lim_pin_state, bit(A_AXIS))) { serial_write('A'); }
+          if (bit_istrue(lim_pin_state, bit(A_AXIS))) { serial_write_all('A'); }
         #endif
         #if ( defined(STM32F1_5) || defined(STM32F4_5) )
-          if (bit_istrue(lim_pin_state, bit(A_AXIS))) { serial_write('A'); }
-          if (bit_istrue(lim_pin_state, bit(B_AXIS))) { serial_write('B'); }
+          if (bit_istrue(lim_pin_state, bit(A_AXIS))) { serial_write_all('A'); }
+          if (bit_istrue(lim_pin_state, bit(B_AXIS))) { serial_write_all('B'); }
         #endif
         #if ( defined(STM32F1_6) || defined(STM32F4_6) )
-          if (bit_istrue(lim_pin_state, bit(A_AXIS))) { serial_write('A'); }
-          if (bit_istrue(lim_pin_state, bit(B_AXIS))) { serial_write('B'); }
-          if (bit_istrue(lim_pin_state, bit(C_AXIS))) { serial_write('C'); }
+          if (bit_istrue(lim_pin_state, bit(A_AXIS))) { serial_write_all('A'); }
+          if (bit_istrue(lim_pin_state, bit(B_AXIS))) { serial_write_all('B'); }
+          if (bit_istrue(lim_pin_state, bit(C_AXIS))) { serial_write_all('C'); }
         #endif
       }
       if (ctrl_pin_state) {
         #ifdef ENABLE_SAFETY_DOOR_INPUT_PIN
-          if (bit_istrue(ctrl_pin_state,CONTROL_PIN_INDEX_SAFETY_DOOR)) { serial_write('D'); }
+          if (bit_istrue(ctrl_pin_state,CONTROL_PIN_INDEX_SAFETY_DOOR)) { serial_write_all('D'); }
         #endif
-        if (bit_istrue(ctrl_pin_state,CONTROL_PIN_INDEX_RESET)) { serial_write('R'); }
-        if (bit_istrue(ctrl_pin_state,CONTROL_PIN_INDEX_FEED_HOLD)) { serial_write('H'); }
-        if (bit_istrue(ctrl_pin_state,CONTROL_PIN_INDEX_CYCLE_START)) { serial_write('S'); }
+        if (bit_istrue(ctrl_pin_state,CONTROL_PIN_INDEX_RESET)) { serial_write_all('R'); }
+        if (bit_istrue(ctrl_pin_state,CONTROL_PIN_INDEX_FEED_HOLD)) { serial_write_all('H'); }
+        if (bit_istrue(ctrl_pin_state,CONTROL_PIN_INDEX_CYCLE_START)) { serial_write_all('S'); }
       }
     }
   #endif
@@ -640,8 +649,8 @@ void report_realtime_status()
         sys.report_wco_counter = (REPORT_WCO_REFRESH_BUSY_COUNT-1); // Reset counter for slow refresh
       } else { sys.report_wco_counter = (REPORT_WCO_REFRESH_IDLE_COUNT-1); }
       if (sys.report_ovr_counter == 0) { sys.report_ovr_counter = 1; } // Set override on next report.
-      printPgmString(PSTR("|WCO:"));
-      report_util_axis_values(wco);
+      printPgmStringAll(PSTR("|WCO:"));
+      report_util_axis_values_all(wco);
     }
   #endif
 
@@ -651,40 +660,40 @@ void report_realtime_status()
       if (sys.state & (STATE_HOMING | STATE_CYCLE | STATE_HOLD | STATE_JOG | STATE_SAFETY_DOOR)) {
         sys.report_ovr_counter = (REPORT_OVR_REFRESH_BUSY_COUNT-1); // Reset counter for slow refresh
       } else { sys.report_ovr_counter = (REPORT_OVR_REFRESH_IDLE_COUNT-1); }
-      printPgmString(PSTR("|Ov:"));
-      print_uint8_base10(sys.f_override);
-      serial_write(',');
-      print_uint8_base10(sys.r_override);
-      serial_write(',');
-      print_uint8_base10(sys.spindle_speed_ovr);
+      printPgmStringAll(PSTR("|Ov:"));
+      print_uint8_base10_all(sys.f_override);
+      serial_write_all(',');
+      print_uint8_base10_all(sys.r_override);
+      serial_write_all(',');
+      print_uint8_base10_all(sys.spindle_speed_ovr);
 
       uint8_t sp_state = spindle_get_state();
       uint8_t cl_state = coolant_get_state();
       if (sp_state || cl_state) {
-        printPgmString(PSTR("|A:"));
+        printPgmStringAll(PSTR("|A:"));
         if (sp_state) { // != SPINDLE_STATE_DISABLE
           #ifdef VARIABLE_SPINDLE 
             #ifdef USE_SPINDLE_DIR_AS_ENABLE_PIN
-              serial_write('S'); // CW
+              serial_write_all('S'); // CW
             #else
-              if (sp_state == SPINDLE_STATE_CW) { serial_write('S'); } // CW
-              else { serial_write('C'); } // CCW
+              if (sp_state == SPINDLE_STATE_CW) { serial_write_all('S'); } // CW
+              else { serial_write_all('C'); } // CCW
             #endif
           #else
-            if (sp_state & SPINDLE_STATE_CW) { serial_write('S'); } // CW
-            else { serial_write('C'); } // CCW
+            if (sp_state & SPINDLE_STATE_CW) { serial_write_all('S'); } // CW
+            else { serial_write_all('C'); } // CCW
           #endif
         }
-        if (cl_state & COOLANT_STATE_FLOOD) { serial_write('F'); }
+        if (cl_state & COOLANT_STATE_FLOOD) { serial_write_all('F'); }
         #ifdef ENABLE_M7
-          if (cl_state & COOLANT_STATE_MIST) { serial_write('M'); }
+          if (cl_state & COOLANT_STATE_MIST) { serial_write_all('M'); }
         #endif
       }  
     }
   #endif
 
-  serial_write('>');
-  report_util_line_feed();
+    serial_write_all('>');
+  report_util_line_feed_all();
 }
 
 
