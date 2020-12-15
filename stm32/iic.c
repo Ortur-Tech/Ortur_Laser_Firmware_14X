@@ -73,18 +73,20 @@
 //初始化IIC
 void IIC_Init(void)
 {
-	GPIO_InitTypeDef GPIO_InitStruct = {0};
+	LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
 
-	__HAL_RCC_GPIOB_CLK_ENABLE();
+	LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOB);
 	/**I2C2 GPIO Configuration
 	PB10     ------> I2C2_SCL
 	PB11     ------> I2C2_SDA
 	*/
-	GPIO_InitStruct.Pin = GPIO_PIN_10|GPIO_PIN_11;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull=GPIO_PULLUP;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+	GPIO_InitStruct.Pin = LL_GPIO_PIN_10|LL_GPIO_PIN_11;
+    GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+    GPIO_InitStruct.Pull = LL_GPIO_PULL_UP;
+    LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
 	IIC_SCL=1;
 	IIC_SDA=1;
 
@@ -171,6 +173,7 @@ void IIC_Send_Byte(uint8_t txd)
 	IIC_SCL=0; //拉低时钟开始数据传输
     for(t=0;t<8;t++)
     {
+    	soft_delay_us(2);
         //IIC_SDA=(txd&0x80)>>7;
 		if((txd&0x80)>>7)
 			IIC_SDA=1;
@@ -181,8 +184,9 @@ void IIC_Send_Byte(uint8_t txd)
 		IIC_SCL=1;
 		soft_delay_us(2);
 		IIC_SCL=0;
-		soft_delay_us(2);
+
     }
+    SDA_IN();
 }
 //读1个字节，ack=1时，发送ACK，ack=0，发送nACK
 uint8_t IIC_Read_Byte(unsigned char ack)
