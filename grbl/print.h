@@ -22,7 +22,7 @@
 #ifndef print_h
 #define print_h
 
-
+void printStringAll(const char *s);
 void printString(const char *s);
 
 void printPgmString(const char *s);
