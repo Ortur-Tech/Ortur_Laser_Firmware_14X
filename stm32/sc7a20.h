@@ -12,17 +12,20 @@
 #include "main.h"
 
 #define SC7A20_ADDR		0x30 //0x30
+#define SC7A20_DEVICE 0X11
+#define OTHER_DEVICE 0X03
 
  typedef struct {
  	uint16_t xValue;
  	uint16_t yValue;
  	uint16_t zValue;
  }SC7A20_TYPE;
-
+ void Gsensor_Init(void);
  extern SC7A20_TYPE scInfo;
  void Sc7a20_Init(void);
  uint8_t Read_Sc7a20_data(void);
-
+ uint8_t Get_GsensorType(void);
+ void Sc7a20_Get_Acceleration(short *gx, short *gy, short *gz);
 #ifdef __cplusplus
 }
 #endif

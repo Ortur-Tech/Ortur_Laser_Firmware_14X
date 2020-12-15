@@ -49,7 +49,7 @@ char Read_One_Byte(char device_addr, char reg_addr)
 void Sc7a20_Init(void)
 {
 
-	IIC_Init();
+	//IIC_Init();
 	soft_delay_ms(20);
 	Write_One_Byte_iicaddr(SC7A20_ADDR, 0x20, 0x47);
 	Write_One_Byte_iicaddr(SC7A20_ADDR, 0x23, 0x88);
@@ -57,8 +57,6 @@ void Sc7a20_Init(void)
 	soft_delay_ms(10);
 }
 
-#define SC7A20_DEVICE 0X11
-#define OTHER_DEVICE 0X03
 
 uint8_t Get_GsensorType(void)
 {
@@ -73,11 +71,34 @@ uint8_t Get_GsensorType(void)
 }
 
 SC7A20_TYPE scInfo;
+//得到加速度值(原始值)
+//gx,gy,gz:陀螺仪x,y,z轴的原始读数(带符号)
+void Sc7a20_Get_Acceleration(short *gx, short *gy, short *gz)
+{
+	uint16_t x_l8,x_h8,y_l8,y_h8,z_l8,z_h8;
 
+	x_l8 = Read_One_Byte(SC7A20_ADDR, 0x28);
+	x_h8 = Read_One_Byte(SC7A20_ADDR, 0x29);
+	y_l8 = Read_One_Byte(SC7A20_ADDR, 0x2A);
+	y_h8 = Read_One_Byte(SC7A20_ADDR, 0x2B);
+	z_l8 = Read_One_Byte(SC7A20_ADDR, 0x2C);
+	z_h8 = Read_One_Byte(SC7A20_ADDR, 0x2D);
+
+    *gx=(short)((x_h8<<8)|x_l8);
+    *gy=(short)((y_h8<<8)|y_l8);
+    *gz=(short)((z_h8<<8)|z_l8);
+
+    *gx=(*gx)>>6;
+    *gy=(*gy)>>6;
+    *gz=(*gz)>>6;
+
+	mprintf(LOG_INFO,"xValue:%d. yValue:%d. zValue:%d.\r\n",*gx,*gy,*gz);
+	return ;
+}
 uint8_t Read_Sc7a20_data(void)
 {
 	char temp;
-	char x_l8,x_h8,y_l8,y_h8,z_l8,z_h8;
+	uint16_t x_l8,x_h8,y_l8,y_h8,z_l8,z_h8;
 	/*可以用来兼容BM250*/
 	if(Get_GsensorType()==SC7A20_DEVICE)
 	{
@@ -92,12 +113,16 @@ uint8_t Read_Sc7a20_data(void)
 			z_l8 = Read_One_Byte(SC7A20_ADDR, 0x2C);
 			z_h8 = Read_One_Byte(SC7A20_ADDR, 0x2D);
 
-			scInfo.xValue=(x_h8<<8)+x_l8;
-			scInfo.yValue=(y_h8<<8)+y_l8;
-			scInfo.zValue=(z_h8<<8)+z_l8;
+			scInfo.xValue=(x_h8<<2)+(x_l8>>6);
+			scInfo.yValue=(y_h8<<2)+(y_l8>>6);
+			scInfo.zValue=(z_h8<<2)+(z_l8>>6);
 
 			mprintf(LOG_INFO,"xValue:%d. yValue:%d. zValue:%d.\r\n",scInfo.xValue,scInfo.yValue,scInfo.zValue);
 			return 0;
+		}
+		else
+		{
+			return 1;
 		}
 	}
 	else
