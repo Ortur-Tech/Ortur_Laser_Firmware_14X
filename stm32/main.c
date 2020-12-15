@@ -107,9 +107,9 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
+  MX_USART1_UART_Init();
   IIC_Init();
-  BMA250_Init();
+  Gsensor_Init();
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -132,7 +132,9 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM3_Init();
   MX_USB_DEVICE_Init();
-  MX_USART1_UART_Init();
+
+
+
 #ifndef DEBUG
   MX_IWDG_Init();
 #endif
