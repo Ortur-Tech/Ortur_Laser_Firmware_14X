@@ -1,11 +1,12 @@
 #include "grbl.h"
 #include "iic.h"
+#include "sc7a20.h"
 //#include "timer.h"
 
 #ifndef DEFAULT_ACCEL_SENSITIVITY
 	#define DEFAULT_ACCEL_SENSITIVITY 350
 #endif
-
+uint8_t BMA250_ReadByte(uint8_t I2C_addr, uint8_t Reg_addr);
 extern int32_t bma2x2_data_readout(int16_t * accel_x_int16_t,int16_t * accel_y_int16_t,int16_t * accel_z_int16_t);
 #define _ABS(x) (x<0?-x:x)
 
@@ -49,6 +50,9 @@ void BMA250_Get_Acceleration(short *gx, short *gy, short *gz);
 #define BMP_AS_RANGE 2
 #define BMP_AS_BANDWIDTH 8
 #define BMP_AS_SLEEPPHASE 2
+
+uint8_t GsensorDeviceType=0;
+
 
 void BMA250_Init(void)
 {
@@ -107,13 +111,7 @@ void BMA250_Init(void)
 //	#error "Sleep phase duration not supported"
 #endif
 
-//	while(1)
-//	{
-//		bSleep=Check_BMA250_ID();
-//		BMA250_Get_Acceleration(&accel_x,&accel_y,&accel_z);
-//	    bBwd=bSleep;
-//	    delay_ms(100);
-//	}
+
 	// write sensor configuration
 	BMA250_WriteByte(BMA250_Addr, BMP_GRANGE, bGRange);  // Set measurement range
 	BMA250_WriteByte(BMA250_Addr, BMP_BWD, bBwd);        // Set filter bandwidth
@@ -124,17 +122,39 @@ void BMA250_Init(void)
 	BMA250_WriteByte(BMA250_Addr, BMP_SCR, 0x80);        // acquire unfiltered acceleration data
 #endif
 
-	bSleep=Check_BMA250_ID();
-	bBwd=bSleep;
-//	// configure sensor interrupt
-//	bmp_as_write_register(BMP_IMR2, 0x01);       // map new data interrupt to INT1 pin
-//	bmp_as_write_register(BMP_ISR2, 0x10);       // enable new data interrupt
+//	while(1)
+//	{
+////		BMA250_WriteByte(BMA250_Addr, BMP_BWD, 0x09);        // Set filter bandwidth
+////		bSleep=BMA250_ReadByte(BMA250_Addr,BMP_BWD);
+////		mprintf(LOG_INFO,"BMP_BWD w/r:0x%02x:0x%02x.\r\n",0x09,bSleep);
+////		BMA250_WriteByte(BMA250_Addr, BMP_BWD, bBwd);        // Set filter bandwidth
+////		bSleep=BMA250_ReadByte(BMA250_Addr,BMP_BWD);
+////		mprintf(LOG_INFO,"BMP_BWD w/r:0x%02x:0x%02x.\r\n",bBwd,bSleep);
 //
-//	// enable CC430 interrupt pin for data read out from acceleration sensor
-//	AS_INT_IFG &= ~AS_INT_PIN;                   // Reset flag
-//	AS_INT_IE  |=  AS_INT_PIN;                   // Enable interrupt
-}
+//		bSleep=Check_BMA250_ID();
+//		mprintf(LOG_INFO,"chip id:0x%02x.\r\n",bSleep);
+//		BMA250_Get_Acceleration(&accel_x,&accel_y,&accel_z);
+//	    bBwd=bSleep;
+//	    mprintf(LOG_INFO,"xValue:%d. yValue:%d. zValue:%d.\r\n",accel_x,accel_y,accel_z);
+//	    delay_ms(1000);
+//	}
 
+}
+void Gsensor_Init(void)
+{
+	if(GsensorDeviceType==0)
+	{
+		GsensorDeviceType=Get_GsensorType();
+	}
+	if(GsensorDeviceType==SC7A20_DEVICE)
+	{
+		Sc7a20_Init();
+	}
+	else
+	{
+		BMA250_Init();
+	}
+}
 /**
 * BMA250 IIC写一个字节
 * I2C_addr  BMA250地址
@@ -267,12 +287,23 @@ uint8_t Check_BMA250_ID(void)
 //gx,gy,gz:陀螺仪x,y,z轴的原始读数(带符号)
 void BMA250_Get_Acceleration(short *gx, short *gy, short *gz)
 {
-    *(gx+0) = BMA250_ReadByte(BMA250_Addr, BMP_ACC_X_LSB);
-    *(gx+1) = BMA250_ReadByte(BMA250_Addr, BMP_ACC_X_MSB);
-    *(gy+0) = BMA250_ReadByte(BMA250_Addr, BMP_ACC_Y_LSB);
-    *(gy+1) = BMA250_ReadByte(BMA250_Addr, BMP_ACC_Y_MSB);
-    *(gz+0) = BMA250_ReadByte(BMA250_Addr, BMP_ACC_Z_LSB);
-    *(gz+1) = BMA250_ReadByte(BMA250_Addr, BMP_ACC_Z_MSB);
+	uint16_t x_l8,x_h8,y_l8,y_h8,z_l8,z_h8;
+
+    x_l8 = BMA250_ReadByte(BMA250_Addr, BMP_ACC_X_LSB);
+    x_h8 = BMA250_ReadByte(BMA250_Addr, BMP_ACC_X_MSB);
+    y_l8 = BMA250_ReadByte(BMA250_Addr, BMP_ACC_Y_LSB);
+    y_h8 = BMA250_ReadByte(BMA250_Addr, BMP_ACC_Y_MSB);
+    z_l8 = BMA250_ReadByte(BMA250_Addr, BMP_ACC_Z_LSB);
+    z_h8 = BMA250_ReadByte(BMA250_Addr, BMP_ACC_Z_MSB);
+
+    *gx=(short)((x_h8<<8)|x_l8);
+    *gy=(short)((y_h8<<8)|y_l8);
+    *gz=(short)((z_h8<<8)|z_l8);
+
+    *gx=(*gx)>>6;
+    *gy=(*gy)>>6;
+    *gz=(*gz)>>6;
+
 }
 
 //TODO:检测10秒内的加速度值
@@ -280,8 +311,15 @@ void BMA250_Get_Acceleration(short *gx, short *gy, short *gz)
 //初始化并读取加速度计数据
 void accel_detection()
 {
-	//延时读取加速度情况
-	BMA250_Get_Acceleration(&accel_x,&accel_y,&accel_z);
+	if(GsensorDeviceType==SC7A20_DEVICE)
+	{
+		Sc7a20_Get_Acceleration(&accel_x,&accel_y,&accel_z);
+	}
+	else
+	{
+		//延时读取加速度情况
+		BMA250_Get_Acceleration(&accel_x,&accel_y,&accel_z);
+	}
 
 	if(accel_x != accel_x_old ||accel_y != accel_y_old ||accel_z != accel_z_old )
 	{
