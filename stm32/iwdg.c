@@ -30,13 +30,18 @@ IWDG_HandleTypeDef hiwdg;
 void MX_IWDG_Init(void)
 {
 
-  hiwdg.Instance = IWDG;
-  hiwdg.Init.Prescaler = IWDG_PRESCALER_64;
-  hiwdg.Init.Reload = 256;
-  if (HAL_IWDG_Init(&hiwdg) != HAL_OK)
-  {
-    Error_Handler();
-  }
+	IWDG->KR=0X5555;//使能对IWDG->PR和IWDG->RLR的写
+  	IWDG->PR=64;  //设置分频系数
+  	IWDG->RLR=256;  //从加载寄存器 IWDG->RLR
+	IWDG->KR=0XAAAA;//reload
+  	IWDG->KR=0XCCCC;//使能看门狗
+//  hiwdg.Instance = IWDG;
+//  hiwdg.Init.Prescaler = IWDG_PRESCALER_64;
+//  hiwdg.Init.Reload = 256;
+//  if (HAL_IWDG_Init(&hiwdg) != HAL_OK)
+//  {
+//    Error_Handler();
+//  }
 
 }
 
@@ -111,7 +116,8 @@ void IWDG_Feed(void)
 	}
 #endif
 #ifndef DEBUG
-	HAL_IWDG_Refresh(&hiwdg);
+	IWDG->KR=0XAAAA;//reload
+	//HAL_IWDG_Refresh(&hiwdg);
 #endif
 }
 /* USER CODE END 1 */
