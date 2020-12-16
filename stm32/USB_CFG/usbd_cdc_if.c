@@ -21,7 +21,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_cdc_if.h"
-
+#include "usb_device.h"
 /* USER CODE BEGIN INCLUDE */
 #include "serial.h"
 /* USER CODE END INCLUDE */
