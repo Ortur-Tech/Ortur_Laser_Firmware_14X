@@ -57,23 +57,11 @@ USBD_HandleTypeDef hUsbDeviceFS;
 /* USER CODE BEGIN 1 */
 void Reset_Usb()
 {
-	LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
-	__HAL_RCC_GPIOA_CLK_ENABLE();
-
-	/*Configure GPIO pin : PtPin */
-	GPIO_InitStruct.Pin = GPIO_PIN_12|GPIO_PIN_11;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
+	HAL_Delay(250);
 	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_12,GPIO_PIN_SET);
-	HAL_Delay(100);
+	HAL_Delay(250);
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_12,GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_11,GPIO_PIN_RESET);
-	HAL_Delay(100);
-	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_12,GPIO_PIN_SET);
-
 
 }
 static uint8_t usbCdcConnectFlag=0;
