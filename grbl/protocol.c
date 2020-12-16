@@ -34,7 +34,7 @@ static char line[LINE_BUFFER_SIZE]; // Line to be executed. Zero-terminated.
 
 static void protocol_exec_rt_suspend();
 
-
+static uint8_t powerOnHomingFlag=0;
 /*
   GRBL PRIMARY LOOP:
 */
@@ -66,6 +66,13 @@ void protocol_main_loop()
     system_execute_startup(line); // Execute startup script.
   }
 
+  if(powerOnHomingFlag==0)
+  {
+	  powerOnHomingFlag=1;
+	  memcpy(line,"$H\0",3);
+	  report_status_message(system_execute_line(line));
+  }
+
   // ---------------------------------------------------------------------------------
   // Primary loop! Upon a system abort, this exits back to main() to reset the system.
   // This is also where Grbl idles while waiting for something to do.
@@ -85,6 +92,10 @@ void protocol_main_loop()
         if (sys.abort) { return; } // Bail to calling function upon system abort
 
         line[char_counter] = 0; // Set string termination character.
+
+        /*蓝灯熄灭：USB未插。 蓝灯闪烁：USB有数据传输。蓝灯常亮：USB线插入状态*/
+        StatusLed_Blink();
+
         #ifdef REPORT_ECHO_LINE_RECEIVED
           report_echo_line_received(line);
         #endif
