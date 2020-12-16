@@ -21,6 +21,8 @@
 #include "gpio.h"
 /* USER CODE BEGIN 0 */
 #include "iwdg.h"
+#include "usb_device.h"
+
 #define KEY_ON 0
 #define KEY_OFF 1
 
@@ -94,7 +96,7 @@ void MX_GPIO_Init(void)
 	LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 	/*Configure GPIO pin : PtPin */
-	GPIO_InitStruct.Pin = LL_GPIO_PIN_15;
+	GPIO_InitStruct.Pin = LL_GPIO_PIN_15|LL_GPIO_PIN_12;
 	GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
 	GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
 	GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
@@ -209,10 +211,10 @@ void PowerOpen_Loop()
 	//默认关机
 	key_count = 0;
 	//初始化按�?
-	__HAL_RCC_GPIOC_CLK_ENABLE();
-  /*Configure GPIO pin : PtPin */
-	LL_GPIO_SetPinPull(KEY_GPIO_Port, KEY_Pin, LL_GPIO_PULL_UP);
-    LL_GPIO_SetPinMode(KEY_GPIO_Port, KEY_Pin, LL_GPIO_MODE_INPUT);
+	//__HAL_RCC_GPIOC_CLK_ENABLE();
+	/*Configure GPIO pin : PtPin */
+	//LL_GPIO_SetPinPull(KEY_GPIO_Port, KEY_Pin, LL_GPIO_PULL_UP);
+    //LL_GPIO_SetPinMode(KEY_GPIO_Port, KEY_Pin, LL_GPIO_MODE_INPUT);
 
 	//debugStr("wait for power on.\n");
 	while(1)
@@ -252,6 +254,32 @@ void PowerLed_Blink_Limit(uint32_t ms)
 		last_blink_time = HAL_GetTick();
 	}
 }
+
+/*标识端口正在通讯*/
+//uint8_t isCommunicationFlag=0;
+//
+//void StatusLed_Show(void)
+//{
+//	static uint32_t time=0;
+//	if(isCommunicationFlag==1)
+//	{
+//		isCommunicationFlag=0;
+//		time=HAL_GetTick();
+//	}
+//
+//	if(isUSBConnect()&&((HAL_GetTick()-time)<5000))
+//	{
+//		StatusLed_Blink();
+//	}
+//	else if(isUSBConnect())
+//	{
+//		StatusLed_On();
+//	}
+//	else
+//	{
+//		StatusLed_Off();
+//	}
+//}
 void PowerClose_Check()
 {
 	//长按关机
@@ -288,13 +316,13 @@ void PowerClose_Check()
 			}
 			else
 			{
-				PowerLed_Blink_Limit(0);
+				//PowerLed_Blink_Limit(0);
 				PowerLed_On();
 			}
 		}
 		else
 		{
-			PowerLed_Blink_Limit(0);
+			//PowerLed_Blink_Limit(0);
 			PowerLed_On();
 		}
 	}
