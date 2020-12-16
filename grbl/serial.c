@@ -23,6 +23,7 @@
 #include "usbd_cdc.h"
 #include "usbd_cdc_if.h"
 #include "usb_device.h"
+#include "gpio.h"
 
 #ifdef STM32
   #ifdef STM32F1
