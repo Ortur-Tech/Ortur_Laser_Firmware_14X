@@ -6,8 +6,7 @@
 #ifndef DEFAULT_ACCEL_SENSITIVITY
 	#define DEFAULT_ACCEL_SENSITIVITY 350
 #endif
-uint8_t BMA250_ReadByte(uint8_t I2C_addr, uint8_t Reg_addr);
-extern int32_t bma2x2_data_readout(int16_t * accel_x_int16_t,int16_t * accel_y_int16_t,int16_t * accel_z_int16_t);
+
 #define _ABS(x) (x<0?-x:x)
 
 int16_t accel_x,accel_y, accel_z;
@@ -22,7 +21,7 @@ uint32_t accel_check_interval_ms = 100; //250毫秒检测一次
 uint64_t last_accel_check_ms = 0;
 uint32_t detection_count = 0; //开始检测
 
-uint8_t BMA250_WriteByte(uint8_t I2C_addr,uint8_t Reg_addr,uint8_t data);
+
 uint8_t Check_BMA250_ID(void);
 void BMA250_Get_Acceleration(short *gx, short *gy, short *gz);
 
@@ -113,13 +112,13 @@ void BMA250_Init(void)
 
 
 	// write sensor configuration
-	BMA250_WriteByte(BMA250_Addr, BMP_GRANGE, bGRange);  // Set measurement range
-	BMA250_WriteByte(BMA250_Addr, BMP_BWD, bBwd);        // Set filter bandwidth
-	BMA250_WriteByte(BMA250_Addr, BMP_PM, bSleep);       // Set filter bandwidth
+	Write_One_Byte_iicaddr(BMA250_Addr, BMP_GRANGE, bGRange);  // Set measurement range
+	Write_One_Byte_iicaddr(BMA250_Addr, BMP_BWD, bBwd);        // Set filter bandwidth
+	Write_One_Byte_iicaddr(BMA250_Addr, BMP_PM, bSleep);       // Set filter bandwidth
 
 
 #ifndef BMP_AS_FILTERING
-	BMA250_WriteByte(BMA250_Addr, BMP_SCR, 0x80);        // acquire unfiltered acceleration data
+	Write_One_Byte_iicaddr(BMA250_Addr, BMP_SCR, 0x80);        // acquire unfiltered acceleration data
 #endif
 
 //	while(1)
@@ -155,132 +154,11 @@ void Gsensor_Init(void)
 		BMA250_Init();
 	}
 }
-/**
-* BMA250 IIC写一个字节
-* I2C_addr  BMA250地址
-* Reg_addr:寄存器地址
-* data: 写入寄存器地址
-* 返回值:0,正常
-*        1,错误代码
-*/
-uint8_t BMA250_WriteByte(uint8_t I2C_addr,uint8_t Reg_addr,uint8_t data)
-{
-	IIC_Start();
-    IIC_Send_Byte(I2C_addr | 0X00); //WRITE i2c
-    if (IIC_Wait_Ack()==1) {
-	goto err;
-    }
 
-    IIC_Send_Byte(Reg_addr);
-    if (IIC_Wait_Ack()==1) {
-	goto err;
-    }
-
-    IIC_Send_Byte(data);
-    if (IIC_Wait_Ack()==1) {
-        goto err;
-    }
-    IIC_Stop();
-    return 1;
-err:
-	IIC_Stop();
-	return 0;
-}
-
-/**
-* BMA250 IIC读一个字节
-* I2C_addr  BMA250地址
-* Reg_addr:寄存器地址
-* 返回值:data,正常
-*        0,错误代码
-*/
-uint8_t BMA250_ReadByte(uint8_t I2C_addr, uint8_t Reg_addr)
-{
-    uint8_t data;
-    IIC_Start();
-    IIC_Send_Byte(I2C_addr | 0X00); //WRITE i2c
-    if (IIC_Wait_Ack()==1) {
-	goto err;
-    }
-
-    IIC_Send_Byte(Reg_addr);
-    if (IIC_Wait_Ack()==1) {
-	goto err;
-    }
-    //IIC_Stop();
-
-    IIC_Start();
-    IIC_Send_Byte(I2C_addr | 0X01); //READ
-    if (IIC_Wait_Ack()==1) {
-	goto err;
-    }
-
-    data = IIC_Read_Byte(0);
-    //send_noack();
-    IIC_Stop();
-    return data;
-
-err:
-	IIC_Stop();
-	return 0;
-}
-
-//读1个字节，ack=1时，发送ACK，ack=0，发送nACK
-uint8_t BMA250_IIC_Read_Byte(uint8_t ack)
-{
-    uint8_t data;
-    data = IIC_Read_Byte(ack);
-//    if(ack) IIC_Ack();
-//    else IIC_NAck();
-    return data;
-}
-
-
-/**
-* BMA250 IIC连续读len个字节
-* I2C_addr:  BMA250地址
-* Reg_addr:寄存器地址
-* len:要读取的长度
-* buff:读取到的数据存储区
-* 返回值:0,正常
-*        其他,错误代码
-*/
-uint8_t BMA250_Read_LenBytes(uint8_t I2C_addr, uint8_t Reg_addr, uint8_t len, uint8_t *buff)
-{
-	IIC_Start();
-	IIC_Send_Byte(I2C_addr | 0X00); //WRITE i2c
-    if (IIC_Wait_Ack()==1) {
-	goto err;
-    }
-
-    IIC_Send_Byte(Reg_addr);
-    if (IIC_Wait_Ack()==1) {
-	goto err;
-    }
-    IIC_Stop();
-
-    IIC_Start();
-    IIC_Send_Byte(I2C_addr | 0X01); //READ
-    if (IIC_Wait_Ack()==1) {
-	goto err;
-    }
-    while(len)
-    {
-            if(len==1) *buff=BMA250_IIC_Read_Byte(0);   //读数据,发送nACK
-            else *buff=BMA250_IIC_Read_Byte(1);		//读数据,发送ACK
-            len--;
-            buff++;
-    }
-    IIC_Stop();
-    return 0;
-err:
-	IIC_Stop();
-	return 1;
-}
 
 uint8_t Check_BMA250_ID(void)
 {
-    return (BMA250_ReadByte(BMA250_Addr, 0x00));
+    return (Read_One_Byte(BMA250_Addr, 0x00));
 }
 
 //得到加速度值(原始值)
@@ -289,12 +167,12 @@ void BMA250_Get_Acceleration(short *gx, short *gy, short *gz)
 {
 	uint16_t x_l8,x_h8,y_l8,y_h8,z_l8,z_h8;
 
-    x_l8 = BMA250_ReadByte(BMA250_Addr, BMP_ACC_X_LSB);
-    x_h8 = BMA250_ReadByte(BMA250_Addr, BMP_ACC_X_MSB);
-    y_l8 = BMA250_ReadByte(BMA250_Addr, BMP_ACC_Y_LSB);
-    y_h8 = BMA250_ReadByte(BMA250_Addr, BMP_ACC_Y_MSB);
-    z_l8 = BMA250_ReadByte(BMA250_Addr, BMP_ACC_Z_LSB);
-    z_h8 = BMA250_ReadByte(BMA250_Addr, BMP_ACC_Z_MSB);
+    x_l8 = Read_One_Byte(BMA250_Addr, BMP_ACC_X_LSB);
+    x_h8 = Read_One_Byte(BMA250_Addr, BMP_ACC_X_MSB);
+    y_l8 = Read_One_Byte(BMA250_Addr, BMP_ACC_Y_LSB);
+    y_h8 = Read_One_Byte(BMA250_Addr, BMP_ACC_Y_MSB);
+    z_l8 = Read_One_Byte(BMA250_Addr, BMP_ACC_Z_LSB);
+    z_h8 = Read_One_Byte(BMA250_Addr, BMP_ACC_Z_MSB);
 
     *gx=(short)((x_h8<<8)|x_l8);
     *gy=(short)((y_h8<<8)|y_l8);
@@ -342,7 +220,6 @@ void accel_detection()
 			}
 		}
 
-
 		if(shake_detected)
 		{
 			shake_detected = 0;
@@ -354,7 +231,7 @@ void accel_detection()
 			{
 				//printString("Detect movement, terminate laser engraving!\r\n");
 				{
-					char diffStr[50];
+					//char diffStr[50];
 					//sprintf(diffStr,"Acceleration fluctuation:%d\r\n",(int)(accel_diff));
 					//printString(diffStr);
 				}
