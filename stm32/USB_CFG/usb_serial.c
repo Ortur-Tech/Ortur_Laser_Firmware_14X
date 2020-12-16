@@ -20,6 +20,113 @@
   along with Grbl.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#if 0 //USB_SERIAL_UART && USB_SERIAL_CDC
+
+#define USBCDC 1  //USB CDC VCP
+#define HWUART 2  //HW UART
+
+uint8_t last_steam = 0;
+
+//
+// Writes a null terminated string to active output stream, blocks if buffer full
+//
+int16_t multiSteamGetC (void)
+{
+	int16_t c = -1;
+
+	if(isUsbCDCConnected())
+	{
+		if(hal.stream.switchable ? true : last_steam == USBCDC)
+		{
+			c = usbGetC();
+			last_steam = USBCDC;
+			hal.stream.switchable = (c == -1);
+		}
+	}
+	else
+	{
+		if(last_steam == USBCDC) //在CDC已经断开连接的情况下,应该将steam指向转到 硬件串口 HWUART
+		{
+			hal.stream.switchable = true;
+			c = '\n'; //强行补换行符防止命令被截断,或者污染后续的命令字符串
+			return c;
+		}
+	}
+
+	if(c == -1 )
+	{
+		if(hal.stream.switchable ? true : last_steam == HWUART)
+		{
+			c = serialGetC();
+			last_steam = HWUART;
+			hal.stream.switchable = (c == -1);
+		}
+	}
+	return c;
+}
+
+//
+// Writes a null terminated string to active stream, blocks if buffer full
+//
+void multiSteamWriteS (const char *s)
+{
+	if(last_steam == USBCDC)
+	{
+		if(isUsbCDCConnected())
+		    usbWriteS(s); //仅在VCP连接的情况下发送字符串,否则会造成发送缓冲溢出阻塞
+	}
+	else if(last_steam == HWUART)
+		serialWriteS(s);
+}
+
+//
+// Writes a null terminated string to all output stream, blocks if buffer full
+//
+void multiSteamWriteSAll (const char *s)
+{
+	if(isUsbCDCConnected())
+		usbWriteS(s); //仅在VCP连接的情况下发送字符串,否则会造成发送缓冲溢出阻塞
+	serialWriteS(s);
+}
+
+//
+// Returns number of free characters in active input buffer
+//
+uint16_t multiSteamRxFree (void)
+{
+	//BUG:可能存在steam切换时的干扰
+	uint16_t uf = usbRxFree();
+	uint16_t sf = serialRxFree();
+	return (uf > sf) ? sf : uf;
+}
+
+//
+// Flushes the serial input buffer
+//
+void multiSteamRxFlush (void)
+{
+	usbRxFlush();
+	serialRxFlush();
+}
+
+//
+// Flushes and adds a CAN character to active input buffer
+//
+void multiSteamRxCancel (void)
+{
+	usbRxCancel();
+	serialRxCancel();
+}
+
+//
+// Suspend/resume the active input buffer
+//
+bool multiSteamSuspendInput (bool suspend)
+{
+	return usbSuspendInput(suspend) && serialSuspendInput(suspend);
+}
+
+#endif
 
 #if 0
 
