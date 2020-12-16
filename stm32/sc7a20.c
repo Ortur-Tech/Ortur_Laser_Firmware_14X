@@ -95,43 +95,7 @@ void Sc7a20_Get_Acceleration(short *gx, short *gy, short *gz)
 	mprintf(LOG_INFO,"xValue:%d. yValue:%d. zValue:%d.\r\n",*gx,*gy,*gz);
 	return ;
 }
-uint8_t Read_Sc7a20_data(void)
-{
-	char temp;
-	uint16_t x_l8,x_h8,y_l8,y_h8,z_l8,z_h8;
-	/*可以用来兼容BM250*/
-	if(Get_GsensorType()==SC7A20_DEVICE)
-	{
-		temp = Read_One_Byte(SC7A20_ADDR, 0x27);
-		temp = temp & 0x0f;
-		if (0x0f == temp)
-		{
-			x_l8 = Read_One_Byte(SC7A20_ADDR, 0x28);
-			x_h8 = Read_One_Byte(SC7A20_ADDR, 0x29);
-			y_l8 = Read_One_Byte(SC7A20_ADDR, 0x2A);
-			y_h8 = Read_One_Byte(SC7A20_ADDR, 0x2B);
-			z_l8 = Read_One_Byte(SC7A20_ADDR, 0x2C);
-			z_h8 = Read_One_Byte(SC7A20_ADDR, 0x2D);
 
-			scInfo.xValue=(x_h8<<2)+(x_l8>>6);
-			scInfo.yValue=(y_h8<<2)+(y_l8>>6);
-			scInfo.zValue=(z_h8<<2)+(z_l8>>6);
-
-			mprintf(LOG_INFO,"xValue:%d. yValue:%d. zValue:%d.\r\n",scInfo.xValue,scInfo.yValue,scInfo.zValue);
-			return 0;
-		}
-		else
-		{
-			return 1;
-		}
-	}
-	else
-	{
-		mprintf(LOG_INFO,"NOT SC7A20 DEVICE.\r\n");
-		return 1;
-	}
-
-}
 
 
 

@@ -23,7 +23,8 @@
  void Gsensor_Init(void);
  extern SC7A20_TYPE scInfo;
  void Sc7a20_Init(void);
- uint8_t Read_Sc7a20_data(void);
+ char Read_One_Byte(char device_addr, char reg_addr);
+ void Write_One_Byte_iicaddr(char iicchar, char addr, char thedata);
  uint8_t Get_GsensorType(void);
  void Sc7a20_Get_Acceleration(short *gx, short *gy, short *gz);
 #ifdef __cplusplus
