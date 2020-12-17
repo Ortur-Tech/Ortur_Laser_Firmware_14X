@@ -83,7 +83,7 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-  Check_Rst_Source();
+  //Check_Rst_Source();
 #ifdef USE_BACKTRACE
 	{ //Enable fault by div 0
     volatile int * SCB_CCR = (volatile int *) 0xE000ED14; // SCB->CCR
@@ -107,9 +107,9 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
+  MX_USART1_UART_Init();
   IIC_Init();
-  BMA250_Init();
+  Gsensor_Init();
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -117,7 +117,7 @@ int main(void)
 
   Reset_Usb();
 #ifndef ORTUR_CNC_MODE
-  Leds_Power(0); //给信号灯供电
+  Leds_Power(0); //关信号灯供电
 
   //阻塞,直到电源开启
   //BUG: PowerOpen_Loop会造成后续代码出错
@@ -132,7 +132,9 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM3_Init();
   MX_USB_DEVICE_Init();
-  MX_USART1_UART_Init();
+
+
+
 #ifndef DEBUG
   MX_IWDG_Init();
 #endif
@@ -140,20 +142,14 @@ int main(void)
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
-  delay_ms(20);
 
-//  while(1)
-//  {
-//	  PowerLed_Blink();
-//	  delay_ms(1);
-//  }
 #ifndef DEBUG
   // Disable IWDG if core is halted,调试时冻结看门狗
-  DBGMCU->CR |= DBGMCU_CR_DBG_IWDG_STOP;
+  //DBGMCU->CR |= DBGMCU_CR_DBG_IWDG_STOP;
 #endif
 
   timing_init();
-  uart_init();
+  //uart_init();
 
   eeprom_init();
   serial_init();   // Setup serial baud rate and interrupts

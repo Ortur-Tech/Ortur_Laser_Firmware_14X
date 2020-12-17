@@ -23,6 +23,7 @@
 
 void coolant_init()
 {
+#if !DEFAULT_LASER_MODE
 #ifdef ATMEGA328P
   COOLANT_FLOOD_DDR |= (1 << COOLANT_FLOOD_BIT); // Configure as output pin
   #ifdef ENABLE_M7
@@ -30,14 +31,15 @@ void coolant_init()
   #endif
 #endif
   coolant_stop();
+#endif
 }
 
 
 // Returns current coolant output state. Overrides may alter it from programmed state.
 uint8_t coolant_get_state()
 {
-  uint8_t cl_state = COOLANT_STATE_DISABLE;
-
+	uint8_t cl_state = COOLANT_STATE_DISABLE;
+#if !DEFAULT_LASER_MODE
 #ifdef STM32
   if (bit_istrue(GPIO_ReadOutputData(COOL_FLOOD_GPIO_Port),COOL_FLOOD_Pin))
   {
@@ -69,7 +71,7 @@ uint8_t coolant_get_state()
     }
   #endif
 #endif
-
+#endif
   return(cl_state);
 }
 
@@ -78,6 +80,7 @@ uint8_t coolant_get_state()
 // an interrupt-level. No report flag set, but only called by routines that don't need it.
 void coolant_stop()
 {
+#if !DEFAULT_LASER_MODE
 #ifdef STM32
 	#ifdef INVERT_COOLANT_FLOOD_PIN
 		GPIO_SetBits(COOL_FLOOD_GPIO_Port,COOL_FLOOD_Pin);
@@ -107,6 +110,7 @@ void coolant_stop()
     #endif
   #endif
 #endif
+#endif
 }
 
 
@@ -116,6 +120,8 @@ void coolant_stop()
 // parser program end, and g-code parser coolant_sync().
 void coolant_set_state(uint8_t mode)
 {
+
+#if !DEFAULT_LASER_MODE
   if (sys.abort) { return; } // Block during abort.
   
 
@@ -181,6 +187,7 @@ void coolant_set_state(uint8_t mode)
 	#endif
 #endif
   sys.report_ovr_counter = 0; // Set to report change immediately
+#endif
 }
 
 
@@ -188,7 +195,9 @@ void coolant_set_state(uint8_t mode)
 // if an abort or check-mode is active.
 void coolant_sync(uint8_t mode)
 {
+#if !DEFAULT_LASER_MODE
   if (sys.state == STATE_CHECK_MODE) { return; }
   protocol_buffer_synchronize(); // Ensure coolant turns on when specified in program.
   coolant_set_state(mode);
+#endif
 }

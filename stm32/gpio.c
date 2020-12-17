@@ -21,6 +21,8 @@
 #include "gpio.h"
 /* USER CODE BEGIN 0 */
 #include "iwdg.h"
+#include "usb_device.h"
+
 #define KEY_ON 0
 #define KEY_OFF 1
 
@@ -43,149 +45,148 @@
         * EVENT_OUT
         * EXTI
 */
+
+#define PIN_SWITCH_LL(A) LL_##A
+
 void MX_GPIO_Init(void)
 {
+	LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
+	/* GPIO Ports Clock Enable */
+	LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOA);
+	LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOB);
+	LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOC);
+	LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOD);
 
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
+	/*Configure GPIO pin Output Level */
+	LL_GPIO_SetOutputPin(GPIOB, LL_GPIO_PIN_12|LL_GPIO_PIN_13|LL_GPIO_PIN_4|LL_GPIO_PIN_7);
 
-  /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_GPIOD_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
+	/*Configure GPIO pin Output Level */
+	LL_GPIO_ResetOutputPin(GPIOB, LL_GPIO_PIN_14|LL_GPIO_PIN_15|LL_GPIO_PIN_3|LL_GPIO_PIN_5
+						  |LL_GPIO_PIN_6|LL_GPIO_PIN_8|LL_GPIO_PIN_9);
 
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, SPIN_EN_Pin|EN_Z_Pin|EN_Y_Pin|EN_X_Pin, GPIO_PIN_SET);
+	/*Configure GPIO pin Output Level */
+	LL_GPIO_ResetOutputPin(STATUS_LED_GPIO_Port, LL_GPIO_PIN_15);
 
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, DIR_Z_Pin|STEP_Z_Pin|POWER_LED_Pin|STEP_X_Pin
-                          |STEP_Y_Pin|DIR_X_Pin|DIR_Y_Pin, GPIO_PIN_RESET);
+	/*Configure GPIO pin : PtPin */
+	LL_GPIO_SetPinPull(KEY_GPIO_Port, LL_GPIO_PIN_13, LL_GPIO_PULL_UP);
+	LL_GPIO_SetPinMode(KEY_GPIO_Port, LL_GPIO_PIN_13, LL_GPIO_MODE_INPUT);
 
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(STATUS_LED_GPIO_Port, STATUS_LED_Pin, GPIO_PIN_RESET);
+	/*Configure GPIO pins : PAPin PAPin PAPin */
+	LL_GPIO_SetPinPull(GPIOA, LL_GPIO_PIN_0, LL_GPIO_PULL_UP);
+	LL_GPIO_SetPinMode(GPIOA, LL_GPIO_PIN_0, LL_GPIO_MODE_INPUT);
+	LL_GPIO_SetPinPull(GPIOA, LL_GPIO_PIN_1, LL_GPIO_PULL_UP);
+	LL_GPIO_SetPinMode(GPIOA, LL_GPIO_PIN_1, LL_GPIO_MODE_INPUT);
+	LL_GPIO_SetPinPull(GPIOA, LL_GPIO_PIN_2, LL_GPIO_PULL_UP);
+	LL_GPIO_SetPinMode(GPIOA, LL_GPIO_PIN_2, LL_GPIO_MODE_INPUT);
 
-  /*Configure GPIO pin : PtPin */
-  GPIO_InitStruct.Pin = KEY_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(KEY_GPIO_Port, &GPIO_InitStruct);
+	/*Configure GPIO pin : PtPin */
+	LL_GPIO_SetPinPull(AMIN_GPIO_Port, LL_GPIO_PIN_4, LL_GPIO_PULL_UP);
+	LL_GPIO_SetPinMode(AMIN_GPIO_Port, LL_GPIO_PIN_4, LL_GPIO_MODE_INPUT);
 
-  /*Configure GPIO pins : PAPin PAPin PAPin */
-  GPIO_InitStruct.Pin = LIM_Y_Pin|LIM_X_Pin|LIM_Z_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	/*Configure GPIO pins : PBPin PBPin PBPin PBPin
+						   PBPin PBPin PBPin PBPin
+						   PBPin PBPin */
+	GPIO_InitStruct.Pin = LL_GPIO_PIN_12|LL_GPIO_PIN_13|LL_GPIO_PIN_14|LL_GPIO_PIN_15
+		  |LL_GPIO_PIN_3|LL_GPIO_PIN_4|LL_GPIO_PIN_6|LL_GPIO_PIN_7
+		  |LL_GPIO_PIN_8|LL_GPIO_PIN_9;
+	GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+	GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
+	GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+	GPIO_InitStruct.Pull = LL_GPIO_PULL_UP;
+	LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : PtPin */
-  GPIO_InitStruct.Pin = AMIN_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(AMIN_GPIO_Port, &GPIO_InitStruct);
+	/*Configure GPIO pin : PtPin */
+	GPIO_InitStruct.Pin = LL_GPIO_PIN_15|LL_GPIO_PIN_12;
+	LL_GPIO_Init(STATUS_LED_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PBPin PBPin PBPin PBPin
-                           PBPin PBPin PBPin PBPin
-                           PBPin PBPin */
-  GPIO_InitStruct.Pin = SPIN_EN_Pin|EN_Z_Pin|DIR_Z_Pin|STEP_Z_Pin
-                          |POWER_LED_Pin|EN_Y_Pin|STEP_Y_Pin|EN_X_Pin
-                          |DIR_X_Pin|DIR_Y_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+	/*Configure GPIO pin : PtPin */
+	GPIO_InitStruct.Pin = LL_GPIO_PIN_5;
+	LL_GPIO_Init(STEP_X_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : PtPin */
-  GPIO_InitStruct.Pin = STATUS_LED_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(STATUS_LED_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PtPin */
-  GPIO_InitStruct.Pin = STEP_X_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(STEP_X_GPIO_Port, &GPIO_InitStruct);
 
 }
 
 /* USER CODE BEGIN 2 */
 void Leds_Power(uint8_t onoff)
 {
-	 GPIO_InitTypeDef GPIO_InitStruct = {0};
+	LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
 #if !defined(ORTUR_CNC_MODE)
 	if(onoff)
 	{
 		//NOTE:新主板需要给指示灯供电
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_SET);
+		LL_GPIO_SetOutputPin(GPIOA, GPIO_PIN_2);
 
-		//将IO设置为输出模式
-	    GPIO_InitStruct.Pin = LIM_Y_Pin|LIM_X_Pin|LIM_Z_Pin;
-	    GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-	    GPIO_InitStruct.Pull = GPIO_PULLUP;
-	    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+		//将IO设置为输入模式
+		LL_GPIO_SetPinPull(GPIOA, LL_GPIO_PIN_0, LL_GPIO_PULL_UP);
+	    LL_GPIO_SetPinMode(GPIOA, LL_GPIO_PIN_0, LL_GPIO_MODE_INPUT);
+	    LL_GPIO_SetPinPull(GPIOA, LL_GPIO_PIN_1, LL_GPIO_PULL_UP);
+	    LL_GPIO_SetPinMode(GPIOA, LL_GPIO_PIN_1, LL_GPIO_MODE_INPUT);
+	    LL_GPIO_SetPinPull(GPIOA, LL_GPIO_PIN_2, LL_GPIO_PULL_UP);
+	    LL_GPIO_SetPinMode(GPIOA, LL_GPIO_PIN_2, LL_GPIO_MODE_INPUT);
 
 		//启用限位开关
 		limits_init();
 
-		HAL_GPIO_WritePin(GPIOA, AMIN_Pin, GPIO_PIN_RESET); //A
+		LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_4); //A
 	}
 	else
 	{
 		//NOTE:新主板需要给指示灯供电
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
+		LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_2);
 
 		//禁用限位开关
 		limits_disable();
 
 		//将IO设置为输出模式
-		GPIO_InitStruct.Pin = LIM_Y_Pin|LIM_X_Pin|LIM_Z_Pin|AMIN_Pin;
-		GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-		GPIO_InitStruct.Pull = GPIO_PULLUP;
-		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+		GPIO_InitStruct.Pin = LL_GPIO_PIN_0|LL_GPIO_PIN_1|LL_GPIO_PIN_2|GPIO_PIN_4;
+	    GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+	    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
+	    GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+	    GPIO_InitStruct.Pull = LL_GPIO_PULL_UP;
+	    LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
 
 		//关闭限位开关指示灯
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET); //Y
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET); //X
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET); //Z
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET); //A
+	    LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_0); //Y
+	    LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_1); //X
+	    LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_2); //Z
+	    LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_4); //A
 	}
 
 #endif
 }
 void PowerLed_Blink(void)
 {
-	HAL_GPIO_TogglePin(POWER_LED_GPIO_Port, POWER_LED_Pin);
+	LL_GPIO_TogglePin(POWER_LED_GPIO_Port, LL_GPIO_PIN_3);
 }
 void PowerLed_On(void)
 {
-	HAL_GPIO_WritePin(POWER_LED_GPIO_Port, POWER_LED_Pin, GPIO_PIN_SET);
+	LL_GPIO_SetOutputPin(POWER_LED_GPIO_Port, LL_GPIO_PIN_3);
 }
 void PowerLed_Off(void)
 {
-	HAL_GPIO_WritePin(POWER_LED_GPIO_Port, POWER_LED_Pin, GPIO_PIN_RESET);
+	LL_GPIO_ResetOutputPin(POWER_LED_GPIO_Port, LL_GPIO_PIN_3);
 }
 
 
 void StatusLed_On(void)
 {
-	HAL_GPIO_WritePin(STATUS_LED_GPIO_Port, STATUS_LED_Pin, GPIO_PIN_SET);
+	LL_GPIO_SetOutputPin(STATUS_LED_GPIO_Port, LL_GPIO_PIN_15);
 }
 void StatusLed_Off(void)
 {
-	HAL_GPIO_WritePin(STATUS_LED_GPIO_Port, STATUS_LED_Pin, GPIO_PIN_RESET);
+	LL_GPIO_ResetOutputPin(STATUS_LED_GPIO_Port, LL_GPIO_PIN_15);
 }
 void StatusLed_Blink(void)
 {
-	HAL_GPIO_TogglePin(STATUS_LED_GPIO_Port, STATUS_LED_Pin);
+	LL_GPIO_TogglePin(STATUS_LED_GPIO_Port, LL_GPIO_PIN_15);
 }
 uint8_t Key_Scan(void)
 {
-	if(0==HAL_GPIO_ReadPin(KEY_GPIO_Port, KEY_Pin))
+	if(0==LL_GPIO_IsInputPinSet(KEY_GPIO_Port, LL_GPIO_PIN_13))
 	{
 		delay_ms(20);
-		if(0==HAL_GPIO_ReadPin(KEY_GPIO_Port, KEY_Pin))
+		if(0==LL_GPIO_IsInputPinSet(KEY_GPIO_Port, LL_GPIO_PIN_13))
 		{
 			return 0;
 		}
@@ -198,16 +199,13 @@ uint8_t poweron_justnow = 0;
 
 void PowerOpen_Loop()
 {
-	 GPIO_InitTypeDef GPIO_InitStruct = {0};
 	//默认关机
 	key_count = 0;
 	//初始化按�?
-	__HAL_RCC_GPIOC_CLK_ENABLE();
-  /*Configure GPIO pin : PtPin */
-  GPIO_InitStruct.Pin = KEY_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(KEY_GPIO_Port, &GPIO_InitStruct);
+	//__HAL_RCC_GPIOC_CLK_ENABLE();
+	/*Configure GPIO pin : PtPin */
+	//LL_GPIO_SetPinPull(KEY_GPIO_Port, KEY_Pin, LL_GPIO_PULL_UP);
+    //LL_GPIO_SetPinMode(KEY_GPIO_Port, KEY_Pin, LL_GPIO_MODE_INPUT);
 
 	//debugStr("wait for power on.\n");
 	while(1)
@@ -247,6 +245,32 @@ void PowerLed_Blink_Limit(uint32_t ms)
 		last_blink_time = HAL_GetTick();
 	}
 }
+
+/*标识端口正在通讯*/
+//uint8_t isCommunicationFlag=0;
+//
+//void StatusLed_Show(void)
+//{
+//	static uint32_t time=0;
+//	if(isCommunicationFlag==1)
+//	{
+//		isCommunicationFlag=0;
+//		time=HAL_GetTick();
+//	}
+//
+//	if(isUSBConnect()&&((HAL_GetTick()-time)<5000))
+//	{
+//		StatusLed_Blink();
+//	}
+//	else if(isUSBConnect())
+//	{
+//		StatusLed_On();
+//	}
+//	else
+//	{
+//		StatusLed_Off();
+//	}
+//}
 void PowerClose_Check()
 {
 	//长按关机
@@ -283,13 +307,13 @@ void PowerClose_Check()
 			}
 			else
 			{
-				PowerLed_Blink_Limit(0);
+				//PowerLed_Blink_Limit(0);
 				PowerLed_On();
 			}
 		}
 		else
 		{
-			PowerLed_Blink_Limit(0);
+			//PowerLed_Blink_Limit(0);
 			PowerLed_On();
 		}
 	}

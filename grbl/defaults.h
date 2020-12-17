@@ -89,7 +89,57 @@
   #define DEFAULT_ANALOG_MAX 10000.0f //analog value		$40
 */
 
-	//-- Tom's Demo CNC
+
+
+/*定义机型*/
+#define ORTUR_LASER_160_150 1
+#define ORTUR_LASER_180_180 2
+#define ORTUR_LASER_210_210 3
+#define ORTUR_LASER_400_300 4
+#define ORTUR_LASER_400_430 5
+#define ORTUR_LASER_400_400 6
+
+
+#define ORTUR_MECHINE_MODE ORTUR_LASER_400_400
+
+#if ORTUR_MECHINE_MODE==ORTUR_LASER_160_150
+	#define DEFAULT_DIRECTION_INVERT_MASK 1 // INVERT X
+	#define DEFAULT_X_MAX_TRAVEL 160.0f // mm NOTE: Must be a positive value.
+	#define DEFAULT_Y_MAX_TRAVEL 150.0f // mm NOTE: Must be a positive value.
+	#define DEFAULT_Z_MAX_TRAVEL 1.0f // mm NOTE: Must be a positive value.	$132
+#elif ORTUR_MECHINE_MODE==ORTUR_LASER_180_180
+	#define DEFAULT_DIRECTION_INVERT_MASK 1 // INVERT X
+	#define DEFAULT_X_MAX_TRAVEL 180.0f // mm NOTE: Must be a positive value.
+	#define DEFAULT_Y_MAX_TRAVEL 180.0f // mm NOTE: Must be a positive value.
+	#define DEFAULT_Z_MAX_TRAVEL 1.0f // mm NOTE: Must be a positive value.	$132
+#elif ORTUR_MECHINE_MODE==ORTUR_LASER_210_210
+	#define DEFAULT_DIRECTION_INVERT_MASK 1 // INVERT X
+	#define DEFAULT_X_MAX_TRAVEL 210.0f // mm NOTE: Must be a positive value.
+	#define DEFAULT_Y_MAX_TRAVEL 210.0f // mm NOTE: Must be a positive value.
+	#define DEFAULT_Z_MAX_TRAVEL 1.0f // mm NOTE: Must be a positive value.	$132
+#elif ORTUR_MECHINE_MODE==ORTUR_LASER_400_300
+	#define DEFAULT_DIRECTION_INVERT_MASK 0
+	#define DEFAULT_X_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.
+	#define DEFAULT_Y_MAX_TRAVEL 300.0f // mm NOTE: Must be a positive value.
+	#define DEFAULT_Z_MAX_TRAVEL 1.0f // mm NOTE: Must be a positive value.	$132
+#elif ORTUR_MECHINE_MODE==ORTUR_LASER_400_430
+	#define DEFAULT_DIRECTION_INVERT_MASK 0
+	#define DEFAULT_X_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.
+	#define DEFAULT_Y_MAX_TRAVEL 430.0f // mm NOTE: Must be a positive value.
+	#define DEFAULT_Z_MAX_TRAVEL 1.0f // mm NOTE: Must be a positive value.	$132
+#elif ORTUR_MECHINE_MODE==ORTUR_LASER_400_400
+	#define DEFAULT_DIRECTION_INVERT_MASK 0
+	#define DEFAULT_X_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.
+	#define DEFAULT_Y_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.
+	#define DEFAULT_Z_MAX_TRAVEL 100.0f // mm NOTE: Must be a positive value.	$132
+#else
+	#define DEFAULT_DIRECTION_INVERT_MASK 1 // INVERT X
+	#define DEFAULT_X_MAX_TRAVEL 160.0f // mm NOTE: Must be a positive value.
+	#define DEFAULT_Y_MAX_TRAVEL 150.0f // mm NOTE: Must be a positive value.
+	#define DEFAULT_Z_MAX_TRAVEL 1.0f // mm NOTE: Must be a positive value.	$132
+#endif
+
+
   #define DEFAULT_X_STEPS_PER_MM 80.0f		// $100		steps/mm
   #define DEFAULT_Y_STEPS_PER_MM 80.0f		// $101
   #define DEFAULT_Z_STEPS_PER_MM 80.0f		// $102
@@ -99,21 +149,21 @@
 
   #define DEFAULT_X_MAX_RATE (150*60.0f) // mm/min	$110
   #define DEFAULT_Y_MAX_RATE (150*60.0f) // mm/min	$111
-  #define DEFAULT_Z_MAX_RATE (150*60.0f) // mm/min	$112
+  #define DEFAULT_Z_MAX_RATE (30*60.0f) // mm/min	$112
   #define DEFAULT_A_MAX_RATE 4000.0f // mm/min	$113
   #define DEFAULT_B_MAX_RATE 4000.0f // mm/min	$114
   #define DEFAULT_C_MAX_RATE 4000.0f // mm/min	$115
 
   #define DEFAULT_X_ACCELERATION (2200.0f*60*60) // 10*60*60 mm/min^2 = 10 mm/sec^2	$120
   #define DEFAULT_Y_ACCELERATION (1800.0f*60*60) // 10*60*60 mm/min^2 = 10 mm/sec^2	$121
-  #define DEFAULT_Z_ACCELERATION (2500.0f*60*60) // 10*60*60 mm/min^2 = 10 mm/sec^2	$122
+  #define DEFAULT_Z_ACCELERATION (1000.0f*60*60) // 10*60*60 mm/min^2 = 10 mm/sec^2	$122
   #define DEFAULT_A_ACCELERATION (400.0f*60*60) // 10*60*60 mm/min^2 = 10 mm/sec^2	$123
   #define DEFAULT_B_ACCELERATION (400.0f*60*60) // 10*60*60 mm/min^2 = 10 mm/sec^2	$124
   #define DEFAULT_C_ACCELERATION (400.0f*60*60) // 10*60*60 mm/min^2 = 10 mm/sec^2	$125
 
-  #define DEFAULT_X_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.	$130
-  #define DEFAULT_Y_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.	$131
-  #define DEFAULT_Z_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.	$132
+  //#define DEFAULT_X_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.	$130
+  //#define DEFAULT_Y_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.	$131
+  //#define DEFAULT_Z_MAX_TRAVEL 100.0f // mm NOTE: Must be a positive value.	$132
   #define DEFAULT_A_MAX_TRAVEL 150.0f // mm NOTE: Must be a positive value.	$133
   #define DEFAULT_B_MAX_TRAVEL 150.0f // mm NOTE: Must be a positive value.	$134
   #define DEFAULT_C_MAX_TRAVEL 150.0f // mm NOTE: Must be a positive value.	$135
@@ -122,7 +172,7 @@
   #define DEFAULT_STEP_PULSE_MICROSECONDS 20		//usec		$0
   #define DEFAULT_STEPPER_IDLE_LOCK_TIME 250 // msec (0-254, 255 keeps steppers enabled)	$1
   #define DEFAULT_STEPPING_INVERT_MASK 0		//					$2
-  #define DEFAULT_DIRECTION_INVERT_MASK 0x0		//					$3
+  //#define DEFAULT_DIRECTION_INVERT_MASK 0x0		//					$3
   #define DEFAULT_INVERT_ST_ENABLE 0 // false						$4
   #define DEFAULT_INVERT_LIMIT_PINS 0 // false					$5
   #define DEFAULT_INVERT_PROBE_PIN 1 // true						$6
@@ -147,7 +197,7 @@
 
   #define DEFAULT_ANALOG_MAX 10000.0f //analog value		$40
   #define DEFAULT_VARIABLE_SPINDLE_ENABLE_PIN 0               //$50
-  #define DEFAULT_ACCEL_SENSITIVITY 400 //
+  #define DEFAULT_ACCEL_SENSITIVITY 250 //
 
 #endif
 

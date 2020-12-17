@@ -22,7 +22,7 @@
 #ifndef print_h
 #define print_h
 
-
+void printStringAll(const char *s);
 void printString(const char *s);
 
 void printPgmString(const char *s);
@@ -43,8 +43,10 @@ void printFloatAll(float n, uint8_t decimal_places);
 //  - CoordValue: Handles all position or coordinate values in inches or mm reporting.
 //  - RateValue: Handles feed rate and current velocity in inches or mm reporting.
 void printFloat_CoordValue(float n);
-void printFloat_RateValue(float n);
+void printFloat_CoordValue_All(float n);
 
+void printFloat_RateValue(float n);
+void printFloat_RateValue_All(float n);
 // Debug tool to print free memory in bytes at the called point. Not used otherwise.
 void printFreeMemory();
 
