@@ -97,21 +97,12 @@ void MX_GPIO_Init(void)
 
 	/*Configure GPIO pin : PtPin */
 	GPIO_InitStruct.Pin = LL_GPIO_PIN_15|LL_GPIO_PIN_12;
-	GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
-	GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
-	GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-	GPIO_InitStruct.Pull = LL_GPIO_PULL_UP;
 	LL_GPIO_Init(STATUS_LED_GPIO_Port, &GPIO_InitStruct);
 
 	/*Configure GPIO pin : PtPin */
 	GPIO_InitStruct.Pin = LL_GPIO_PIN_5;
-	GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
-	GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
-	GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-	GPIO_InitStruct.Pull = LL_GPIO_PULL_UP;
 	LL_GPIO_Init(STEP_X_GPIO_Port, &GPIO_InitStruct);
 
-	StatusLed_Off();
 
 }
 
