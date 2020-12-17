@@ -303,7 +303,7 @@ uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
 
 uint8_t Serial_Send(void)
 {
-
+	return 0;
 }
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
