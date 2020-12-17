@@ -50,11 +50,10 @@ void Sc7a20_Init(void)
 {
 
 	//IIC_Init();
-	soft_delay_ms(20);
+	//soft_delay_ms(20);
 	Write_One_Byte_iicaddr(SC7A20_ADDR, 0x20, 0x47);
 	Write_One_Byte_iicaddr(SC7A20_ADDR, 0x23, 0x88);
 
-	soft_delay_ms(10);
 }
 
 
@@ -70,7 +69,7 @@ uint8_t Get_GsensorType(void)
 	}
 }
 
-SC7A20_TYPE scInfo;
+
 //得到加速度值(原始值)
 //gx,gy,gz:陀螺仪x,y,z轴的原始读数(带符号)
 void Sc7a20_Get_Acceleration(short *gx, short *gy, short *gz)
@@ -92,7 +91,7 @@ void Sc7a20_Get_Acceleration(short *gx, short *gy, short *gz)
     *gy=(*gy)>>6;
     *gz=(*gz)>>6;
 
-	mprintf(LOG_INFO,"xValue:%d. yValue:%d. zValue:%d.\r\n",*gx,*gy,*gz);
+	//mprintf(LOG_INFO,"xValue:%d. yValue:%d. zValue:%d.\r\n",*gx,*gy,*gz);
 	return ;
 }
 
