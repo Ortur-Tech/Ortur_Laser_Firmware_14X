@@ -149,7 +149,7 @@ int main(void)
 #endif
 
   timing_init();
-  uart_init();
+  //uart_init();
 
   eeprom_init();
   serial_init();   // Setup serial baud rate and interrupts
