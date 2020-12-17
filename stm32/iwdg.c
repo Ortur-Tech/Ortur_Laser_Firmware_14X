@@ -22,6 +22,7 @@
 
 /* USER CODE BEGIN 0 */
 #include "system.h"
+#include "usb_device.h"
 /* USER CODE END 0 */
 
 IWDG_HandleTypeDef hiwdg;
@@ -71,7 +72,7 @@ void IWDG_Feed(void)
 	{
 		last_sys_position[0] = sys_position[0];
 		last_sys_position[1] = sys_position[1];
-		last_check_timestamp = HAL_GetTick();
+		last_check_timestamp = HAL_GetTick()/1000;
 	}
 
 	//注意,�?光已经开�?
@@ -98,7 +99,7 @@ void IWDG_Feed(void)
 				allow_laser_time = max_weak_time;
 			}
 
-			if(HAL_GetTick() - last_check_timestamp >= allow_laser_time)
+			if((HAL_GetTick()/1000) - last_check_timestamp >= allow_laser_time)
 			{
 				//printString("Exceeding the maximum exposure time of the laser!\r\n");
 				//printString("In weak laser mode, the maximum time allowed is 100 second.\r\n");
@@ -112,7 +113,7 @@ void IWDG_Feed(void)
 	}
 	else
 	{
-		last_check_timestamp = HAL_GetTick();
+		last_check_timestamp = HAL_GetTick()/1000;
 	}
 #endif
 #ifndef DEBUG
