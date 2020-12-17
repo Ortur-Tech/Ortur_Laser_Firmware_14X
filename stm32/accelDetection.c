@@ -192,6 +192,9 @@ void accel_detection()
 	if(GsensorDeviceType==SC7A20_DEVICE)
 	{
 		Sc7a20_Get_Acceleration(&accel_x,&accel_y,&accel_z);
+		accel_x=accel_x*2;
+		accel_y=accel_y*2;
+		accel_z=accel_z*2;
 	}
 	else
 	{
@@ -201,6 +204,7 @@ void accel_detection()
 
 	if(accel_x != accel_x_old ||accel_y != accel_y_old ||accel_z != accel_z_old )
 	{
+		 //mprintf(LOG_INFO,"xValue:%d. yValue:%d. zValue:%d.\r\n",accel_x,accel_y,accel_z);
 		//仅在雕刻模式下起作用
 		//如果数据突变,就表明有较大的震动或位移,这样雕刻会错位,无法继续
 
@@ -214,8 +218,11 @@ void accel_detection()
 
 			//雕刻时,不允许加速度突变
 			accel_diff = _ABS(accel_x_diff) + _ABS(accel_y_diff) + _ABS(accel_z_diff);
+			mprintf(LOG_INFO,"accel_diff:%d.\r\n",accel_diff);
 			if( accel_diff > settings.accel_sensitivity )
 			{
+				mprintf(LOG_INFO,"xValue:%d. yValue:%d. zValue:%d.\r\n",accel_x_old,accel_y_old,accel_z_old);
+				mprintf(LOG_INFO,"xValue:%d. yValue:%d. zValue:%d.\r\n",accel_x,accel_y,accel_z);
 				shake_detected = 1;
 			}
 		}
@@ -229,7 +236,7 @@ void accel_detection()
 			//进入警告状态,终止雕刻
 			if(sys.state == STATE_CYCLE)
 			{
-				//printString("Detect movement, terminate laser engraving!\r\n");
+				printString("Detect movement!\r\n");
 				{
 					//char diffStr[50];
 					//sprintf(diffStr,"Acceleration fluctuation:%d\r\n",(int)(accel_diff));
