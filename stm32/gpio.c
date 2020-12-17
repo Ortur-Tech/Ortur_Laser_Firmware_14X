@@ -131,8 +131,7 @@ void Leds_Power(uint8_t onoff)
 	}
 	else
 	{
-		//NOTE:新主板需要给指示灯供电
-		LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_2);
+
 
 		//禁用限位开关
 		limits_disable();
