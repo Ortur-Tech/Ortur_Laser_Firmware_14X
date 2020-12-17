@@ -69,6 +69,8 @@ void protocol_main_loop()
   if(powerOnHomingFlag==0)
   {
 	  powerOnHomingFlag=1;
+	  memcpy(line,"$HZ\0",4);
+	  report_status_message(system_execute_line(line));
 	  memcpy(line,"$H\0",3);
 	  report_status_message(system_execute_line(line));
   }
