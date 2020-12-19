@@ -69,8 +69,10 @@ void protocol_main_loop()
   if(powerOnHomingFlag==0)
   {
 	  powerOnHomingFlag=1;
+#if ORTUR_MODEL==OLM_MODEL_400
 	  memcpy(line,"$HZ\0",4);
 	  report_status_message(system_execute_line(line));
+#endif
 	  memcpy(line,"$H\0",3);
 	  report_status_message(system_execute_line(line));
   }

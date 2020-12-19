@@ -26,23 +26,14 @@
 //#define GRBL_VERSION_BUILD "20170801"
 #define GRBL_VERSION_BUILD "20190903"
 
-#define ORTUR_VER_NUM 138
-#define ORTUR_VERSION "138"
+#define ORTUR_VER_NUM 150
+#define ORTUR_VERSION "150"
 
 //工作模式选择
 #define ORTUR_LASER_MODE //激光模式
 //#define ORTUR_PLOTTER_MODE //绘图模式
 //#define ORTUR_CNC_MODE //CNC模式
 
-//机型选择
-#define OLM            1
-#define OLM_1          2
-#define OLM_2          3
-#define C40            4
-#define OLM_MODEL_180  5
-#define OLM_MODEL_210  6
-#define OLM_MODEL_400  7
-#define OCM            8
 
 //#define ORTUR_MODEL OLM
 //#define ORTUR_MODEL_NAME "Ortur Laser Master"
@@ -68,9 +59,9 @@
 //#define ORTUR_MODEL_NAME "Ortur Laser Master Model 210"
 //#define DEFAULT_ORTUR_LASER_210_210
 
-#define ORTUR_MODEL OLM_MODEL_400
-#define ORTUR_MODEL_NAME "Ortur Laser Master Model 400"
-#define DEFAULT_ORTUR_LASER_400_400
+//#define ORTUR_MODEL OLM_MODEL_400
+//#define ORTUR_MODEL_NAME "Ortur Laser Master Model 400"
+//#define DEFAULT_ORTUR_LASER_400_400
 
 //#define ORTUR_MODEL OCM
 //#define ORTUR_MODEL_NAME "Ortur CNC Master"

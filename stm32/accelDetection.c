@@ -3,9 +3,6 @@
 #include "sc7a20.h"
 //#include "timer.h"
 
-#ifndef DEFAULT_ACCEL_SENSITIVITY
-	#define DEFAULT_ACCEL_SENSITIVITY 350
-#endif
 
 #define _ABS(x) (x<0?-x:x)
 
@@ -200,6 +197,7 @@ void accel_detection()
 	{
 		//延时读取加速度情况
 		BMA250_Get_Acceleration(&accel_x,&accel_y,&accel_z);
+		settings.accel_sensitivity=2*settings.accel_sensitivity;
 	}
 
 	if(accel_x != accel_x_old ||accel_y != accel_y_old ||accel_z != accel_z_old )
@@ -218,9 +216,11 @@ void accel_detection()
 
 			//雕刻时,不允许加速度突变
 			accel_diff = _ABS(accel_x_diff) + _ABS(accel_y_diff) + _ABS(accel_z_diff);
+
 			mprintf(LOG_INFO,"accel_diff:%d.\r\n",accel_diff);
 			if( accel_diff > settings.accel_sensitivity )
 			{
+				//print_uint32_base10(accel_diff);
 				mprintf(LOG_INFO,"xValue:%d. yValue:%d. zValue:%d.\r\n",accel_x_old,accel_y_old,accel_z_old);
 				mprintf(LOG_INFO,"xValue:%d. yValue:%d. zValue:%d.\r\n",accel_x,accel_y,accel_z);
 				shake_detected = 1;

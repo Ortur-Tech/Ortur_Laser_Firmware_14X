@@ -110,6 +110,12 @@ int main(void)
   MX_USART1_UART_Init();
   IIC_Init();
   Gsensor_Init();
+
+//  while(1)
+//  {
+//	  accel_detection();
+//	  delay_ms(50);
+//  }
   /* USER CODE END SysInit */
   /* Initialize all configured peripherals */
   Reset_Usb();
