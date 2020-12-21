@@ -65,7 +65,7 @@ void protocol_main_loop()
     // All systems go!
     system_execute_startup(line); // Execute startup script.
   }
-
+#ifndef DEBUG
   if(powerOnHomingFlag==0)
   {
 	  powerOnHomingFlag=1;
@@ -76,6 +76,7 @@ void protocol_main_loop()
 	  memcpy(line,"$H\0",3);
 	  report_status_message(system_execute_line(line));
   }
+#endif
 
   // ---------------------------------------------------------------------------------
   // Primary loop! Upon a system abort, this exits back to main() to reset the system.
@@ -136,6 +137,7 @@ void protocol_main_loop()
             if (line_flags & LINE_FLAG_COMMENT_PARENTHESES) { line_flags &= ~(LINE_FLAG_COMMENT_PARENTHESES); }
           }
         } else {
+        	steamSwitchAble=0;
           if (c <= ' ') {
             // Throw away whitepace and control characters
           } else if (c == '/') {
