@@ -699,7 +699,7 @@
 
 // Paste default settings definitions here.
 
-#define ENABLE_DIGITAL_OUTPUT
+//#define ENABLE_DIGITAL_OUTPUT
 /* ---------------------------------------------------------------------------------------
  * Enable M62 (turn ON/HIGH) and M63 (turn OFF/LOW) with P-word digital controls,
  * 																Pvalue is the pin index ranging from 0 to 254, 255 will be ALL pins
@@ -714,7 +714,7 @@
  */
 
 
-#define ENABLE_WAIT_ON_INPUT
+//#define ENABLE_WAIT_ON_INPUT
 /* ---------------------------------------------------------------------------------------
  * Enable M66 wait on input mode
  * 																 Pvalue is the pin index ranging from 0 to 254
@@ -732,7 +732,7 @@
  */
 
 
-#define ENABLE_ANALOG_OUTPUT
+//#define ENABLE_ANALOG_OUTPUT
 /* ---------------------------------------------------------------------------------------
  * Enable M67 Analog output using PWM with E-word and Q-wor for anlog controls
  * 																Evalue is an int representing the index for the analog pin, value=255 will be all pins
