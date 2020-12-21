@@ -181,6 +181,26 @@ void BMA250_Get_Acceleration(short *gx, short *gy, short *gz)
 
 }
 
+void Get_Acceleration(uint8_t devAddr ,uint8_t firstAddr,short *gx, short *gy, short *gz)
+{
+	uint16_t x_l8,x_h8,y_l8,y_h8,z_l8,z_h8;
+
+    x_l8 = Read_One_Byte(devAddr, firstAddr);
+    x_h8 = Read_One_Byte(devAddr, firstAddr+1);
+    y_l8 = Read_One_Byte(devAddr, firstAddr+2);
+    y_h8 = Read_One_Byte(devAddr, firstAddr+3);
+    z_l8 = Read_One_Byte(devAddr, firstAddr+4);
+    z_h8 = Read_One_Byte(devAddr, firstAddr+5);
+
+    *gx=(short)((x_h8<<8)|x_l8);
+    *gy=(short)((y_h8<<8)|y_l8);
+    *gz=(short)((z_h8<<8)|z_l8);
+
+    *gx=(*gx)>>6;
+    *gy=(*gy)>>6;
+    *gz=(*gz)>>6;
+}
+
 //TODO:检测10秒内的加速度值
 
 //初始化并读取加速度计数据
@@ -188,7 +208,8 @@ void accel_detection()
 {
 	if(GsensorDeviceType==SC7A20_DEVICE)
 	{
-		Sc7a20_Get_Acceleration(&accel_x,&accel_y,&accel_z);
+		Get_Acceleration(SC7A20_ADDR, 0X28,&accel_x,&accel_y,&accel_z);
+		//Sc7a20_Get_Acceleration(&accel_x,&accel_y,&accel_z);
 		accel_x=accel_x*2;
 		accel_y=accel_y*2;
 		accel_z=accel_z*2;
@@ -196,8 +217,9 @@ void accel_detection()
 	else
 	{
 		//延时读取加速度情况
-		BMA250_Get_Acceleration(&accel_x,&accel_y,&accel_z);
-		settings.accel_sensitivity=2*settings.accel_sensitivity;
+		//BMA250_Get_Acceleration(&accel_x,&accel_y,&accel_z);
+		Get_Acceleration(BMA250_Addr, BMP_ACC_X_LSB,&accel_x,&accel_y,&accel_z);
+		//settings.accel_sensitivity=settings.accel_sensitivity;
 	}
 
 	if(accel_x != accel_x_old ||accel_y != accel_y_old ||accel_z != accel_z_old )
@@ -220,7 +242,7 @@ void accel_detection()
 			mprintf(LOG_INFO,"accel_diff:%d.\r\n",accel_diff);
 			if( accel_diff > settings.accel_sensitivity )
 			{
-				//print_uint32_base10(accel_diff);
+			    //print_uint32_base10(accel_diff);
 				mprintf(LOG_INFO,"xValue:%d. yValue:%d. zValue:%d.\r\n",accel_x_old,accel_y_old,accel_z_old);
 				mprintf(LOG_INFO,"xValue:%d. yValue:%d. zValue:%d.\r\n",accel_x,accel_y,accel_z);
 				shake_detected = 1;
@@ -236,7 +258,7 @@ void accel_detection()
 			//进入警告状态,终止雕刻
 			if(sys.state == STATE_CYCLE)
 			{
-				printString("Detect movement!\r\n");
+				printString("Move!\r\n");
 				{
 					//char diffStr[50];
 					//sprintf(diffStr,"Acceleration fluctuation:%d\r\n",(int)(accel_diff));
