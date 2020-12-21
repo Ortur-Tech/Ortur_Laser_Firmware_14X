@@ -128,6 +128,7 @@ void report_status_message(uint8_t status_code)
       print_uint8_base10(status_code);
       report_util_line_feed();
   }
+  steamSwitchAble=1;
 }
 
 // Prints alarm messages.
@@ -481,6 +482,9 @@ void report_build_info(char *line)
 // and has been sent into protocol_execute_line() routine to be executed by Grbl.
 void report_echo_line_received(char *line)
 {
+	//调试时可以两个串口输出，发布仅输出一个
+//	  printPgmStringAll(PSTR("[echo: ")); printStringAll(line);
+//	  report_util_feedback_line_feed_all();
   printPgmString(PSTR("[echo: ")); printString(line);
   report_util_feedback_line_feed();
 }
