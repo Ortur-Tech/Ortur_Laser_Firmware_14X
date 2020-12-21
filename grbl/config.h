@@ -387,7 +387,7 @@
 // NOTE: Only use this for debugging purposes!! When echoing, this takes up valuable resources and can effect
 // performance. If absolutely needed for normal operation, the serial write buffer should be greatly increased
 // to help minimize transmission waiting within the serial write protocol.
-// #define REPORT_ECHO_LINE_RECEIVED // Default disabled. Uncomment to enable.
+#define REPORT_ECHO_LINE_RECEIVED // Default disabled. Uncomment to enable.
 
 // Minimum planner junction speed. Sets the default minimum junction speed the planner plans to at
 // every buffer block junction, except for starting from rest and end of the buffer, which are always
@@ -751,7 +751,7 @@
  */
 
 
-#define ENABLE_ACCEL_SCALING
+//#define ENABLE_ACCEL_SCALING
 /* ---------------------------------------------------------------------------------------
  * Enable M100 custom Acceleration with P-word for axis, and Q-word for acceleration fraction
  *   temporarily change the acceleration set in $120,$121,etc... the change is NOT written to the EEPROM
