@@ -168,7 +168,7 @@ static int8_t CDC_DeInit_FS(void)
   return (USBD_OK);
   /* USER CODE END 4 */
 }
-
+uint8_t cdc_establish_connection = 0; //标记CDC连接建立中
 /**
   * @brief  Manage the CDC class requests
   * @param  cmd: Command code
@@ -219,15 +219,19 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
   /* 6      | bDataBits  |   1   | Number Data bits (5, 6, 7, 8 or 16).          */
   /*******************************************************************************/
     case CDC_SET_LINE_CODING:
-
+    	cdc_establish_connection = 1; //标识连接中
     break;
 
     case CDC_GET_LINE_CODING:
-
+    	cdc_establish_connection = 1; //标识连接中
     break;
 
     case CDC_SET_CONTROL_LINE_STATE:
-
+    	if(!cdc_establish_connection && isUsbCDCConnected()) //非连接中的控制状态是断开VCP的信号
+		{
+			setUsbCDCConnected(0);
+		}
+		cdc_establish_connection = 0;
     break;
 
     case CDC_SEND_BREAK:
