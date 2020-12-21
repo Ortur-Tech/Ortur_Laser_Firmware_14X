@@ -26,8 +26,8 @@
 //#define GRBL_VERSION_BUILD "20170801"
 #define GRBL_VERSION_BUILD "20190903"
 
-#define ORTUR_VER_NUM 150
-#define ORTUR_VERSION "150"
+#define ORTUR_VER_NUM 140
+#define ORTUR_VERSION "140"
 
 //工作模式选择
 #define ORTUR_LASER_MODE //激光模式
