@@ -72,7 +72,7 @@ static void MX_NVIC_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-extern void BMA250_Init(void);
+
 /* USER CODE END 0 */
 
 /**
