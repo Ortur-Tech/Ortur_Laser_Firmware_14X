@@ -187,7 +187,7 @@
 	#define ADDR_FLASH_PAGE_127   ((uint32_t)0x0801FC00) /* Base @ of Page 127, 1 Kbytes */
 
 //	#define EEPROM_START_ADDRESS  ADDR_FLASH_PAGE_127		//-- use the last page
-  #define EEPROM_START_ADDRESS  ADDR_FLASH_PAGE_63   //-- use the last page of 64K
+  #define EEPROM_START_ADDRESS  ADDR_FLASH_PAGE_15   //-- use the last page of 64K
 	extern void FLASH_PageErase(uint32_t PageAddress);	//-- this was NOT exported from stem32f1xx_hal_flash_ex.c for some reason
 
 

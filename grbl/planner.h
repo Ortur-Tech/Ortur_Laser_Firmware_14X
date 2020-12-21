@@ -26,7 +26,7 @@
 // The number of linear motions that can be in the plan at any give time
 #ifndef BLOCK_BUFFER_SIZE
 	#ifdef STM32
-		#define BLOCK_BUFFER_SIZE 200
+		#define BLOCK_BUFFER_SIZE 100
 	#endif
 	#ifdef ATMEGA328P
 		#ifdef USE_LINE_NUMBERS

@@ -7,7 +7,7 @@
 
 
 
-#define DEBUG_LEVEL 0x00//LOG_ERROR
+#define DEBUG_LEVEL 0//LOG_INFO//LOG_ERROR
 /*调试等级*/
 typedef enum{
     LOG_DEBUG=1,
@@ -19,7 +19,7 @@ typedef enum{
 }LogLevel;
 
 
-#define mprintf(level,format,...)  ((level&DEBUG_LEVEL)?printf(format,##__VA_ARGS__):0)
+#define mprintf(level,format,...)  ((level&DEBUG_LEVEL)?printf(format,##__VA_ARGS__):((void)0U))
 
 
 void soft_delay_us(uint32_t nus);

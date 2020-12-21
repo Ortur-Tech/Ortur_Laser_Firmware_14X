@@ -74,7 +74,7 @@
    *                          a little less than 13bit resolution (8192 steps to represent 0 to 5V)
    *                          for a 5000 RPM range spindle, the resolution is about 0.7 RPM
    */
-  #define SPINDLE_PWM_MAX_VALUE       7199
+  #define SPINDLE_PWM_MAX_VALUE       1000
   #define SPINDLE_PWM_MIN_VALUE       1   // Must be greater than zero.
   #define SPINDLE_PWM_OFF_VALUE       0
   #define SPINDLE_PWM_RANGE           (SPINDLE_PWM_MAX_VALUE-SPINDLE_PWM_MIN_VALUE)

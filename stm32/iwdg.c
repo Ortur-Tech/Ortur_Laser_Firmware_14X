@@ -32,8 +32,8 @@ void MX_IWDG_Init(void)
 {
 
 	IWDG->KR=0X5555;//使能对IWDG->PR和IWDG->RLR的写
-  	IWDG->PR=64;  //设置分频系数
-  	IWDG->RLR=256;  //从加载寄存器 IWDG->RLR
+  	IWDG->PR=6;  //设置分频系数
+  	IWDG->RLR=625;  //从加载寄存器 IWDG->RLR
 	IWDG->KR=0XAAAA;//reload
   	IWDG->KR=0XCCCC;//使能看门狗
 //  hiwdg.Instance = IWDG;
@@ -48,11 +48,12 @@ void MX_IWDG_Init(void)
 
 /* USER CODE BEGIN 1 */
 #ifdef ORTUR_LASER_MODE
-int32_t last_sys_position[N_AXIS]; // 最后一次检测位置
-uint64_t last_check_timestamp = 0; // 最后一次检测时间
-uint32_t max_exposure_time = 60;// 最长曝光时间 100s
-uint32_t min_exposure_time = 10;//最短曝光时间
-uint32_t max_weak_time = 100;//最长弱光时间
+
+int32_t last_sys_position[N_AXIS]; 		// 最后一次检测位置
+uint64_t last_check_timestamp = 0; 		// 最后一次检测时间
+uint32_t max_exposure_time = 60;		// 最长曝光时间 100s
+uint32_t min_exposure_time = 10;		//最短曝光时间
+uint32_t max_weak_time = 100;			//最长弱光时间
 
 uint32_t curr_laser_power;//当前激光功率
 
@@ -91,8 +92,8 @@ void IWDG_Feed(void)
 #endif
 			if(curr_laser_power > max_weak_time )
 			{
-				allow_laser_time = min_exposure_time + (float)(max_exposure_time - min_exposure_time) *
-						           (float)(max_laser_power - getLaserPower()) / (float)(max_laser_power);
+				allow_laser_time = min_exposure_time + (max_exposure_time - min_exposure_time) *
+						           (max_laser_power - getLaserPower()) /(max_laser_power);
 			}
 			else
 			{
@@ -101,7 +102,7 @@ void IWDG_Feed(void)
 
 			if((HAL_GetTick()/1000) - last_check_timestamp >= allow_laser_time)
 			{
-				//printString("Exceeding the maximum exposure time of the laser!\r\n");
+				printString("Laser exposure timeout!\r\n");
 				//printString("In weak laser mode, the maximum time allowed is 100 second.\r\n");
 				//printString("None weak laser mode , the maximum time allowed is in the range from 10 to 60 second , according to the power .\r\n");
 				//printString("Reset Grbl.\r\n");

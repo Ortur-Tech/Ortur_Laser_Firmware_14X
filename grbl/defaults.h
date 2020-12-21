@@ -89,45 +89,56 @@
   #define DEFAULT_ANALOG_MAX 10000.0f //analog value		$40
 */
 
+//机型选择
+#define OLM            1
+#define OLM_1          2
+#define OLM_2          3
+#define C40            4
+#define OLM_MODEL_180  5
+#define OLM_MODEL_210  6
+#define OLM_MODEL_400  7
+#define OCM            8
 
+#define ORTUR_MODEL OLM_MODEL_400
 
-/*定义机型*/
-#define ORTUR_LASER_160_150 1
-#define ORTUR_LASER_180_180 2
-#define ORTUR_LASER_210_210 3
-#define ORTUR_LASER_400_300 4
-#define ORTUR_LASER_400_430 5
-#define ORTUR_LASER_400_400 6
-
-
-#define ORTUR_MECHINE_MODE ORTUR_LASER_400_400
-
-#if ORTUR_MECHINE_MODE==ORTUR_LASER_160_150
+#if ORTUR_MODEL==OLM
+	#define ORTUR_MODEL_NAME "Ortur Laser Master"
 	#define DEFAULT_DIRECTION_INVERT_MASK 1 // INVERT X
 	#define DEFAULT_X_MAX_TRAVEL 160.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Y_MAX_TRAVEL 150.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Z_MAX_TRAVEL 1.0f // mm NOTE: Must be a positive value.	$132
-#elif ORTUR_MECHINE_MODE==ORTUR_LASER_180_180
+#elif ORTUR_MODEL==OLM_MODEL_180
+	#define ORTUR_MODEL_NAME "Ortur Laser Master Model 180"
 	#define DEFAULT_DIRECTION_INVERT_MASK 1 // INVERT X
 	#define DEFAULT_X_MAX_TRAVEL 180.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Y_MAX_TRAVEL 180.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Z_MAX_TRAVEL 1.0f // mm NOTE: Must be a positive value.	$132
-#elif ORTUR_MECHINE_MODE==ORTUR_LASER_210_210
+#elif ORTUR_MODEL==OLM_1
+	#define ORTUR_MODEL_NAME "Ortur Laser Master 1"
 	#define DEFAULT_DIRECTION_INVERT_MASK 1 // INVERT X
 	#define DEFAULT_X_MAX_TRAVEL 210.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Y_MAX_TRAVEL 210.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Z_MAX_TRAVEL 1.0f // mm NOTE: Must be a positive value.	$132
-#elif ORTUR_MECHINE_MODE==ORTUR_LASER_400_300
+#elif ORTUR_MODEL==OLM_MODEL_210
+	#define ORTUR_MODEL_NAME "Ortur Laser Master Model 210"
+	#define DEFAULT_DIRECTION_INVERT_MASK 1 // INVERT X
+	#define DEFAULT_X_MAX_TRAVEL 210.0f // mm NOTE: Must be a positive value.
+	#define DEFAULT_Y_MAX_TRAVEL 210.0f // mm NOTE: Must be a positive value.
+	#define DEFAULT_Z_MAX_TRAVEL 1.0f // mm NOTE: Must be a positive value.	$132
+#elif ORTUR_MODEL==C40
+	#define ORTUR_MODEL_NAME "C40"
 	#define DEFAULT_DIRECTION_INVERT_MASK 0
 	#define DEFAULT_X_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Y_MAX_TRAVEL 300.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Z_MAX_TRAVEL 1.0f // mm NOTE: Must be a positive value.	$132
-#elif ORTUR_MECHINE_MODE==ORTUR_LASER_400_430
+#elif ORTUR_MODEL==OLM_2
+	#define ORTUR_MODEL_NAME "Ortur Laser Master 2"
 	#define DEFAULT_DIRECTION_INVERT_MASK 0
 	#define DEFAULT_X_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Y_MAX_TRAVEL 430.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Z_MAX_TRAVEL 1.0f // mm NOTE: Must be a positive value.	$132
-#elif ORTUR_MECHINE_MODE==ORTUR_LASER_400_400
+#elif ORTUR_MODEL==OLM_MODEL_400
+	#define ORTUR_MODEL_NAME "Ortur Laser Master Model 400"
 	#define DEFAULT_DIRECTION_INVERT_MASK 0
 	#define DEFAULT_X_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Y_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.

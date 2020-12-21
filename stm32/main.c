@@ -72,7 +72,7 @@ static void MX_NVIC_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-extern void BMA250_Init(void);
+
 /* USER CODE END 0 */
 
 /**
@@ -100,7 +100,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
+  __enable_irq();
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -110,11 +110,14 @@ int main(void)
   MX_USART1_UART_Init();
   IIC_Init();
   Gsensor_Init();
+
+//  while(1)
+//  {
+//	  accel_detection();
+//	  delay_ms(50);
+//  }
   /* USER CODE END SysInit */
-
   /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-
   Reset_Usb();
 #ifndef ORTUR_CNC_MODE
   Leds_Power(0); //关信号灯供电
@@ -128,6 +131,7 @@ int main(void)
   //开启电源指示灯
   PowerLed_On();
 
+  MX_GPIO_Init();
   MX_TIM1_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();

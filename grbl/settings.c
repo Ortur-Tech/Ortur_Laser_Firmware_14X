@@ -64,7 +64,7 @@ void settings_write_coord_data(uint8_t coord_select, float *coord_data)
 void write_global_settings()
 {
   eeprom_put_char(0, SETTINGS_VERSION);
-  eeprom_put_char(1, ORTUR_MODEL);
+  //eeprom_put_char(1, ORTUR_MODEL);
   memcpy_to_eeprom_with_checksum(EEPROM_ADDR_GLOBAL, (char*)&settings, sizeof(settings_t));
 }
 
@@ -251,7 +251,7 @@ uint8_t read_global_settings() {
 
 // A helper method to set settings from command line
 uint8_t settings_store_global_setting(uint8_t parameter, float value) {
-#if !DEFAULT_LASER_MODE
+#if  !DEFAULT_LASER_MODE
   if (value < 0.0) { return(STATUS_NEGATIVE_VALUE); }
   if (parameter >= AXIS_SETTINGS_START_VAL) {
     // Store axis configuration. Axis numbering sequence set by AXIS_SETTING defines.

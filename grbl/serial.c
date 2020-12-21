@@ -44,6 +44,11 @@ uint8_t serial_rx_buffer[RX_RING_BUFFER];
 uint8_t serial_rx_buffer_head = 0;
 volatile uint8_t serial_rx_buffer_tail = 0;
 
+/*虚拟usb串口接收缓冲区*/
+uint8_t usb_serial_rx_buffer[RX_RING_BUFFER];
+uint8_t usb_serial_rx_buffer_head = 0;
+volatile uint8_t usb_serial_rx_buffer_tail = 0;
+
 uint8_t serial_tx_buffer[TX_RING_BUFFER];
 uint8_t serial_tx_buffer_head = 0;
 volatile uint8_t serial_tx_buffer_tail = 0;
@@ -101,8 +106,8 @@ void serial_init()
 #define HWUART 2  //HW UART
 
 uint8_t last_steam=USBCDC;
-
 uint8_t steamSwitchAble=1;
+
 extern USBD_HandleTypeDef hUsbDeviceFS;
 // Writes one byte to the TX serial buffer. Called by main program.
 void serial_write(uint8_t data)
@@ -188,25 +193,78 @@ ISR(SERIAL_UDRE)
 }
 #endif
 
+char usbGetC(void)
+{
+	  uint8_t tail = usb_serial_rx_buffer_tail; // Temporary serial_rx_buffer_tail (to optimize for volatile)
+	  if (usb_serial_rx_buffer_head == tail) {
+	    return SERIAL_NO_DATA;
+	  } else {
+	    uint8_t data = usb_serial_rx_buffer[tail];
+
+	    tail++;
+	    if (tail == RX_RING_BUFFER) { tail = 0; }
+	    usb_serial_rx_buffer_tail = tail;
+
+	    return data;
+	  }
+}
+
+char serialGetC(void)
+{
+	  uint8_t tail = serial_rx_buffer_tail; // Temporary serial_rx_buffer_tail (to optimize for volatile)
+	  if (serial_rx_buffer_head == tail) {
+	    return SERIAL_NO_DATA;
+	  } else {
+	    uint8_t data = serial_rx_buffer[tail];
+
+	    tail++;
+	    if (tail == RX_RING_BUFFER) { tail = 0; }
+	    serial_rx_buffer_tail = tail;
+
+	    return data;
+	  }
+}
+
 // Fetches the first byte in the serial read buffer. Called by main program.
 uint8_t serial_read()
 {
-  uint8_t tail = serial_rx_buffer_tail; // Temporary serial_rx_buffer_tail (to optimize for volatile)
-  if (serial_rx_buffer_head == tail) {
-    return SERIAL_NO_DATA;
-  } else {
-    uint8_t data = serial_rx_buffer[tail];
+	int16_t c = SERIAL_NO_DATA;
 
-    tail++;
-    if (tail == RX_RING_BUFFER) { tail = 0; }
-    serial_rx_buffer_tail = tail;
+	if(isUsbCDCConnected())
+	{
+		if(steamSwitchAble ? true : last_steam == USBCDC)
+		{
+			c = usbGetC();
+			last_steam = USBCDC;
+			steamSwitchAble = (c == SERIAL_NO_DATA);
+		}
+	}
+	else
+	{
+		if(last_steam == USBCDC) //在CDC已经断开连接的情况下,应该将steam指向转到 硬件串口 HWUART
+		{
+			//steamSwitchAble = true;
+			//c = '\n'; //强行补换行符防止命令被截断,或者污染后续的命令字符串
+			last_steam=HWUART;
+			return '\n';
+		}
+	}
 
-    return data;
-  }
+	if(c == SERIAL_NO_DATA )
+	{
+		if(steamSwitchAble ? true : last_steam == HWUART)
+		{
+			c = serialGetC();
+			last_steam = HWUART;
+			steamSwitchAble = (c == SERIAL_NO_DATA);
+		}
+	}
+	return c;
+
 }
 
 #ifdef STM32
-void HandleUartIT(uint8_t data)
+void HandleUartIT(uint8_t data,uint8_t steam)
 {
 	uint8_t next_head;
   // Pick off realtime command characters directly from the serial stream. These characters are
@@ -252,15 +310,35 @@ void HandleUartIT(uint8_t data)
           #endif
         }
         // Throw away any unfound extended-ASCII character by not passing it to the serial buffer.
-      } else { // Write character to buffer
-        next_head = serial_rx_buffer_head + 1;
-        if (next_head == RX_RING_BUFFER) { next_head = 0; }
+      }
+      else
+      {
+    	if(steam==USBCDC)
+    	{
+			// Write character to buffer
+			next_head = usb_serial_rx_buffer_head + 1;
+			if (next_head == RX_RING_BUFFER) { next_head = 0; }
 
-        // Write data to buffer unless it is full.
-        if (next_head != serial_rx_buffer_tail) {
-          serial_rx_buffer[serial_rx_buffer_head] = data;
-          serial_rx_buffer_head = next_head;
-        }
+			// Write data to buffer unless it is full.
+			if (next_head != usb_serial_rx_buffer_tail)
+			{
+				usb_serial_rx_buffer[usb_serial_rx_buffer_head] = data;
+				usb_serial_rx_buffer_head = next_head;
+			}
+    	}
+    	else
+    	{
+    		// Write character to buffer
+			next_head = serial_rx_buffer_head + 1;
+			if (next_head == RX_RING_BUFFER) { next_head = 0; }
+
+			// Write data to buffer unless it is full.
+			if (next_head != serial_rx_buffer_tail)
+			{
+			  serial_rx_buffer[serial_rx_buffer_head] = data;
+			  serial_rx_buffer_head = next_head;
+			}
+    	}
       }
   }
 }
@@ -274,63 +352,27 @@ uint32_t last_steam_use_time=0;
 void USART1_IRQHandler (void)
 {
 	uint8_t data=0;
-	if((last_steam==HWUART)||
-		(serial_rx_buffer_head==serial_rx_buffer_tail)||
-		(serial_rx_buffer[serial_rx_buffer_head-1]=='\n'))
+
+	if(USART1->SR &(1<<5))  //接收到数据
 	{
-		last_steam=HWUART;
-		if(USART1->SR &(1<<5))  //接收到数据
-		{
-		    data = USART1->DR;
-		    HandleUartIT(data);
-		}
-		last_steam_use_time=HAL_GetTick();
+		data = USART1->DR;
+		HandleUartIT(data,HWUART);
 	}
-	else if((HAL_GetTick()-last_steam_use_time)>SERIAL_SWITCH_TIME)
-	{
-		HandleUartIT('\n');
-		last_steam=HWUART;
-		if(USART1->SR &(1<<5))  //接收到数据
-		{
-		    data = USART1->DR;
-		    HandleUartIT(data);
-		}
-		last_steam_use_time=HAL_GetTick();
-	}
+
 }
 
 #ifdef USE_USB
 void OnUsbDataRx(uint8_t* dataIn, uint8_t length)
 {
     uint8_t data;
-    if((last_steam==USBCDC)||
-	(serial_rx_buffer_head==serial_rx_buffer_tail)||
-	(serial_rx_buffer[serial_rx_buffer_head-1]=='\n'))
-    {
-        last_steam=USBCDC;
-    	// Write data to buffer unless it is full.
-    	while (length != 0)
-    	{
-            data = *dataIn ++;
-            HandleUartIT(data);
-            length--;
-       }
-       last_steam_use_time=HAL_GetTick();
-    }
-    else if((HAL_GetTick()-last_steam_use_time)>SERIAL_SWITCH_TIME)
-   {
-       HandleUartIT('\n');
-	   last_steam=USBCDC;
-		// Write data to buffer unless it is full.
-		while (length != 0)
-		{
-			   data = *dataIn ++;
-			   HandleUartIT(data);
-			   length--;
-		}
-	  last_steam_use_time=HAL_GetTick();
-   }
 
+	// Write data to buffer unless it is full.
+	while (length != 0)
+	{
+		data = *dataIn ++;
+		HandleUartIT(data,USBCDC);
+		length--;
+   }
 }
 #endif
 
