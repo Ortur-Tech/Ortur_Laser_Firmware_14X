@@ -140,6 +140,24 @@ void print_uint32_base10(uint32_t n)
     serial_write('0' + buf[i-1]);
 }
 
+void print_uint32_base10_all(uint32_t n)
+{
+  if (n == 0) {
+    serial_write_all('0');
+    return;
+  }
+
+  unsigned char buf[10];
+  uint8_t i = 0;
+
+  while (n > 0) {
+    buf[i++] = n % 10;
+    n /= 10;
+  }
+
+  for (; i > 0; i--)
+    serial_write_all('0' + buf[i-1]);
+}
 
 void printInteger(long n)
 {
@@ -155,9 +173,9 @@ void printIntegerAll(long n)
 {
   if (n < 0) {
     serial_write_all('-');
-    print_uint32_base10(-n);
+    print_uint32_base10_all(-n);
   } else {
-    print_uint32_base10(n);
+    print_uint32_base10_all(n);
   }
 }
 
@@ -253,9 +271,9 @@ void printFloat_CoordValue(float n) {
 }
 void printFloat_CoordValue_All(float n) {
   if (bit_istrue(settings.flags,BITFLAG_REPORT_INCHES)) {
-    printFloat(n*INCH_PER_MM,N_DECIMAL_COORDVALUE_INCH);
+	  printFloatAll(n*INCH_PER_MM,N_DECIMAL_COORDVALUE_INCH);
   } else {
-    printFloat(n,N_DECIMAL_COORDVALUE_MM);
+	  printFloatAll(n,N_DECIMAL_COORDVALUE_MM);
   }
 }
 
@@ -268,9 +286,9 @@ void printFloat_RateValue(float n) {
 }
 void printFloat_RateValue_All(float n) {
   if (bit_istrue(settings.flags,BITFLAG_REPORT_INCHES)) {
-    printFloat(n*INCH_PER_MM,N_DECIMAL_RATEVALUE_INCH);
+	  printFloatAll(n*INCH_PER_MM,N_DECIMAL_RATEVALUE_INCH);
   } else {
-    printFloat(n,N_DECIMAL_RATEVALUE_MM);
+	  printFloatAll(n,N_DECIMAL_RATEVALUE_MM);
   }
 }
 
