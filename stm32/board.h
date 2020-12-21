@@ -19,7 +19,7 @@ typedef enum{
 }LogLevel;
 
 
-#define mprintf(level,format,...)  ((level&DEBUG_LEVEL)?printf(format,##__VA_ARGS__):0)
+#define mprintf(level,format,...)  ((level&DEBUG_LEVEL)?printf(format,##__VA_ARGS__):((void)0U))
 
 
 void soft_delay_us(uint32_t nus);
