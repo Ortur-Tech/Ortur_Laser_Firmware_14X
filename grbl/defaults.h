@@ -99,7 +99,7 @@
 #define OLM_MODEL_400  7
 #define OCM            8
 
-#define ORTUR_MODEL OLM_2
+#define ORTUR_MODEL OLM_MODEL_400
 
 #if ORTUR_MODEL==OLM
 	#define ORTUR_MODEL_NAME "Ortur Laser Master"
