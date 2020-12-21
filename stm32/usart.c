@@ -28,7 +28,7 @@
 
 void MX_USART1_UART_Init(void)
 {
-  LL_USART_InitTypeDef USART_InitStruct = {0};
+//  LL_USART_InitTypeDef USART_InitStruct = {0};
 
   LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
 
@@ -53,17 +53,22 @@ void MX_USART1_UART_Init(void)
   GPIO_InitStruct.Mode = LL_GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = LL_GPIO_PULL_UP;
   LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-//  LL_GPIO_SetPinPull(GPIOA, LL_GPIO_PIN_10, LL_GPIO_PULL_UP);
-//  LL_GPIO_SetPinMode(GPIOA, LL_GPIO_PIN_10, LL_GPIO_MODE_INPUT);
 
-  USART_InitStruct.BaudRate = 115200;
-  USART_InitStruct.DataWidth = LL_USART_DATAWIDTH_8B;
-  USART_InitStruct.StopBits = LL_USART_STOPBITS_1;
-  USART_InitStruct.Parity = LL_USART_PARITY_NONE;
-  USART_InitStruct.TransferDirection = LL_USART_DIRECTION_TX_RX;
-  USART_InitStruct.HardwareFlowControl = LL_USART_HWCONTROL_NONE;
-  USART_InitStruct.OverSampling = LL_USART_OVERSAMPLING_16;
-  LL_USART_Init(USART1, &USART_InitStruct);
+
+//  USART_InitStruct.BaudRate = 115200;
+//  USART_InitStruct.DataWidth = LL_USART_DATAWIDTH_8B;
+//  USART_InitStruct.StopBits = LL_USART_STOPBITS_1;
+//  USART_InitStruct.Parity = LL_USART_PARITY_NONE;
+//  USART_InitStruct.TransferDirection = LL_USART_DIRECTION_TX_RX;
+//  USART_InitStruct.HardwareFlowControl = LL_USART_HWCONTROL_NONE;
+//  USART_InitStruct.OverSampling = LL_USART_OVERSAMPLING_16;
+//  LL_USART_Init(USART1, &USART_InitStruct);
+  /*设置波特率115200*/
+  USART1->BRR=625;
+  USART1->CR1|=0X200C;//设置停止位和校验位
+  USART1->CR1|=1<<8;//接收使能
+  USART1->CR1|=1<<5;//接收缓冲区非空中断使能
+
   LL_USART_ConfigAsyncMode(USART1);
 
   LL_USART_EnableIT_RXNE(USART1);
