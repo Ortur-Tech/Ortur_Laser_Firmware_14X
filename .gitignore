@@ -5,14 +5,15 @@
 *.launch
 *.su
 
-/Debug/
-/Release/
+/Debug*/
+/Release*/
 
 /Atollic/
 /cubeide/F13/Debug/
 /cubeide/F16/
 /cubeide/F46/
 /cubeide/F13/Release/
+.settings
 
 
 *.hex
