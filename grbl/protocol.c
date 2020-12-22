@@ -66,15 +66,18 @@ void protocol_main_loop()
     system_execute_startup(line); // Execute startup script.
   }
 #ifndef DEBUG
-  if(powerOnHomingFlag==0)
+  if(powerOnHomingFlag == 0)
   {
-	  powerOnHomingFlag=1;
-#if ORTUR_MODEL==OLM_MODEL_400
+	  powerOnHomingFlag = 1;
+#if ORTUR_MODEL == OLM_MODEL_400
 	  memcpy(line,"$HZ\0",4);
 	  report_status_message(system_execute_line(line));
 #endif
+
+#if ORTUR_MODEL != C40
 	  memcpy(line,"$H\0",3);
 	  report_status_message(system_execute_line(line));
+#endif
   }
 #endif
 
