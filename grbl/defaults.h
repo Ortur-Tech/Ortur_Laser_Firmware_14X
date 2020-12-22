@@ -144,12 +144,12 @@
   #define DEFAULT_B_MAX_RATE           (150*60.0f) // $114  B Max rate [mm/min]
   #define DEFAULT_C_MAX_RATE           (150*60.0f) // $115  C Max rate [mm/min]
 
-  #define DEFAULT_X_ACCELERATION   	 (10.0f*60*60) // $120  X Acceleration [mm/sec^2]
-  #define DEFAULT_Y_ACCELERATION   	 (10.0f*60*60) // $121  Y Acceleration [mm/sec^2]
-  #define DEFAULT_Z_ACCELERATION   	 (10.0f*60*60) // $122  Z Acceleration [mm/sec^2]
-  #define DEFAULT_A_ACCELERATION   	 (10.0f*60*60) // $123  A Acceleration [mm/sec^2]
-  #define DEFAULT_B_ACCELERATION   	 (10.0f*60*60) // $124  B Acceleration [mm/sec^2]
-  #define DEFAULT_C_ACCELERATION   	 (10.0f*60*60) // $125  C Acceleration [mm/sec^2]
+  #define DEFAULT_X_ACCELERATION   (2200.0f*60*60) // $120  X Acceleration [mm/sec^2]
+  #define DEFAULT_Y_ACCELERATION   (1800.0f*60*60) // $121  Y Acceleration [mm/sec^2]
+  #define DEFAULT_Z_ACCELERATION   (1000.0f*60*60) // $122  Z Acceleration [mm/sec^2]
+  #define DEFAULT_A_ACCELERATION   (1000.0f*60*60) // $123  A Acceleration [mm/sec^2]
+  #define DEFAULT_B_ACCELERATION   (1000.0f*60*60) // $124  B Acceleration [mm/sec^2]
+  #define DEFAULT_C_ACCELERATION   (1000.0f*60*60) // $125  C Acceleration [mm/sec^2]
 
 #ifndef DEFAULT_X_MAX_TRAVEL
   #define DEFAULT_X_MAX_TRAVEL              160.0f // $130  X Max travel [mm] NOTE: Must be a positive value.
