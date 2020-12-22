@@ -65,7 +65,7 @@ uint32_t off_laser_power = SPINDLE_PWM_OFF_VALUE;//认为激光关闭的功率
 void IWDG_Feed(void)
 {
 #ifdef ORTUR_LASER_MODE
-	//�?查xyz位置是否变化
+	//检查xyz位置是否变化
 	if(sys_position[0] != last_sys_position[0] ||
 	   sys_position[1] != last_sys_position[1])
 	{
@@ -74,10 +74,10 @@ void IWDG_Feed(void)
 		last_check_timestamp = HAL_GetTick()/1000;
 	}
 
-	//注意,�?光已经开�?
+	//注意,激光已经开启
 	if(isLaserOpen())
 	{
-		//�?光功率过大且长时间未移动
+		//激光功率过大且长时间未移动
 		curr_laser_power = getLaserPower();
 		if(curr_laser_power > off_laser_power )
 		{
