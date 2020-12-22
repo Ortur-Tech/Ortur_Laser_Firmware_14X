@@ -93,6 +93,8 @@ void MX_GPIO_Init(void)
 /**
  * @brief 电源LED指示控制
  * @param onoff 1:开 0:关
+ * 红灯熄灭：关机状态。 红灯闪烁：机器报警。红灯常亮：开机状态。
+ * 蓝灯熄灭：USB未插。 蓝灯闪烁：USB有数据传输。蓝灯常亮：USB线插入状态。
  */
 void Leds_Power(uint8_t onoff)
 {
@@ -141,6 +143,7 @@ void Leds_Power(uint8_t onoff)
 
 #endif
 }
+
 /**
  * @brief PowerLed_Blink
  */

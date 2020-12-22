@@ -88,14 +88,10 @@ void Check_Rst_Source(void)
 	  if(LL_RCC_IsActiveFlag_SFTRST())
       {
 	  }
-
-
-
 	  if(LL_RCC_IsActiveFlag_WWDGRST())
       {
 
 	  }
-
 	  LL_RCC_ClearResetFlags();
 
 }

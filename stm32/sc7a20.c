@@ -57,13 +57,11 @@ char Read_One_Byte(char device_addr, char reg_addr)
 
 }
 /**
- * @brief Sc7a20_Init
+ * @brief Sc7a20_Init 初始化 sc7a20
  */
 void Sc7a20_Init(void)
 {
 
-	//IIC_Init();
-	//soft_delay_ms(20);
 	Write_One_Byte_iicaddr(SC7A20_ADDR, 0x20, 0x47);
 	Write_One_Byte_iicaddr(SC7A20_ADDR, 0x23, 0x88);
 
@@ -87,9 +85,9 @@ uint8_t Get_GsensorType(void)
 
 /**
  * @brief Sc7a20_Get_Acceleration得到加速度值(原始值)
- * @param gx gx,gy,gz:陀螺仪x,y,z轴的原始读数(带符号)
- * @param gy
- * @param gz
+ * @param gx x轴加速度的原始读数(带符号)
+ * @param gy y轴加速度的原始读数(带符号)
+ * @param gz z轴加速度的原始读数(带符号)
  */
 void Sc7a20_Get_Acceleration(short *gx, short *gy, short *gz)
 {

@@ -28,7 +28,9 @@
 #include "usbd_cdc_if.h"
 
 USBD_HandleTypeDef hUsbDeviceFS;
-
+/**
+ * @brief Reset_Usb 强制复位USB
+ */
 void Reset_Usb()
 {
 	HAL_Delay(250);

@@ -15,10 +15,10 @@
 #define SC7A20_DEVICE 0X11
 #define OTHER_DEVICE 0X03
 
- void Gsensor_Init(void);
+ void Gsensor_Init(void);//!< 传感器初始化
  void Sc7a20_Init(void);
- char Read_One_Byte(char device_addr, char reg_addr);
- void Write_One_Byte_iicaddr(char iicchar, char addr, char thedata);
+ char Read_One_Byte(char device_addr, char reg_addr);//!<从传感器初读一个字节
+ void Write_One_Byte_iicaddr(char iicchar, char addr, char thedata);//!<写一个字节到传感器
  uint8_t Get_GsensorType(void);
  void Sc7a20_Get_Acceleration(short *gx, short *gy, short *gz);
 #ifdef __cplusplus

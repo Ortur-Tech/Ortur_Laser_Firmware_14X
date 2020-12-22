@@ -21,7 +21,7 @@
 #include "tim.h"
 
 /**
- * @brief MX_TIM1_Init
+ * @brief MX_TIM1_Init 1Khz
  */
 void MX_TIM1_Init(void)
 {

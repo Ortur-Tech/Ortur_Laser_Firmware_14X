@@ -60,12 +60,19 @@ int main(void)
 	cm_backtrace_init("CmBacktrace", ORTUR_MODEL_NAME , "Grbl " GRBL_VERSION " - OLF " ORTUR_VERSION);
 #endif
 
+  /* 抽象层初始化*/
   HAL_Init();
+  /*使能 全局中断（BootLoader跳转前会关闭全局中断）*/
   __enable_irq();
+  /*初始化系统时钟*/
   SystemClock_Config();
+  /*初始化串口1波特率115200*/
   MX_USART1_UART_Init();
+  /*IIC初始化*/
   IIC_Init();
+  /*加速度传感器初始化*/
   Gsensor_Init();
+  /*复位USB以便主机识别*/
   Reset_Usb();
 
 #ifndef ORTUR_CNC_MODE
@@ -79,22 +86,25 @@ int main(void)
 #endif
   //开启电源指示灯
   PowerLed_On();
-
+  /*初始化所有用到的GPIO*/
   MX_GPIO_Init();
+  /*初始化定时器1*/
   MX_TIM1_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
+  /*USB初始化*/
   MX_USB_DEVICE_Init();
 
 #ifndef DEBUG
   IWDG_Init();
 #endif
-
+  /*中断分组初始化*/
   MX_NVIC_Init();
-
+  /*定时器初始化*/
   timing_init();
-
+  /*flash模拟EEprom初始化，初始化参数*/
   eeprom_init();
+  /*串口初始化*/
   serial_init();   // Setup serial baud rate and interrupts
   settings_init(); // Load Grbl settings from EEPROM
   stepper_init();  // Configure stepper pins and interrupt timers
@@ -120,10 +130,7 @@ int main(void)
     if (bit_istrue(settings.flags,BITFLAG_HOMING_ENABLE)) { sys.state = STATE_ALARM; }
   #endif
 
-  /* USER CODE END 2 */
-
   /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
   while (1)
   {
     // Reset system variables.
@@ -162,15 +169,12 @@ int main(void)
     // Start Grbl main loop. Processes program inputs and executes them.
     protocol_main_loop();
 
-    /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
   }
-  /* USER CODE END 3 */
+
 }
 
 /**
-  * @brief System Clock Configuration
+  * @brief System Clock Configuration 主频72Mhz
   * @retval None
   */
 
@@ -197,7 +201,7 @@ void SystemClock_Config(void)
 }
 
 /**
-  * @brief NVIC Configuration.
+  * @brief NVIC Configuration.中断不分组
   * @retval None
   */
 static void MX_NVIC_Init(void)
