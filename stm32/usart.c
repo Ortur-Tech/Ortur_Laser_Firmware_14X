@@ -20,16 +20,13 @@
 /* Includes ------------------------------------------------------------------*/
 #include "usart.h"
 
-/* USER CODE BEGIN 0 */
 
-/* USER CODE END 0 */
 
-/* USART1 init function */
-
+/**
+ * @brief 串口1初始化
+ */
 void MX_USART1_UART_Init(void)
 {
-//  LL_USART_InitTypeDef USART_InitStruct = {0};
-
   LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* Peripheral clock enable */
@@ -54,15 +51,6 @@ void MX_USART1_UART_Init(void)
   GPIO_InitStruct.Pull = LL_GPIO_PULL_UP;
   LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-
-//  USART_InitStruct.BaudRate = 115200;
-//  USART_InitStruct.DataWidth = LL_USART_DATAWIDTH_8B;
-//  USART_InitStruct.StopBits = LL_USART_STOPBITS_1;
-//  USART_InitStruct.Parity = LL_USART_PARITY_NONE;
-//  USART_InitStruct.TransferDirection = LL_USART_DIRECTION_TX_RX;
-//  USART_InitStruct.HardwareFlowControl = LL_USART_HWCONTROL_NONE;
-//  USART_InitStruct.OverSampling = LL_USART_OVERSAMPLING_16;
-//  LL_USART_Init(USART1, &USART_InitStruct);
   /*设置波特率115200*/
   USART1->BRR=625;
   USART1->CR1|=0X200C;//设置停止位和校验位
@@ -76,9 +64,3 @@ void MX_USART1_UART_Init(void)
   LL_USART_Enable(USART1);
 
 }
-
-/* USER CODE BEGIN 1 */
-
-/* USER CODE END 1 */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

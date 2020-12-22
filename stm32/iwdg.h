@@ -26,33 +26,16 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
-/* USER CODE BEGIN Includes */
-
-/* USER CODE END Includes */
-
 extern IWDG_HandleTypeDef hiwdg;
 
-/* USER CODE BEGIN Private defines */
+void IWDG_Init(void);
 
-/* USER CODE END Private defines */
-
-void MX_IWDG_Init(void);
-
-/* USER CODE BEGIN Prototypes */
 void IWDG_Feed(void);
-/* USER CODE END Prototypes */
+
 
 #ifdef __cplusplus
 }
 #endif
 #endif /*__ iwdg_H */
 
-/**
-  * @}
-  */
 
-/**
-  * @}
-  */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

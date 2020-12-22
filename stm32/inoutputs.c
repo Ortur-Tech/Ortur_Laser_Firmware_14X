@@ -55,6 +55,9 @@ const PIN_MASK inputs_pin_mask[N_INPUTS_DIG] =
 #endif
 
 //------------------------------------------------------------------------
+/**
+ * @brief inoutputs_init
+ */
 void inoutputs_init()
 {
   outputs_digital_reset();
@@ -65,14 +68,19 @@ void inoutputs_init()
 
 }
 
-// Reset outputs
+/**
+ * @brief Reset outputs
+ */
 void outputs_digital_reset()
 {
   uint8_t i;
   for (i = 0; i < N_OUTPUTS_DIG; i++)
     GPIO_ResetBits(AUX_GPIO_Port, outputs_pin_mask[i]);
 }
-// Set outputs
+
+/**
+ * @brief Set outputs
+ */
 void outputs_digital_set()
 {
   uint8_t i;
@@ -80,7 +88,10 @@ void outputs_digital_set()
     GPIO_SetBits(AUX_GPIO_Port, outputs_pin_mask[i]);
 }
 
-// Returns output state as a bit-wise uint8 variable.
+/**
+ * @brief outputs_get_digital_state
+ * @return output state as a bit-wise uint8 variable.
+ */
 uint8_t outputs_get_digital_state()
 {
   uint8_t outputs_state = 0;
@@ -94,7 +105,11 @@ uint8_t outputs_get_digital_state()
     }
   return outputs_state;
 }
-
+/**
+ * @brief outputs_set_digital
+ * @param bit_index
+ * @param OnOff
+ */
 void outputs_set_digital(uint8_t bit_index, uint8_t OnOff)
 {
   if (bit_index < N_OUTPUTS_DIG)
@@ -105,7 +120,11 @@ void outputs_set_digital(uint8_t bit_index, uint8_t OnOff)
       GPIO_ResetBits(AUX_GPIO_Port, outputs_pin_mask[bit_index]);
     }
 }
-
+/**
+ * @brief outputs_digital_action
+ * @param bit_index
+ * @param Action
+ */
 void outputs_digital_action(uint8_t bit_index, uint8_t Action)
 {
   protocol_buffer_synchronize();

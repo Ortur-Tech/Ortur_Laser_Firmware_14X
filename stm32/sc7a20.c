@@ -10,6 +10,12 @@
 #include "main.h"
 #include "board.h"
 
+/**
+ * @brief Write_One_Byte_iicaddr
+ * @param iicchar 芯片地址
+ * @param addr 寄存器地址
+ * @param thedata 写入数据
+ */
 void Write_One_Byte_iicaddr(char iicchar, char addr, char thedata)
 {
 	uint8_t acktemp = 1;
@@ -24,7 +30,12 @@ void Write_One_Byte_iicaddr(char iicchar, char addr, char thedata)
 	IIC_Stop();
 }
 
-
+/**
+ * @brief Read_One_Byte
+ * @param device_addr
+ * @param reg_addr
+ * @return 读到的数据
+ */
 char Read_One_Byte(char device_addr, char reg_addr)
 {
 	uint8_t acktemp = 1;
@@ -45,7 +56,9 @@ char Read_One_Byte(char device_addr, char reg_addr)
 	return mydata;
 
 }
-
+/**
+ * @brief Sc7a20_Init
+ */
 void Sc7a20_Init(void)
 {
 
@@ -56,7 +69,10 @@ void Sc7a20_Init(void)
 
 }
 
-
+/**
+ * @brief Get_GsensorType
+ * @return 返回芯片id
+ */
 uint8_t Get_GsensorType(void)
 {
 	if(SC7A20_DEVICE== Read_One_Byte(SC7A20_ADDR, 0xf))
@@ -69,9 +85,12 @@ uint8_t Get_GsensorType(void)
 	}
 }
 
-
-//得到加速度值(原始值)
-//gx,gy,gz:陀螺仪x,y,z轴的原始读数(带符号)
+/**
+ * @brief Sc7a20_Get_Acceleration得到加速度值(原始值)
+ * @param gx gx,gy,gz:陀螺仪x,y,z轴的原始读数(带符号)
+ * @param gy
+ * @param gz
+ */
 void Sc7a20_Get_Acceleration(short *gx, short *gy, short *gz)
 {
 	uint16_t x_l8,x_h8,y_l8,y_h8,z_l8,z_h8;

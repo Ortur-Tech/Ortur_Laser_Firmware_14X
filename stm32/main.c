@@ -26,30 +26,9 @@
 #include "usb_device.h"
 #include "gpio.h"
 
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
 #include "grbl.h"
 #include "sc7a20.h"
-/* USER CODE END Includes */
 
-/* Private typedef -----------------------------------------------------------*/
-/* USER CODE BEGIN PTD */
-
-/* USER CODE END PTD */
-
-/* Private define ------------------------------------------------------------*/
-/* USER CODE BEGIN PD */
-
-/* USER CODE END PD */
-
-/* Private macro -------------------------------------------------------------*/
-/* USER CODE BEGIN PM */
-
-/* USER CODE END PM */
-
-/* Private variables ---------------------------------------------------------*/
-
-/* USER CODE BEGIN PV */
 system_t sys;
 int32_t sys_position[N_AXIS];      // Real-time machine (aka home) position vector in steps.
 int32_t sys_probe_position[N_AXIS]; // Last probe position in machine coordinates and steps.
@@ -61,19 +40,9 @@ volatile uint8_t sys_rt_exec_accessory_override; // Global realtime executor bit
 #ifdef DEBUG
   volatile uint8_t sys_rt_exec_debug;
 #endif
-/* USER CODE END PV */
 
-/* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_NVIC_Init(void);
-/* USER CODE BEGIN PFP */
-
-/* USER CODE END PFP */
-
-/* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
-
-/* USER CODE END 0 */
 
 /**
   * @brief  The application entry point.
@@ -82,8 +51,6 @@ static void MX_NVIC_Init(void);
 int main(void)
 {
 
-  /* USER CODE BEGIN 1 */
-  //Check_Rst_Source();
 #ifdef USE_BACKTRACE
 	{ //Enable fault by div 0
     volatile int * SCB_CCR = (volatile int *) 0xE000ED14; // SCB->CCR
@@ -92,33 +59,15 @@ int main(void)
 	/* CmBacktrace initialize */
 	cm_backtrace_init("CmBacktrace", ORTUR_MODEL_NAME , "Grbl " GRBL_VERSION " - OLF " ORTUR_VERSION);
 #endif
-  /* USER CODE END 1 */
 
-  /* MCU Configuration--------------------------------------------------------*/
-
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
-
-  /* USER CODE BEGIN Init */
   __enable_irq();
-  /* USER CODE END Init */
-
-  /* Configure the system clock */
   SystemClock_Config();
-
-  /* USER CODE BEGIN SysInit */
   MX_USART1_UART_Init();
   IIC_Init();
   Gsensor_Init();
-
-//  while(1)
-//  {
-//	  accel_detection();
-//	  delay_ms(50);
-//  }
-  /* USER CODE END SysInit */
-  /* Initialize all configured peripherals */
   Reset_Usb();
+
 #ifndef ORTUR_CNC_MODE
   Leds_Power(0); //关信号灯供电
 
@@ -137,23 +86,13 @@ int main(void)
   MX_TIM3_Init();
   MX_USB_DEVICE_Init();
 
-
-
 #ifndef DEBUG
-  MX_IWDG_Init();
+  IWDG_Init();
 #endif
 
-  /* Initialize interrupts */
   MX_NVIC_Init();
-  /* USER CODE BEGIN 2 */
-
-#ifndef DEBUG
-  // Disable IWDG if core is halted,调试时冻结看门狗
-  //DBGMCU->CR |= DBGMCU_CR_DBG_IWDG_STOP;
-#endif
 
   timing_init();
-  //uart_init();
 
   eeprom_init();
   serial_init();   // Setup serial baud rate and interrupts
@@ -255,44 +194,6 @@ void SystemClock_Config(void)
 		temp=RCC->CFGR>>2;
 		temp&=0x03;
 	}
-//  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-//  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-//  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
-//
-//  /** Initializes the RCC Oscillators according to the specified parameters
-//  * in the RCC_OscInitTypeDef structure.
-//  */
-//  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE;
-//  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
-//  RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
-//  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-//  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
-//  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-//  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-//  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
-//  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-//  {
-//    Error_Handler();
-//  }
-//  /** Initializes the CPU, AHB and APB buses clocks
-//  */
-//  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-//                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-//  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-//  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-//  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
-//  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
-//
-//  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
-//  {
-//    Error_Handler();
-//  }
-//  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USB;
-//  PeriphClkInit.UsbClockSelection = RCC_USBCLKSOURCE_PLL_DIV1_5;
-//  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
-//  {
-//    Error_Handler();
-//  }
 }
 
 /**
@@ -309,9 +210,6 @@ static void MX_NVIC_Init(void)
   HAL_NVIC_EnableIRQ(EXTI1_IRQn);
 }
 
-/* USER CODE BEGIN 4 */
-
-/* USER CODE END 4 */
 
 /**
   * @brief  This function is executed in case of error occurrence.

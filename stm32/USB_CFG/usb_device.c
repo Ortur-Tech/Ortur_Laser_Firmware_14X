@@ -27,34 +27,8 @@
 #include "usbd_cdc.h"
 #include "usbd_cdc_if.h"
 
-/* USER CODE BEGIN Includes */
-
-/* USER CODE END Includes */
-
-/* USER CODE BEGIN PV */
-/* Private variables ---------------------------------------------------------*/
-
-/* USER CODE END PV */
-
-/* USER CODE BEGIN PFP */
-/* Private function prototypes -----------------------------------------------*/
-
-/* USER CODE END PFP */
-
-/* USB Device Core handle declaration. */
 USBD_HandleTypeDef hUsbDeviceFS;
 
-/*
- * -- Insert your variables declaration here --
- */
-/* USER CODE BEGIN 0 */
-
-/* USER CODE END 0 */
-
-/*
- * -- Insert your external function declaration here --
- */
-/* USER CODE BEGIN 1 */
 void Reset_Usb()
 {
 	HAL_Delay(250);
@@ -65,6 +39,10 @@ void Reset_Usb()
 
 }
 static uint8_t usbCdcConnectFlag=0;
+/**
+ * @brief isUsbCDCConnected
+ * @return 1：已连接 0：未连接
+ */
 uint8_t isUsbCDCConnected(void)
 {
 	if((usbCdcConnectFlag==1)&&(isUSBConnect()==1))
@@ -75,11 +53,19 @@ uint8_t isUsbCDCConnected(void)
 	return 0;
 
 }
+/**
+ * @brief setUsbCDCConnected
+ * @param status
+ */
 void setUsbCDCConnected(uint8_t status)
 {
 	usbCdcConnectFlag=status;
 }
 /* USER CODE END 1 */
+/**
+ * @brief isUSBConnect
+ * @return 1：已连接 0：未连接
+ */
 uint8_t isUSBConnect(void)
 {
 	if(hUsbDeviceFS.dev_state== USBD_STATE_CONFIGURED)
@@ -89,7 +75,7 @@ uint8_t isUSBConnect(void)
 	return 0;
 }
 /**
-  * Init USB device Library, add supported class and start the library
+  * @brief Init USB device Library, add supported class and start the library
   * @retval None
   */
 void MX_USB_DEVICE_Init(void)

@@ -29,25 +29,9 @@
 #define POWEROFF_COUNT 200 //*10ms
 #define POWERON_COUNT 50 //*10ms
 
-/* USER CODE END 0 */
-
-/*----------------------------------------------------------------------------*/
-/* Configure GPIO                                                             */
-/*----------------------------------------------------------------------------*/
-/* USER CODE BEGIN 1 */
-
-/* USER CODE END 1 */
-
-/** Configure pins as
-        * Analog
-        * Input
-        * Output
-        * EVENT_OUT
-        * EXTI
-*/
-
-#define PIN_SWITCH_LL(A) LL_##A
-
+/**
+ * @brief 初始化GPIO
+ */
 void MX_GPIO_Init(void)
 {
 	LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -106,7 +90,10 @@ void MX_GPIO_Init(void)
 
 }
 
-/* USER CODE BEGIN 2 */
+/**
+ * @brief 电源LED指示控制
+ * @param onoff 1:开 0:关
+ */
 void Leds_Power(uint8_t onoff)
 {
 	LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -154,32 +141,53 @@ void Leds_Power(uint8_t onoff)
 
 #endif
 }
+/**
+ * @brief PowerLed_Blink
+ */
 void PowerLed_Blink(void)
 {
 	LL_GPIO_TogglePin(POWER_LED_GPIO_Port, LL_GPIO_PIN_3);
 }
+/**
+ * @brief PowerLed_On
+ */
 void PowerLed_On(void)
 {
 	LL_GPIO_SetOutputPin(POWER_LED_GPIO_Port, LL_GPIO_PIN_3);
 }
+/**
+ * @brief PowerLed_Off
+ */
 void PowerLed_Off(void)
 {
 	LL_GPIO_ResetOutputPin(POWER_LED_GPIO_Port, LL_GPIO_PIN_3);
 }
 
-
+/**
+ * @brief StatusLed_On
+ */
 void StatusLed_On(void)
 {
 	LL_GPIO_SetOutputPin(STATUS_LED_GPIO_Port, LL_GPIO_PIN_15);
 }
+/**
+ * @brief StatusLed_Off
+ */
 void StatusLed_Off(void)
 {
 	LL_GPIO_ResetOutputPin(STATUS_LED_GPIO_Port, LL_GPIO_PIN_15);
 }
+/**
+ * @brief StatusLed_Blink
+ */
 void StatusLed_Blink(void)
 {
 	LL_GPIO_TogglePin(STATUS_LED_GPIO_Port, LL_GPIO_PIN_15);
 }
+/**
+ * @brief Key_Scan
+ * @return 1:没有按键按下 0：有按键按下
+ */
 uint8_t Key_Scan(void)
 {
 	if(0==LL_GPIO_IsInputPinSet(KEY_GPIO_Port, LL_GPIO_PIN_13))
@@ -195,18 +203,14 @@ uint8_t Key_Scan(void)
 
 uint32_t key_count = 0;
 uint8_t poweron_justnow = 0;
-
+/**
+ * @brief 开机等待循环
+ */
 void PowerOpen_Loop()
 {
 	//默认关机
 	key_count = 0;
-	//初始化按�?
-	//__HAL_RCC_GPIOC_CLK_ENABLE();
-	/*Configure GPIO pin : PtPin */
-	//LL_GPIO_SetPinPull(KEY_GPIO_Port, KEY_Pin, LL_GPIO_PULL_UP);
-    //LL_GPIO_SetPinMode(KEY_GPIO_Port, KEY_Pin, LL_GPIO_MODE_INPUT);
 
-	//debugStr("wait for power on.\n");
 	while(1)
 	{
 		if(Key_Scan() == KEY_ON)
@@ -229,12 +233,15 @@ void PowerOpen_Loop()
 			//打开led
 			PowerLed_On();
 			poweron_justnow = POWERON_COUNT;
-			//debugStr("power on.\n");
 			break;
 		}
 	}
 	key_count = 0;
 }
+/**
+ * @brief 电源led翻转时间
+ * @param ms单位毫秒
+ */
 void PowerLed_Blink_Limit(uint32_t ms)
 {
 	static int32_t last_blink_time = 0;
@@ -244,32 +251,9 @@ void PowerLed_Blink_Limit(uint32_t ms)
 		last_blink_time = HAL_GetTick();
 	}
 }
-
-/*标识端口正在通讯*/
-//uint8_t isCommunicationFlag=0;
-//
-//void StatusLed_Show(void)
-//{
-//	static uint32_t time=0;
-//	if(isCommunicationFlag==1)
-//	{
-//		isCommunicationFlag=0;
-//		time=HAL_GetTick();
-//	}
-//
-//	if(isUSBConnect()&&((HAL_GetTick()-time)<5000))
-//	{
-//		StatusLed_Blink();
-//	}
-//	else if(isUSBConnect())
-//	{
-//		StatusLed_On();
-//	}
-//	else
-//	{
-//		StatusLed_Off();
-//	}
-//}
+/**
+ * @brief 关机按键检测
+ */
 void PowerClose_Check()
 {
 	//长按关机
@@ -280,7 +264,6 @@ void PowerClose_Check()
 			++key_count;
 			if(!(key_count%10))
 			{
-				//debugStr("key pressed.\n");
 				PowerLed_Blink();
 			}
 		}
@@ -306,13 +289,11 @@ void PowerClose_Check()
 			}
 			else
 			{
-				//PowerLed_Blink_Limit(0);
 				PowerLed_On();
 			}
 		}
 		else
 		{
-			//PowerLed_Blink_Limit(0);
 			PowerLed_On();
 		}
 	}
@@ -327,9 +308,6 @@ void PowerClose_Check()
 		//关机动作
 		PowerLed_Off();
 		StatusLed_Off();
-
-		//debugStr("power off.\n");
-
 		// Immediately disables steppers
 		st_go_idle();
 
@@ -340,7 +318,6 @@ void PowerClose_Check()
 		coolant_stop();
 
 		//等待用户释放按钮
-		//debugStr("wait for key release.\n");
 		key_count = 0;
 		while(1)
 		{
@@ -363,9 +340,7 @@ void PowerClose_Check()
 			{
 				//关闭led
 				PowerLed_Off();
-				//debugStr("key release.\n");
 				delay_ms(200);
-
 				__disable_fault_irq();
 				NVIC_SystemReset();
 				break;
@@ -373,7 +348,3 @@ void PowerClose_Check()
 		}
 	}
 }
-
-/* USER CODE END 2 */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
