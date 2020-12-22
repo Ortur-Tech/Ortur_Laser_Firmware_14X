@@ -37,7 +37,6 @@
 #define OLM_MODEL_180  5
 #define OLM_MODEL_210  6
 #define OLM_MODEL_400  7
-#define OCM            8
 
 //#define ORTUR_MODEL OLM_MODEL_400
 
@@ -83,11 +82,6 @@
 	#define DEFAULT_X_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Y_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Z_MAX_TRAVEL 100.0f // mm NOTE: Must be a positive value.	$132
-#elif ORTUR_MODEL==OCM
-	#define DEFAULT_DIRECTION_INVERT_MASK 1 // INVERT X
-	#define DEFAULT_X_MAX_TRAVEL 160.0f // mm NOTE: Must be a positive value.
-	#define DEFAULT_Y_MAX_TRAVEL 150.0f // mm NOTE: Must be a positive value.
-	#define DEFAULT_Z_MAX_TRAVEL 1.0f // mm NOTE: Must be a positive value.	$132
 #else
 	#error "Please select a machine model !"
 #endif
@@ -119,7 +113,7 @@
 
   #define DEFAULT_SPINDLE_RPM_MAX  		   1000.0f // $30   Max spindle speed [RPM]
   #define DEFAULT_SPINDLE_RPM_MIN  			  0.0f // $31   Min spindle speed [RPM]
-  #define DEFAULT_LASER_MODE                     1 // $32   Laser mode [boolean]								$32
+  #define DEFAULT_LASER_MODE                     1 // $32   Laser mode [boolean]
 
   #define DEFAULT_ACCEL_SENSITIVITY            250 // $33   Acceleration sensitivity [bit]
 
@@ -149,10 +143,10 @@
   #define DEFAULT_C_ACCELERATION    (400.0f*60*60) // $125  C Acceleration [mm/sec^2]
 
 #ifndef DEFAULT_X_MAX_TRAVEL
-  #define DEFAULT_X_MAX_TRAVEL              400.0f // $130  X Max travel [mm] NOTE: Must be a positive value.
+  #define DEFAULT_X_MAX_TRAVEL              160.0f // $130  X Max travel [mm] NOTE: Must be a positive value.
 #endif
 #ifndef DEFAULT_Y_MAX_TRAVEL
-  #define DEFAULT_Y_MAX_TRAVEL              400.0f // $131  Y Max travel [mm] NOTE: Must be a positive value.
+  #define DEFAULT_Y_MAX_TRAVEL              150.0f // $131  Y Max travel [mm] NOTE: Must be a positive value.
 #endif
 #ifndef DEFAULT_Z_MAX_TRAVEL
   #define DEFAULT_Z_MAX_TRAVEL              100.0f // $132  Z Max travel [mm] NOTE: Must be a positive value.
