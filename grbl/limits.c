@@ -459,6 +459,9 @@ void limits_go_home(uint8_t cycle_mask)
         }
       }
       IWDG_Feed();
+      //HOME时调用实时命令处理,避免无状态返回的情况
+      protocol_execute_realtime_limited();
+
     #ifdef ENABLE_DUAL_AXIS
       } while ((STEP_MASK & axislock) || (sys.homing_axis_lock_dual));
     #else

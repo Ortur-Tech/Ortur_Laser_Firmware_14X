@@ -74,10 +74,10 @@ void IWDG_Feed(void)
 		last_check_timestamp = HAL_GetTick()/1000;
 	}
 
-	//注意,�?光已经开�?
+	//注意,激光已经开启
 	if(isLaserOpen())
 	{
-		//�?光功率过大且长时间未移动
+		//激光功率过大且长时间未移动
 		curr_laser_power = getLaserPower();
 		if(curr_laser_power > off_laser_power )
 		{

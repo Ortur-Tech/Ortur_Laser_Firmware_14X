@@ -242,12 +242,30 @@ void protocol_auto_cycle_start()
 // limit switches, or the main program.
 void protocol_execute_realtime()
 {
-  protocol_exec_rt_system();
-  //检查加速度,侦测移动
-  accel_detection_limit();
-  if (sys.suspend) { protocol_exec_rt_suspend(); }
+  static uint8_t recursion = 0;
+  if(!recursion)//防止递归调用
+  {
+  	recursion++;
+
+    protocol_exec_rt_system();
+    //检查加速度,侦测移动
+    accel_detection_limit();
+    if (sys.suspend) { protocol_exec_rt_suspend(); }
+
+    recursion--;
+  }
 }
 
+void protocol_execute_realtime_limited()
+{
+  //限制调用频率
+  static uint32_t last_call_time = 0;
+  if((HAL_GetTick() - last_call_time) >= 10)
+  {
+    protocol_execute_realtime();
+    last_call_time = HAL_GetTick();
+  }
+}
 
 // Executes run-time commands, when required. This function primarily operates as Grbl's state
 // machine and controls the various real-time features Grbl has to offer.
