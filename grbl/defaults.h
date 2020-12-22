@@ -66,6 +66,7 @@
 	#define DEFAULT_Z_MAX_TRAVEL 1.0f // mm NOTE: Must be a positive value.	$132
 #elif ORTUR_MODEL==C40
 	#define ORTUR_MODEL_NAME "C40"
+  	#define DEFAULT_HOMING_ENABLE                  1 // $22   Homing cycle [boolean]
 	#define DEFAULT_DIRECTION_INVERT_MASK 0
 	#define DEFAULT_X_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Y_MAX_TRAVEL 300.0f // mm NOTE: Must be a positive value.
@@ -78,10 +79,12 @@
 	#define DEFAULT_Z_MAX_TRAVEL 1.0f // mm NOTE: Must be a positive value.	$132
 #elif ORTUR_MODEL==OLM_MODEL_400
 	#define ORTUR_MODEL_NAME "Ortur Laser Master Model 400"
+	#define DEFAULT_HOMING_DIR_MASK       0b11 // $23   Homing dir invert [mask]
 	#define DEFAULT_DIRECTION_INVERT_MASK 0
 	#define DEFAULT_X_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Y_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Z_MAX_TRAVEL 100.0f // mm NOTE: Must be a positive value.	$132
+ 	#define DEFAULT_Z_STEPS_PER_MM 400.0f // $102
 #else
 	#error "Please select a machine model !"
 #endif
@@ -95,7 +98,7 @@
 #endif
   #define DEFAULT_INVERT_ST_ENABLE               0 // $4    Step enable invert [boolean]
   #define DEFAULT_INVERT_LIMIT_PINS              0 // $5    Limit pins invert [boolean]
-  #define DEFAULT_INVERT_PROBE_PIN               1 // $6    Probe pin invert [boolean]
+  #define DEFAULT_INVERT_PROBE_PIN               0 // $6    Probe pin invert [boolean]
 
   #define DEFAULT_STATUS_REPORT_MASK             3 // $10   Status report [mask]  MPos enabled
   #define DEFAULT_JUNCTION_DEVIATION         0.05f // $11   Junction deviation [mm]
@@ -103,10 +106,14 @@
   #define DEFAULT_REPORT_INCHES                  0 // $13   Report inches [boolean]
 
   #define DEFAULT_SOFT_LIMIT_ENABLE              0 // $20   Soft limits [boolean]
-  #define DEFAULT_HARD_LIMIT_ENABLE              1 // $21   Hard limits [boolean]
+  #define DEFAULT_HARD_LIMIT_ENABLE              0 // $21   Hard limits [boolean]
+#ifndef DEFAULT_HOMING_ENABLE
   #define DEFAULT_HOMING_ENABLE                  1 // $22   Homing cycle [boolean]
+#endif
+#ifndef  DEFAULT_HOMING_DIR_MASK
   #define DEFAULT_HOMING_DIR_MASK            0b111 // $23   Homing dir invert [mask]
-  #define DEFAULT_HOMING_FEED_RATE      (10.0f*50) // $24   Homing feed [mm/min]
+#endif
+  #define DEFAULT_HOMING_FEED_RATE      (10.0f*60) // $24   Homing feed [mm/min]
   #define DEFAULT_HOMING_SEEK_RATE      (50.0f*60) // $25   Homing seek [mm/min]
   #define DEFAULT_HOMING_DEBOUNCE_DELAY        100 // $26   Homing debounce [milliseconds] (0-65k)
   #define DEFAULT_HOMING_PULLOFF              5.0f // $27   Homing pull-off [mm]
@@ -123,7 +130,9 @@
 
   #define DEFAULT_X_STEPS_PER_MM 		     80.0f // $100		steps/mm
   #define DEFAULT_Y_STEPS_PER_MM 		     80.0f // $101
+#ifndef DEFAULT_Z_STEPS_PER_MM
   #define DEFAULT_Z_STEPS_PER_MM 		     80.0f // $102
+#endif
   #define DEFAULT_A_STEPS_PER_MM 		   3200.0f // $103
   #define DEFAULT_B_STEPS_PER_MM 		   3200.0f // $104
   #define DEFAULT_C_STEPS_PER_MM 		   3200.0f // $105
@@ -135,12 +144,12 @@
   #define DEFAULT_B_MAX_RATE           (150*60.0f) // $114  B Max rate [mm/min]
   #define DEFAULT_C_MAX_RATE           (150*60.0f) // $115  C Max rate [mm/min]
 
-  #define DEFAULT_X_ACCELERATION   (2200.0f*60*60) // $120  X Acceleration [mm/sec^2]
-  #define DEFAULT_Y_ACCELERATION   (1800.0f*60*60) // $121  Y Acceleration [mm/sec^2]
-  #define DEFAULT_Z_ACCELERATION   (1000.0f*60*60) // $122  Z Acceleration [mm/sec^2]
-  #define DEFAULT_A_ACCELERATION    (400.0f*60*60) // $123  A Acceleration [mm/sec^2]
-  #define DEFAULT_B_ACCELERATION    (400.0f*60*60) // $124  B Acceleration [mm/sec^2]
-  #define DEFAULT_C_ACCELERATION    (400.0f*60*60) // $125  C Acceleration [mm/sec^2]
+  #define DEFAULT_X_ACCELERATION   	 (10.0f*60*60) // $120  X Acceleration [mm/sec^2]
+  #define DEFAULT_Y_ACCELERATION   	 (10.0f*60*60) // $121  Y Acceleration [mm/sec^2]
+  #define DEFAULT_Z_ACCELERATION   	 (10.0f*60*60) // $122  Z Acceleration [mm/sec^2]
+  #define DEFAULT_A_ACCELERATION   	 (10.0f*60*60) // $123  A Acceleration [mm/sec^2]
+  #define DEFAULT_B_ACCELERATION   	 (10.0f*60*60) // $124  B Acceleration [mm/sec^2]
+  #define DEFAULT_C_ACCELERATION   	 (10.0f*60*60) // $125  C Acceleration [mm/sec^2]
 
 #ifndef DEFAULT_X_MAX_TRAVEL
   #define DEFAULT_X_MAX_TRAVEL              160.0f // $130  X Max travel [mm] NOTE: Must be a positive value.
