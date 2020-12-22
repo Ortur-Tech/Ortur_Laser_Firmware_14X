@@ -64,7 +64,7 @@ void settings_write_coord_data(uint8_t coord_select, float *coord_data)
 void write_global_settings()
 {
   eeprom_put_char(0, SETTINGS_VERSION);
-  //eeprom_put_char(1, ORTUR_MODEL);
+  eeprom_put_char(1, ORTUR_MODEL);
   memcpy_to_eeprom_with_checksum(EEPROM_ADDR_GLOBAL, (char*)&settings, sizeof(settings_t));
 }
 
@@ -237,7 +237,8 @@ uint8_t settings_read_coord_data(uint8_t coord_select, float *coord_data)
 uint8_t read_global_settings() {
   // Check version-byte of eeprom
   uint8_t version = eeprom_get_char(0);
-  if (version == SETTINGS_VERSION) {
+  uint8_t model = eeprom_get_char(1);
+  if (version == SETTINGS_VERSION && model == ORTUR_MODEL) {
     // Read settings-record and check checksum
     if (!(memcpy_from_eeprom_with_checksum((char*)&settings, EEPROM_ADDR_GLOBAL, sizeof(settings_t)))) {
       return(false);
