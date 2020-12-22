@@ -135,7 +135,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="stm32/BMA2x2_driver|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_dma.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c|doc|grbl/examples|stm32/BMA2x2_driver/examples" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Debug_OLM_MODEL_400_NOOFFSET|Release_OLM_MODEL_400|Release_OLM_MODEL_210|Release_OLM_MODEL_180|Release_OLM_2|Release_OLM_1|Release_OLM|Release_C40|stm32/BMA2x2_driver|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_dma.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c|doc|grbl/examples|stm32/BMA2x2_driver/examples" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -273,7 +273,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="stm32/BMA2x2_driver|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_dma.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c|doc|grbl/examples|stm32/BMA2x2_driver/examples" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Debug_OLM_MODEL_400_NOOFFSET|Release_OLM_MODEL_400|Release_OLM_MODEL_210|Release_OLM_MODEL_180|Release_OLM_2|Release_OLM_1|Release_OLM|Release_C40|stm32/BMA2x2_driver|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_dma.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c|doc|grbl/examples|stm32/BMA2x2_driver/examples" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -411,7 +411,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="stm32/BMA2x2_driver|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_dma.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c|doc|grbl/examples|stm32/BMA2x2_driver/examples" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Debug_OLM_MODEL_400_NOOFFSET|Release_OLM_MODEL_400|Release_OLM_MODEL_210|Release_OLM_MODEL_180|Release_OLM_2|Release_OLM_1|Release_OLM|Release_C40|stm32/BMA2x2_driver|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_dma.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c|doc|grbl/examples|stm32/BMA2x2_driver/examples" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -549,7 +549,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="stm32/BMA2x2_driver|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_dma.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c|doc|grbl/examples|stm32/BMA2x2_driver/examples" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Debug_OLM_MODEL_400_NOOFFSET|Release_OLM_MODEL_400|Release_OLM_MODEL_210|Release_OLM_MODEL_180|Release_OLM_2|Release_OLM_1|Release_OLM|Release_C40|stm32/BMA2x2_driver|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_dma.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c|doc|grbl/examples|stm32/BMA2x2_driver/examples" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -687,7 +687,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="stm32/BMA2x2_driver|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_dma.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c|doc|grbl/examples|stm32/BMA2x2_driver/examples" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Debug_OLM_MODEL_400_NOOFFSET|Release_OLM_MODEL_400|Release_OLM_MODEL_210|Release_OLM_MODEL_180|Release_OLM_2|Release_OLM_1|Release_OLM|Release_C40|stm32/BMA2x2_driver|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_dma.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c|doc|grbl/examples|stm32/BMA2x2_driver/examples" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -825,7 +825,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="stm32/BMA2x2_driver|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_dma.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c|doc|grbl/examples|stm32/BMA2x2_driver/examples" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Debug_OLM_MODEL_400_NOOFFSET|Release_OLM_MODEL_400|Release_OLM_MODEL_210|Release_OLM_MODEL_180|Release_OLM_2|Release_OLM_1|Release_OLM|Release_C40|stm32/BMA2x2_driver|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_dma.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c|doc|grbl/examples|stm32/BMA2x2_driver/examples" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -963,7 +963,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="stm32/BMA2x2_driver|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_dma.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c|doc|grbl/examples|stm32/BMA2x2_driver/examples" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Debug_OLM_MODEL_400_NOOFFSET|Release_OLM_MODEL_400|Release_OLM_MODEL_210|Release_OLM_MODEL_180|Release_OLM_2|Release_OLM_1|Release_OLM|Release_C40|stm32/BMA2x2_driver|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_dma.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c|doc|grbl/examples|stm32/BMA2x2_driver/examples" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -1101,7 +1101,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="stm32/BMA2x2_driver|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_dma.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c|doc|grbl/examples|stm32/BMA2x2_driver/examples" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Debug_OLM_MODEL_400_NOOFFSET|Release_OLM_MODEL_400|Release_OLM_MODEL_210|Release_OLM_MODEL_180|Release_OLM_2|Release_OLM_1|Release_OLM|Release_C40|stm32/BMA2x2_driver|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_dma.c|stm32/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c|doc|grbl/examples|stm32/BMA2x2_driver/examples" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -1114,6 +1114,28 @@
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Release_OLM_MODEL_210">
+			<resource resourceType="FOLDER" workspacePath="/LaserMasterGrbl/Release_OLM_MODEL_210"/>
+		</configuration>
+		<configuration configurationName="Release_C40">
+			<resource resourceType="FOLDER" workspacePath="/LaserMasterGrbl/Release_C40"/>
+		</configuration>
+		<configuration configurationName="Release_OLM_MODEL_400">
+			<resource resourceType="FOLDER" workspacePath="/LaserMasterGrbl/Release_OLM_MODEL_400"/>
+		</configuration>
+		<configuration configurationName="Release_OLM_MODEL_180">
+			<resource resourceType="FOLDER" workspacePath="/LaserMasterGrbl/Release_OLM_MODEL_180"/>
+		</configuration>
+		<configuration configurationName="Release_OLM_2">
+			<resource resourceType="FOLDER" workspacePath="/LaserMasterGrbl/Release_OLM_2"/>
+		</configuration>
+		<configuration configurationName="Release_OLM">
+			<resource resourceType="FOLDER" workspacePath="/LaserMasterGrbl/Release_OLM"/>
+		</configuration>
+		<configuration configurationName="Release_OLM_1">
+			<resource resourceType="FOLDER" workspacePath="/LaserMasterGrbl/Release_OLM_1"/>
+		</configuration>
+		<configuration configurationName="Debug_OLM_MODEL_400_NOOFFSET"/>
 		<configuration configurationName="Debug">
 			<resource resourceType="FOLDER" workspacePath="/LaserMasterGrbl/Debug"/>
 		</configuration>
