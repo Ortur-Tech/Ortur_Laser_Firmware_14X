@@ -5,8 +5,8 @@
 *.launch
 *.su
 
-/Debug/
-/Release/
+/Debug*/
+/Release*/
 
 /Atollic/
 /cubeide/F13/Debug/
