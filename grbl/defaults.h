@@ -66,7 +66,7 @@
 	#define DEFAULT_Z_MAX_TRAVEL 1.0f // mm NOTE: Must be a positive value.	$132
 #elif ORTUR_MODEL==C40
 	#define ORTUR_MODEL_NAME "C40"
-  	#define DEFAULT_HOMING_ENABLE                  1 // $22   Homing cycle [boolean]
+  	#define DEFAULT_HOMING_ENABLE                 0 // $22   Homing cycle [boolean]
 	#define DEFAULT_DIRECTION_INVERT_MASK 0
 	#define DEFAULT_X_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Y_MAX_TRAVEL 300.0f // mm NOTE: Must be a positive value.
