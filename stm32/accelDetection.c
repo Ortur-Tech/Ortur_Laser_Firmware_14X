@@ -263,8 +263,8 @@ void accel_detection()
 			//进入警告状态,终止雕刻
 			if(sys.state == STATE_CYCLE)
 			{
-				printString("Move!\r\n");
-
+				printStringAll("Shock and Movement detected!\r\n");
+				//print_uint32_base10(accel_diff);
 				sys.state = STATE_ALARM;
 				sys.abort = 1;
 			}
@@ -280,7 +280,8 @@ void accel_detection()
 }
 
 /**
- * @brief 限制加速度检测的频率
+ * @brief
+ *  限制加速度检测的频率100ms读取一次
  */
 void accel_detection_limit()
 {

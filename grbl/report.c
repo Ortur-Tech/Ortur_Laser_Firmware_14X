@@ -394,6 +394,14 @@ void report_execute_startup_message(char *line, uint8_t status_code)
 // Prints build info line
 void report_build_info(char *line)
 {
+  printPgmString(PSTR("[AUTHOR: Owen"));
+  report_util_feedback_line_feed();
+  printPgmString(PSTR("[MODEL: " ORTUR_MODEL_NAME ));
+	report_util_feedback_line_feed();
+  printPgmString(PSTR("[OLF: " ORTUR_VERSION ));
+  report_util_feedback_line_feed();
+  printPgmString(PSTR("[DATE:"__TIME__" - "__DATE__));
+  report_util_feedback_line_feed();
   printPgmString(PSTR("[VER:" GRBL_VERSION "." GRBL_VERSION_BUILD ":"));
   printString(line);
   report_util_feedback_line_feed();

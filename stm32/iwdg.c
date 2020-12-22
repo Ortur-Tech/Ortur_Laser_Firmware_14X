@@ -28,7 +28,7 @@
 IWDG_HandleTypeDef hiwdg;
 
 /**
- * @brief IWDG init function
+ * @brief IWDG init function 1s最长喂狗时间
  */
 void IWDG_Init(void)
 {
@@ -60,12 +60,12 @@ uint32_t off_laser_power = SPINDLE_PWM_OFF_VALUE;//认为激光关闭的功率
 #endif
 
 /**
- * @brief IWDG_Feed
+ * @brief IWDG_Feed  喂狗同时检测激光是否在固定位置一直开着
  */
 void IWDG_Feed(void)
 {
 #ifdef ORTUR_LASER_MODE
-	//检查xyz位置是否变化
+    //检查xyz位置是否变化
 	if(sys_position[0] != last_sys_position[0] ||
 	   sys_position[1] != last_sys_position[1])
 	{
@@ -100,7 +100,7 @@ void IWDG_Feed(void)
 
 			if((HAL_GetTick()/1000) - last_check_timestamp >= allow_laser_time)
 			{
-				printString("Laser exposure timeout!\r\n");
+				printStringAll("Laser exposure timeout!\r\n");
 				sys.state = STATE_ALARM;
 				sys.abort = 1;
 			}

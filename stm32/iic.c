@@ -79,6 +79,7 @@ void IIC_Init(void)
 	LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
 
 	LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOB);
+	LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOA);
 	/**I2C2 GPIO Configuration
 	PB10     ------> I2C2_SCL
 	PB11     ------> I2C2_SDA
@@ -89,6 +90,9 @@ void IIC_Init(void)
     GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_UP;
     LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+    /*在这里初始化USB DP 以降低代码量*/
+    GPIO_InitStruct.Pin = LL_GPIO_PIN_12;
+    LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 	IIC_SCL=1;
 	IIC_SDA=1;

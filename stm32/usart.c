@@ -23,7 +23,7 @@
 
 
 /**
- * @brief 串口1初始化
+ * @brief 串口1初始化 波特率115200
  */
 void MX_USART1_UART_Init(void)
 {
