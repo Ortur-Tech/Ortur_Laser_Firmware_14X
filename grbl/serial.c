@@ -192,7 +192,10 @@ ISR(SERIAL_UDRE)
   if (tail == serial_tx_buffer_head) { UCSR0B &= ~(1 << UDRIE0); }
 }
 #endif
-
+/**
+ * @brief usbGetC
+ * @return 从缓冲区获取的数据
+ */
 char usbGetC(void)
 {
 	  uint8_t tail = usb_serial_rx_buffer_tail; // Temporary serial_rx_buffer_tail (to optimize for volatile)
@@ -208,7 +211,10 @@ char usbGetC(void)
 	    return data;
 	  }
 }
-
+/**
+ * @brief serialGetC
+ * @return 从缓冲区获取的数据
+ */
 char serialGetC(void)
 {
 	  uint8_t tail = serial_rx_buffer_tail; // Temporary serial_rx_buffer_tail (to optimize for volatile)
@@ -225,7 +231,10 @@ char serialGetC(void)
 	  }
 }
 
-// Fetches the first byte in the serial read buffer. Called by main program.
+/**
+ * @brief Fetches the first byte in the serial read buffer.
+ * @return
+ */
 uint8_t serial_read()
 {
 	int16_t c = SERIAL_NO_DATA;
@@ -264,6 +273,11 @@ uint8_t serial_read()
 }
 
 #ifdef STM32
+/**
+ * @brief 串口接收中断处理函数
+ * @param data 从串口传过来的数据
+ * @param steam USBCDC：虚拟串口 其他：硬件串口
+ */
 void HandleUartIT(uint8_t data,uint8_t steam)
 {
 	uint8_t next_head;
@@ -348,7 +362,9 @@ void HandleUartIT(uint8_t data,uint8_t steam)
 #define SERIAL_SWITCH_TIME 3000
 
 uint32_t last_steam_use_time=0;
-
+/**
+ * @brief USART1_IRQHandler
+ */
 void USART1_IRQHandler (void)
 {
 	uint8_t data=0;
@@ -362,6 +378,11 @@ void USART1_IRQHandler (void)
 }
 
 #ifdef USE_USB
+/**
+ * @brief OnUsbDataRx USB数据接收
+ * @param dataIn
+ * @param length
+ */
 void OnUsbDataRx(uint8_t* dataIn, uint8_t length)
 {
     uint8_t data;

@@ -20,11 +20,9 @@
 /* Includes ------------------------------------------------------------------*/
 #include "tim.h"
 
-/* USER CODE BEGIN 0 */
-
-/* USER CODE END 0 */
-
-/* TIM1 init function */
+/**
+ * @brief MX_TIM1_Init
+ */
 void MX_TIM1_Init(void)
 {
   LL_TIM_InitTypeDef TIM_InitStruct = {0};
@@ -74,7 +72,10 @@ void MX_TIM1_Init(void)
   LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 }
-/* TIM2 init function */
+
+/**
+ * @brief TIM2 init function
+ */
 void MX_TIM2_Init(void)
 {
   LL_TIM_InitTypeDef TIM_InitStruct = {0};
@@ -97,7 +98,10 @@ void MX_TIM2_Init(void)
   LL_TIM_DisableMasterSlaveMode(TIM2);
 
 }
-/* TIM3 init function */
+
+/**
+ * @brief TIM3 init function
+ */
 void MX_TIM3_Init(void)
 {
   LL_TIM_InitTypeDef TIM_InitStruct = {0};
@@ -139,9 +143,3 @@ void MX_TIM3_Init(void)
   LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 }
-
-/* USER CODE BEGIN 1 */
-
-/* USER CODE END 1 */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

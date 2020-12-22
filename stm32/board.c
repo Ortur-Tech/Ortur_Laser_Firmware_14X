@@ -5,7 +5,6 @@
  *      Author: c
  */
 
-
 #include "board.h"
 
 
@@ -21,7 +20,10 @@ PUTCHAR_PROTOTYPE
     return ch;
 }
 
-/*当单片机主频为72兆赫兹时比较精准的软件延时*/
+/**
+ * @brief 当单片机主频为72兆赫兹时比较精准的软件延时
+ * @param nus单位微秒
+ */
 void soft_delay_us(uint32_t nus)
 {
 	 while (nus --)
@@ -51,7 +53,10 @@ void soft_delay_us(uint32_t nus)
 	  }
 
 }
-
+/**
+ * @brief soft_delay_ms
+ * @param nms单位毫秒
+ */
 void soft_delay_ms(uint32_t nms)
 {
 	while(nms--)
@@ -59,7 +64,9 @@ void soft_delay_ms(uint32_t nms)
 		soft_delay_us(1000);
 	}
 }
-
+/**
+ * @brief 检测复位源
+ */
 void Check_Rst_Source(void)
 {
 

@@ -47,35 +47,7 @@ extern const PIN_MASK limit_pin_mask[N_AXIS];
 extern uint32_t uTICKS_PER_MICROSECOND;
 extern float fTICKS_PER_MINUTE;
 
-//-- Stepper
-/*
-void Step_IT_Stop();
-void Step_IT_Start(stepper_t *pST);
 
-void Step_Set_IT_segment_timing_init(stepper_t *pST);
-void Step_Set_IT_Enable();
-void Step_Set_IT_Disable();
-void Step_Reset_IT_Enable();
-void Step_Reset_IT_Disable();
-
-void Step_Set_IT_Clear(uint32_t uParam);
-void Step_Reset_IT_Clear(uint32_t uParam);
-
-*/
-//-- Limits
-/*
-void Limit_IT_Stop();
-void Limit_IT_Start();
-*/
-
-//-- Spindle
-/*
-#ifdef STM32F4
-	HAL_StatusTypeDef Spindle_PWM_Stop();
-	HAL_StatusTypeDef Spindle_PWM_Start();
-	void Spindle_PWM_Set(uint16_t uPWM);
-#endif
-*/
 
 #ifdef STM32F13
 
@@ -153,17 +125,7 @@ void uart_sendch(uint8_t ch);
 #endif
 
 
-
-
-
 void spi_limits_init();
-
-
-
-
-
-
-
 
 
 #ifdef __cplusplus

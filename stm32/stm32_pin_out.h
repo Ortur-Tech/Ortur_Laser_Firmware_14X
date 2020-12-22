@@ -37,10 +37,6 @@
   #define CON_GPIO_Port GPIOA
   #define CONTROL_MASK	(CON_CYCLE_START_Pin|CON_SAFETY_DOOR_Pin|CON_RESET_Pin|CON_FEED_HOLD_Pin)
 
-  /*
-  #define SetStepperDisableBit() GPIO_SetBits(STEP_ENABLE_GPIO_Port,LL_GPIO_Pin_15)
-  #define ResetStepperDisableBit() GPIO_ResetBits(STEP_ENABLE_GPIO_Port,LL_GPIO_Pin_15)
-  */
   #define SetStepperDisableBit()   do{GPIO_SetBits(EN_X_GPIO_Port,EN_X_Pin);GPIO_SetBits(EN_Y_GPIO_Port,EN_Y_Pin);GPIO_SetBits(EN_Z_GPIO_Port,EN_Z_Pin);}while(0)
   #define ResetStepperDisableBit() do{GPIO_ResetBits(EN_X_GPIO_Port,EN_X_Pin);GPIO_ResetBits(EN_Y_GPIO_Port,EN_Y_Pin);GPIO_ResetBits(EN_Z_GPIO_Port,EN_Z_Pin);}while(0)
 

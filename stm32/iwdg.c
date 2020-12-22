@@ -27,8 +27,10 @@
 
 IWDG_HandleTypeDef hiwdg;
 
-/* IWDG init function */
-void MX_IWDG_Init(void)
+/**
+ * @brief IWDG init function
+ */
+void IWDG_Init(void)
 {
 
 	IWDG->KR=0X5555;//使能对IWDG->PR和IWDG->RLR的写
@@ -36,20 +38,13 @@ void MX_IWDG_Init(void)
   	IWDG->RLR=625;  //从加载寄存器 IWDG->RLR
 	IWDG->KR=0XAAAA;//reload
   	IWDG->KR=0XCCCC;//使能看门狗
-//  hiwdg.Instance = IWDG;
-//  hiwdg.Init.Prescaler = IWDG_PRESCALER_64;
-//  hiwdg.Init.Reload = 256;
-//  if (HAL_IWDG_Init(&hiwdg) != HAL_OK)
-//  {
-//    Error_Handler();
-//  }
 
 }
 
 /* USER CODE BEGIN 1 */
 #ifdef ORTUR_LASER_MODE
 
-int32_t last_sys_position[N_AXIS]; 		// 最后一次检测位置
+int32_t last_sys_position[N_AXIS]; 		//!< 最后一次检测位置
 uint64_t last_check_timestamp = 0; 		// 最后一次检测时间
 uint32_t max_exposure_time = 60;		// 最长曝光时间 100s
 uint32_t min_exposure_time = 10;		//最短曝光时间
@@ -59,11 +54,14 @@ uint32_t curr_laser_power;//当前激光功率
 
 uint32_t allow_laser_time;//允许激光静态开启时间
 
-uint32_t max_laser_power = SPINDLE_PWM_MAX_VALUE; //激光最大功率
+uint32_t max_laser_power = SPINDLE_PWM_MAX_VALUE; ///< 激光最大功率
 uint32_t weak_laser_power = 20;//弱光功率
 uint32_t off_laser_power = SPINDLE_PWM_OFF_VALUE;//认为激光关闭的功率
 #endif
 
+/**
+ * @brief IWDG_Feed
+ */
 void IWDG_Feed(void)
 {
 #ifdef ORTUR_LASER_MODE
@@ -103,10 +101,6 @@ void IWDG_Feed(void)
 			if((HAL_GetTick()/1000) - last_check_timestamp >= allow_laser_time)
 			{
 				printString("Laser exposure timeout!\r\n");
-				//printString("In weak laser mode, the maximum time allowed is 100 second.\r\n");
-				//printString("None weak laser mode , the maximum time allowed is in the range from 10 to 60 second , according to the power .\r\n");
-				//printString("Reset Grbl.\r\n");
-
 				sys.state = STATE_ALARM;
 				sys.abort = 1;
 			}
@@ -119,7 +113,6 @@ void IWDG_Feed(void)
 #endif
 #ifndef DEBUG
 	IWDG->KR=0XAAAA;//reload
-	//HAL_IWDG_Refresh(&hiwdg);
 #endif
 }
 /* USER CODE END 1 */

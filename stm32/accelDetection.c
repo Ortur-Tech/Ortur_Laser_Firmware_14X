@@ -47,9 +47,12 @@ void BMA250_Get_Acceleration(short *gx, short *gy, short *gz);
 #define BMP_AS_BANDWIDTH 8
 #define BMP_AS_SLEEPPHASE 2
 
-uint8_t GsensorDeviceType=0;
+uint8_t GsensorDeviceType=0;    //!<gsensor芯片类型
 
-
+/**
+ * @brief BMA250_Init
+ * @param
+ */
 void BMA250_Init(void)
 {
     uint8_t bGRange = 0;                                  // g Range;
@@ -118,24 +121,11 @@ void BMA250_Init(void)
 	Write_One_Byte_iicaddr(BMA250_Addr, BMP_SCR, 0x80);        // acquire unfiltered acceleration data
 #endif
 
-//	while(1)
-//	{
-////		BMA250_WriteByte(BMA250_Addr, BMP_BWD, 0x09);        // Set filter bandwidth
-////		bSleep=BMA250_ReadByte(BMA250_Addr,BMP_BWD);
-////		mprintf(LOG_INFO,"BMP_BWD w/r:0x%02x:0x%02x.\r\n",0x09,bSleep);
-////		BMA250_WriteByte(BMA250_Addr, BMP_BWD, bBwd);        // Set filter bandwidth
-////		bSleep=BMA250_ReadByte(BMA250_Addr,BMP_BWD);
-////		mprintf(LOG_INFO,"BMP_BWD w/r:0x%02x:0x%02x.\r\n",bBwd,bSleep);
-//
-//		bSleep=Check_BMA250_ID();
-//		mprintf(LOG_INFO,"chip id:0x%02x.\r\n",bSleep);
-//		BMA250_Get_Acceleration(&accel_x,&accel_y,&accel_z);
-//	    bBwd=bSleep;
-//	    mprintf(LOG_INFO,"xValue:%d. yValue:%d. zValue:%d.\r\n",accel_x,accel_y,accel_z);
-//	    delay_ms(1000);
-//	}
-
 }
+/**
+ * @brief Gsensor_Init
+ * @author Cc
+ */
 void Gsensor_Init(void)
 {
 	if(GsensorDeviceType==0)
@@ -152,14 +142,21 @@ void Gsensor_Init(void)
 	}
 }
 
-
+/**
+ * @brief Check_BMA250_ID
+ * @return 芯片id
+ */
 uint8_t Check_BMA250_ID(void)
 {
     return (Read_One_Byte(BMA250_Addr, 0x00));
 }
 
-//得到加速度值(原始值)
-//gx,gy,gz:陀螺仪x,y,z轴的原始读数(带符号)
+/**
+ * @brief BMA250_Get_Acceleration 得到加速度值(原始值)
+ * @param gx 陀螺仪x,y,z轴的原始读数(带符号)
+ * @param gy
+ * @param gz
+ */
 void BMA250_Get_Acceleration(short *gx, short *gy, short *gz)
 {
 	uint16_t x_l8,x_h8,y_l8,y_h8,z_l8,z_h8;
@@ -181,10 +178,19 @@ void BMA250_Get_Acceleration(short *gx, short *gy, short *gz)
 
 }
 
+/**
+ * @brief Get_Acceleration
+ * @param devAddr 设备地址
+ * @param firstAddr 读取首地址
+ * @param gx x轴加速度value
+ * @param gy y轴加速度value
+ * @param gz z轴加速度值
+ */
 void Get_Acceleration(uint8_t devAddr ,uint8_t firstAddr,short *gx, short *gy, short *gz)
 {
 	uint16_t x_l8,x_h8,y_l8,y_h8,z_l8,z_h8;
 
+    /*读加速度值*/
     x_l8 = Read_One_Byte(devAddr, firstAddr);
     x_h8 = Read_One_Byte(devAddr, firstAddr+1);
     y_l8 = Read_One_Byte(devAddr, firstAddr+2);
@@ -192,6 +198,7 @@ void Get_Acceleration(uint8_t devAddr ,uint8_t firstAddr,short *gx, short *gy, s
     z_l8 = Read_One_Byte(devAddr, firstAddr+4);
     z_h8 = Read_One_Byte(devAddr, firstAddr+5);
 
+    /*取高10bit*/
     *gx=(short)((x_h8<<8)|x_l8);
     *gy=(short)((y_h8<<8)|y_l8);
     *gz=(short)((z_h8<<8)|z_l8);
@@ -204,12 +211,15 @@ void Get_Acceleration(uint8_t devAddr ,uint8_t firstAddr,short *gx, short *gy, s
 //TODO:检测10秒内的加速度值
 
 //初始化并读取加速度计数据
+/**
+ * @brief 检测加速度是否超限制
+ */
 void accel_detection()
 {
 	if(GsensorDeviceType==SC7A20_DEVICE)
 	{
+        /*读取*/
 		Get_Acceleration(SC7A20_ADDR, 0X28,&accel_x,&accel_y,&accel_z);
-		//Sc7a20_Get_Acceleration(&accel_x,&accel_y,&accel_z);
 		accel_x=accel_x*2;
 		accel_y=accel_y*2;
 		accel_z=accel_z*2;
@@ -217,14 +227,12 @@ void accel_detection()
 	else
 	{
 		//延时读取加速度情况
-		//BMA250_Get_Acceleration(&accel_x,&accel_y,&accel_z);
 		Get_Acceleration(BMA250_Addr, BMP_ACC_X_LSB,&accel_x,&accel_y,&accel_z);
-		//settings.accel_sensitivity=settings.accel_sensitivity;
 	}
 
 	if(accel_x != accel_x_old ||accel_y != accel_y_old ||accel_z != accel_z_old )
 	{
-		 //mprintf(LOG_INFO,"xValue:%d. yValue:%d. zValue:%d.\r\n",accel_x,accel_y,accel_z);
+		 mprintf(LOG_INFO,"xValue:%d. yValue:%d. zValue:%d.\r\n",accel_x,accel_y,accel_z);
 		//仅在雕刻模式下起作用
 		//如果数据突变,就表明有较大的震动或位移,这样雕刻会错位,无法继续
 
@@ -242,7 +250,6 @@ void accel_detection()
 			mprintf(LOG_INFO,"accel_diff:%d.\r\n",accel_diff);
 			if( accel_diff > settings.accel_sensitivity )
 			{
-			    //print_uint32_base10(accel_diff);
 				mprintf(LOG_INFO,"xValue:%d. yValue:%d. zValue:%d.\r\n",accel_x_old,accel_y_old,accel_z_old);
 				mprintf(LOG_INFO,"xValue:%d. yValue:%d. zValue:%d.\r\n",accel_x,accel_y,accel_z);
 				shake_detected = 1;
@@ -253,30 +260,15 @@ void accel_detection()
 		{
 			shake_detected = 0;
 
-			//debugStr("shake_detected");
-
 			//进入警告状态,终止雕刻
 			if(sys.state == STATE_CYCLE)
 			{
 				printString("Move!\r\n");
-				{
-					//char diffStr[50];
-					//sprintf(diffStr,"Acceleration fluctuation:%d\r\n",(int)(accel_diff));
-					//printString(diffStr);
-				}
-				//printString("Reset Grbl.\r\n");
+
 				sys.state = STATE_ALARM;
 				sys.abort = 1;
 			}
 		}
-
-//		uint8_t buf[100]={0};
-//		sprintf(buf,"accel_xyz:[%d",(int)(accel_x)); //_g*10000.0f
-//		debugStr(buf);
-//		sprintf(buf,", %d ,",(int)(accel_y)); //_g*10000.0f
-//		debugStr(buf);
-//		sprintf(buf,"%d].\r\n",(int)(accel_z)); //_g*10000.0f
-//		debugStr(buf);
 
 		//计算均值
 		accel_x_old = (accel_x_old + accel_x) / 2;
@@ -287,11 +279,11 @@ void accel_detection()
 	++detection_count;//统计检测次数
 }
 
-//限制加速度检测的频率
+/**
+ * @brief 限制加速度检测的频率
+ */
 void accel_detection_limit()
 {
-	//NOTE: 测试,屏蔽掉加速度传感器
-	//return;
 
 	//雕刻运行时才检测
 	if(sys.state == STATE_CYCLE)
