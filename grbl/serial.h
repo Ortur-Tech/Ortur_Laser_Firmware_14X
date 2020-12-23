@@ -26,7 +26,7 @@
 
 #ifdef STM32
 	#define RX_BUFFER_SIZE 254
-	#define TX_BUFFER_SIZE 128
+	#define TX_BUFFER_SIZE 254
 
 	void process_it_char(uint8_t data);
 
