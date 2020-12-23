@@ -19,6 +19,7 @@
 
 #include "main.h"
 #include "stm32f1xx_it.h"
+#include "usb_device.h"
 
 #include "system.h"		//-- HandleControlIT
 #include "limits.h"		//-- HandleLimitIT
@@ -154,7 +155,12 @@ void SysTick_Handler(void)
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
-
+#ifdef USE_USB
+    if(isUsbPlugIn())
+    {
+        setUsbPlugIn(isUsbPlugIn() - 1);
+    }
+#endif
   /* USER CODE END SysTick_IRQn 1 */
 }
 

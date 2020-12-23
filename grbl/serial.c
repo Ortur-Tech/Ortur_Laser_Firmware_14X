@@ -109,25 +109,42 @@ uint8_t last_steam=USBCDC;
 uint8_t steamSwitchAble=1;
 
 extern USBD_HandleTypeDef hUsbDeviceFS;
-// Writes one byte to the TX serial buffer. Called by main program.
-void serial_write(uint8_t data)
-{
-#ifdef STM32
-#ifdef USE_USB
-	//usb串口未连接时,不发送任何数据
-	//if(!isUSBConnect()){return;}
 
-	if((last_steam == USBCDC)&&(isUsbCDCConnected()))
+void usb_serial_write(uint8_t data)
+{
+	//usb串口未连接时,不发送任何数据
+	if(isUsbCDCConnected())
 	{
 		__disable_irq();
 		// Store data and advance head
 		serial_tx_buffer[serial_tx_buffer_head++] = data;
 		__enable_irq();
-		if(serial_tx_buffer[serial_tx_buffer_head-1]=='\n')
+		if((serial_tx_buffer[serial_tx_buffer_head-1]=='\n')||(TX_RING_BUFFER<=serial_tx_buffer_head))
 		{
-			while(USBD_BUSY==CDC_Transmit_FS(serial_tx_buffer,serial_tx_buffer_head));
+			while(USBD_BUSY==CDC_Transmit_FS(serial_tx_buffer,serial_tx_buffer_head))
+			{
+				if(!isUsbCDCConnected())
+				{
+					break;
+				}
+			}
+			if((serial_tx_buffer_head%64)==0)
+			{
+				CDC_Transmit_FS(serial_tx_buffer,0);
+			}
 			serial_tx_buffer_head=0;
 		}
+	}
+}
+// Writes one byte to the TX serial buffer. Called by main program.
+void serial_write(uint8_t data)
+{
+#ifdef STM32
+#ifdef USE_USB
+
+	if(last_steam == USBCDC)
+	{
+		usb_serial_write(data);
 	}
 	else
 	{
@@ -158,18 +175,7 @@ void serial_write(uint8_t data)
 }
 void serial_write_all(uint8_t data)
 {
-	if(isUsbCDCConnected())
-	{
-		__disable_irq();
-		// Store data and advance head
-		serial_tx_buffer[serial_tx_buffer_head++] = data;
-		__enable_irq();
-		if(serial_tx_buffer[serial_tx_buffer_head-1]=='\n')
-		{
-			while(USBD_BUSY==CDC_Transmit_FS(serial_tx_buffer,serial_tx_buffer_head));
-			serial_tx_buffer_head=0;
-		}
-	}
+	usb_serial_write(data);
 	uart_sendch(data);
 
 }

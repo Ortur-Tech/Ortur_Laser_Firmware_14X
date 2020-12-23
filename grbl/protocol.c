@@ -184,7 +184,7 @@ void protocol_main_loop()
 
 #ifdef USEUSB
     //指示USB连接状态
-    if(isUSBConnect())
+    if(isUsbPlugIn())
     	StatusLed_On();
     else
     	StatusLed_Off();
