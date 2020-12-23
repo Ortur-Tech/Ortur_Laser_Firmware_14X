@@ -220,9 +220,9 @@ void accel_detection()
 	{
         /*读取*/
 		Get_Acceleration(SC7A20_ADDR, 0X28,&accel_x,&accel_y,&accel_z);
-		accel_x=accel_x*2;
-		accel_y=accel_y*2;
-		accel_z=accel_z*2;
+		accel_x = accel_x * 165 / 100; // * 1.65
+		accel_y = accel_y * 165 / 100;
+		accel_z = accel_z * 165 / 100;
 	}
 	else
 	{
@@ -261,10 +261,11 @@ void accel_detection()
 			shake_detected = 0;
 
 			//进入警告状态,终止雕刻
-			if(sys.state == STATE_CYCLE)
+			if(sys.trust_state == STATE_CYCLE)
 			{
-				printStringAll("Shock and Movement detected!\r\n");
-				//print_uint32_base10(accel_diff);
+				printStringAll("Shock and Movement detected! (");
+				print_uint32_base10_all(accel_diff);
+				printStringAll(")\r\n");
 				sys.state = STATE_ALARM;
 				sys.abort = 1;
 			}
@@ -285,9 +286,13 @@ void accel_detection()
  */
 void accel_detection_limit()
 {
+  static uint8_t recursion = 0;
+  if(!recursion)//防止递归调用
+  {
+	recursion++;
 
 	//雕刻运行时才检测
-	if(sys.state == STATE_CYCLE)
+	if(sys.trust_state == STATE_CYCLE)
 	{
 		//定时检查,避免速度太频繁
 		if(last_accel_check_ms + accel_check_interval_ms <= HAL_GetTick())
@@ -300,4 +305,7 @@ void accel_detection_limit()
 	{
 		detection_count = 0;
 	}
+
+	recursion--;
+  }
 }

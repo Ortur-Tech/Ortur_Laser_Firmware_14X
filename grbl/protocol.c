@@ -306,6 +306,9 @@ void protocol_exec_rt_system()
       return; // Nothing else to do but exit.
     }
 
+    // Recode sys trust_state
+    sys.trust_state = sys.state;
+
     // Execute and serial print status
     if (rt_exec & EXEC_STATUS_REPORT) {
       report_realtime_status();
