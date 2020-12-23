@@ -39,6 +39,8 @@ void IWDG_Init(void)
 	IWDG->KR=0XAAAA;//reload
   	IWDG->KR=0XCCCC;//使能看门狗
 
+  	__HAL_DBGMCU_FREEZE_IWDG();
+
 }
 
 /* USER CODE BEGIN 1 */
