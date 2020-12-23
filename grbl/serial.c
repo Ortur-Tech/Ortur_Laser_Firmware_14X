@@ -460,4 +460,5 @@ ISR(SERIAL_RX)
 void serial_reset_read_buffer()
 {
   serial_rx_buffer_tail = serial_rx_buffer_head;
+  usb_serial_rx_buffer_tail = usb_serial_rx_buffer_head;
 }
