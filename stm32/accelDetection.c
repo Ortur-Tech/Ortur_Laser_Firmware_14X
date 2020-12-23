@@ -261,7 +261,7 @@ void accel_detection()
 			shake_detected = 0;
 
 			//进入警告状态,终止雕刻
-			if(sys.state == STATE_CYCLE)
+			if(sys.trust_state == STATE_CYCLE)
 			{
 				printStringAll("Shock and Movement detected! (");
 				print_uint32_base10_all(accel_diff);
@@ -292,7 +292,7 @@ void accel_detection_limit()
 	recursion++;
 
 	//雕刻运行时才检测
-	if(sys.state == STATE_CYCLE)
+	if(sys.trust_state == STATE_CYCLE)
 	{
 		//定时检查,避免速度太频繁
 		if(last_accel_check_ms + accel_check_interval_ms <= HAL_GetTick())
