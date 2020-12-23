@@ -40,6 +40,7 @@ void Reset_Usb()
 	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_12,GPIO_PIN_RESET);
 
 }
+uint8_t usbPlugIn = 0;
 static uint8_t usbCdcConnectFlag=0;
 /**
  * @brief isUsbCDCConnected
@@ -47,13 +48,7 @@ static uint8_t usbCdcConnectFlag=0;
  */
 uint8_t isUsbCDCConnected(void)
 {
-	if((usbCdcConnectFlag==1)&&(isUSBConnect()==1))
-	{
-		return usbCdcConnectFlag;
-	}
-
-	return 0;
-
+	return usbPlugIn && usbCdcConnectFlag;
 }
 /**
  * @brief setUsbCDCConnected
@@ -63,19 +58,21 @@ void setUsbCDCConnected(uint8_t status)
 {
 	usbCdcConnectFlag=status;
 }
-/* USER CODE END 1 */
-/**
- * @brief isUSBConnect
- * @return 1：已连接 0：未连接
- */
-uint8_t isUSBConnect(void)
+
+
+uint8_t isUsbPlugIn(void)
 {
-	if(hUsbDeviceFS.dev_state== USBD_STATE_CONFIGURED)
-	{
-		return 1;
-	}
-	return 0;
+	return usbPlugIn;
 }
+
+// Is usb cable plug in
+void setUsbPlugIn(uint8_t value)
+{
+	usbPlugIn = value;
+	if(usbPlugIn == 0)
+		usbCdcConnectFlag = 0;
+}
+
 /**
   * @brief Init USB device Library, add supported class and start the library
   * @retval None

@@ -55,7 +55,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
-
+#include "usb_device.h"
 /** @addtogroup STM32F1xx_HAL_Driver
   * @{
   */
@@ -1248,6 +1248,9 @@ void HAL_PCD_IRQHandler(PCD_HandleTypeDef *hpcd)
 {
   uint16_t store_ep[8];
   uint8_t i;
+
+  //NOTE: 检测USB是否连接,最好的办法就是检查USB_Istr活动状态
+  setUsbPlugIn(100);
 
   if (__HAL_PCD_GET_FLAG(hpcd, USB_ISTR_CTR))
   {

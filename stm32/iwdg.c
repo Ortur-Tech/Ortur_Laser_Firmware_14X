@@ -83,7 +83,7 @@ void IWDG_Feed(void)
 		{
 #ifdef USEUSB
 			//usb线未连接
-			if(!isUSBConnect())
+			if(!isUsbPlugIn())
 			{
 				return;
 			}
