@@ -110,6 +110,10 @@ uint8_t steamSwitchAble = 0;
 
 extern USBD_HandleTypeDef hUsbDeviceFS;
 
+/**
+ * @brief usb_serial_write 写数据到USB
+ * @param data
+ */
 void usb_serial_write(uint8_t data)
 {
 	//usb串口未连接时,不发送任何数据
@@ -128,6 +132,7 @@ void usb_serial_write(uint8_t data)
 					break;
 				}
 			}
+            /*64字节的整数倍需要外加一个空trans否则主机收不到这包数据*/
 			if((serial_tx_buffer_head%64)==0)
 			{
 				CDC_Transmit_FS(serial_tx_buffer,0);
@@ -137,6 +142,10 @@ void usb_serial_write(uint8_t data)
 	}
 }
 // Writes one byte to the TX serial buffer. Called by main program.
+/**
+ * @brief serial_write  写数据到上次使用的串口
+ * @param data
+ */
 void serial_write(uint8_t data)
 {
 #ifdef STM32
@@ -173,11 +182,14 @@ void serial_write(uint8_t data)
   UCSR0B |=  (1 << UDRIE0);
 #endif
 }
+/**
+ * @brief serial_write_all  写数据到两个串口
+ * @param data
+ */
 void serial_write_all(uint8_t data)
 {
 	usb_serial_write(data);
 	uart_sendch(data);
-
 }
 #ifdef ATMEGA328P
 // Data Register Empty Interrupt handler
@@ -398,8 +410,8 @@ void USART1_IRQHandler (void)
 #ifdef USE_USB
 /**
  * @brief OnUsbDataRx USB数据接收
- * @param dataIn
- * @param length
+ * @param dataIn 数据指针
+ * @param length 数据长度
  */
 void OnUsbDataRx(uint8_t* dataIn, uint8_t length)
 {
