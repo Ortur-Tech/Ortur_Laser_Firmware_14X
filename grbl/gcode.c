@@ -365,6 +365,7 @@ uint8_t gc_execute_line(char *line)
 					break;
 				}
 				break;
+#if !DEFAULT_LASER_MODE
 #ifdef ENABLE_M7
 			case 7:
 			case 8:
@@ -388,6 +389,7 @@ uint8_t gc_execute_line(char *line)
 					break;
 				}
 				break;
+#endif
 #ifdef ENABLE_PARKING_OVERRIDE_CONTROL
 				case 56:
 				word_bit = MODAL_GROUP_M9;
