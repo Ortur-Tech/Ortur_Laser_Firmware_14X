@@ -254,12 +254,19 @@ char serialGetC(void)
 //
 bool switchable_state(uint8_t state)
 {
-	static uint32_t last_no_idle_time = 0;
-
-	if(state != STATE_IDLE)
-		last_no_idle_time = HAL_GetTick();
-
-	return (HAL_GetTick() - last_no_idle_time) > 1000;
+	return state == STATE_IDLE
+			|| (state & (
+					  STATE_ALARM
+					| STATE_CHECK_MODE
+					| STATE_HOMING
+					//| STATE_CYCLE
+					//| STATE_HOLD
+					| STATE_JOG
+					| STATE_SAFETY_DOOR
+					| STATE_SLEEP
+					//| STATE_ESTOP
+					//| STATE_TOOL_CHANGE
+					)) ;
 }
 
 /**
@@ -270,34 +277,36 @@ uint8_t serial_read()
 {
 	int16_t c = SERIAL_NO_DATA;
 
-	if(isUsbCDCConnected())
-	{
-		if(last_steam == USBCDC || (steamSwitchAble && switchable_state(sys.trust_state)) )
-		{
+
+
+//	if(isUsbCDCConnected())
+//	{
+//		if(last_steam == USBCDC || (steamSwitchAble && switchable_state(sys.trust_state)) )
+//		{
 			c = usbGetC();
 			last_steam = USBCDC;
 			steamSwitchAble = (c == SERIAL_NO_DATA);
-		}
-	}
-	else
-	{
-		if(last_steam == USBCDC) //在CDC已经断开连接的情况下,应该将steam指向转到 硬件串口 HWUART
-		{
-			last_steam = HWUART;
-			c = '\n'; //强行补换行符防止命令被截断,或者污染后续的命令字符串
-		}
-	}
-
-	if(c == SERIAL_NO_DATA )
-	{
-		if(last_steam == HWUART
-				||( steamSwitchAble && switchable_state(sys.trust_state)))
-		{
-			c = serialGetC();
-			last_steam = HWUART;
-			steamSwitchAble = (c == SERIAL_NO_DATA);
-		}
-	}
+//		}
+//	}
+//	else
+//	{
+//		if(last_steam == USBCDC) //在CDC已经断开连接的情况下,应该将steam指向转到 硬件串口 HWUART
+//		{
+//			last_steam = HWUART;
+//			c = '\n'; //强行补换行符防止命令被截断,或者污染后续的命令字符串
+//		}
+//	}
+//
+//	if(c == SERIAL_NO_DATA )
+//	{
+//		if(last_steam == HWUART
+//				||( steamSwitchAble && switchable_state(sys.trust_state)))
+//		{
+//			c = serialGetC();
+//			last_steam = HWUART;
+//			steamSwitchAble = (c == SERIAL_NO_DATA);
+//		}
+//	}
 	return c;
 
 }
