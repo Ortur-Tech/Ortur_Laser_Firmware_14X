@@ -70,7 +70,7 @@
 #define TRUE 1
 #define FALSE 0
 
-
+//#define soft_delay_us(...)
 /**
  * @brief 初始化IIC
  */
