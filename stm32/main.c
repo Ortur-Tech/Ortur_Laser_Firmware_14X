@@ -89,14 +89,12 @@ int main(void)
   /*初始化所有用到的GPIO*/
   MX_GPIO_Init();
   /*初始化定时器1*/
-  MX_TIM1_Init();
-  MX_TIM2_Init();
-  MX_TIM3_Init();
+  MX_TIM_Init();
   /*USB初始化*/
   MX_USB_DEVICE_Init();
 
 #ifndef DEBUG
-  IWDG_Init();
+  //IWDG_Init();
 #endif
   /*中断分组初始化*/
   MX_NVIC_Init();
