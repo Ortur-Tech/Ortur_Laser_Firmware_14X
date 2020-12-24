@@ -28,14 +28,14 @@
 IWDG_HandleTypeDef hiwdg;
 
 /**
- * @brief IWDG init function 1s最长喂狗时间
+ * @brief IWDG init function 3s最长喂狗时间
  */
 void IWDG_Init(void)
 {
 
 	IWDG->KR=0X5555;//使能对IWDG->PR和IWDG->RLR的写
   	IWDG->PR=6;  //设置分频系数
-  	IWDG->RLR=625;  //从加载寄存器 IWDG->RLR
+  	IWDG->RLR=625*3;  //从加载寄存器 IWDG->RLR
 	IWDG->KR=0XAAAA;//reload
   	IWDG->KR=0XCCCC;//使能看门狗
 
