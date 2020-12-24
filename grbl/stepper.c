@@ -110,7 +110,7 @@ typedef struct {
   #endif
 
   uint8_t execute_step;     // Flags step execution for each interrupt.
-  uint8_t step_pulse_time;  // Step pulse reset time after step rise
+  uint32_t step_pulse_time;  // Step pulse reset time after step rise
   PIN_MASK step_outbits;         // The next stepping-bits to be output
   PIN_MASK dir_outbits;
     #ifdef ENABLE_DUAL_AXIS
