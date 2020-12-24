@@ -82,7 +82,7 @@ static st_block_t st_block_buffer[SEGMENT_BUFFER_SIZE-1];
 // the planner, where the remaining planner block steps still can.
 typedef struct {
   uint16_t n_step;           // Number of step events to be executed for this segment
-  uint16_t cycles_per_tick;  // Step distance traveled per ISR tick, aka step rate.
+  uint32_t cycles_per_tick;  // Step distance traveled per ISR tick, aka step rate.
   uint8_t  st_block_index;   // Stepper block data index. Uses this information to execute this segment.
   #ifdef ADAPTIVE_MULTI_AXIS_STEP_SMOOTHING
     uint8_t amass_level;    // Indicates AMASS level for the ISR to execute this segment
@@ -269,7 +269,17 @@ void st_wake_up()
 		LL_TIM_ClearFlag_UPDATE(STEP_RESET_TIMER);
 
 		//TIM4->ARR = st.exec_segment->cycles_per_tick - 1;
-		LL_TIM_SetAutoReload(STEP_SET_TIMER,st.exec_segment->cycles_per_tick - 1);
+		/*兼容高低速率确保脉冲时间准确*/
+		if(st.exec_segment->cycles_per_tick>65535)
+		{
+			LL_TIM_SetPrescaler(STEP_SET_TIMER,72-1);
+			LL_TIM_SetAutoReload(STEP_SET_TIMER,st.exec_segment->cycles_per_tick/72-1);
+		}
+		else
+		{
+			LL_TIM_SetPrescaler(STEP_SET_TIMER,0);
+			LL_TIM_SetAutoReload(STEP_SET_TIMER,st.exec_segment->cycles_per_tick - 1);
+		}
 		// Set the Autoreload value
 		#ifndef ADAPTIVE_MULTI_AXIS_STEP_SMOOTHING
 			LL_TIM_SetPrescaler(STEP_SET_TIMER,st.exec_segment->prescaler);
@@ -387,7 +397,10 @@ void HandleStepSetIT(void)
 
   // Enable step pulse reset timer so that The Stepper Port Reset Interrupt can reset the signal after
   // exactly settings.pulse_microseconds microseconds, independent of the main Timer1 prescaler.
-  NVIC_EnableIRQ(STEP_RESET_IRQ);
+	//LL_TIM_SetCounter(STEP_RESET_TIMER, 0);
+    STEP_RESET_TIMER->CNT=0;
+	NVIC_EnableIRQ(STEP_RESET_IRQ);
+
 
   busy = true;
 
@@ -398,8 +411,17 @@ void HandleStepSetIT(void)
       // Initialize new step segment and load number of steps to execute
       st.exec_segment = &segment_buffer[segment_buffer_tail];
 
-      // Initialize step segment timing per step and load number of steps to execute.
-      STEP_SET_TIMER->ARR = st.exec_segment->cycles_per_tick - 1;
+      if(st.exec_segment->cycles_per_tick>65535)
+      {
+    	  STEP_SET_TIMER->PSC = 72-1;
+    	  STEP_SET_TIMER->ARR = st.exec_segment->cycles_per_tick/72 - 1;
+      }
+      else
+      {
+    	  LL_TIM_SetPrescaler(STEP_SET_TIMER,0);
+		  // Initialize step segment timing per step and load number of steps to execute.
+		  STEP_SET_TIMER->ARR = st.exec_segment->cycles_per_tick - 1;
+      }
       // Set the Autoreload value
       #ifndef ADAPTIVE_MULTI_AXIS_STEP_SMOOTHING
         //TIM4->PSC = st.exec_segment->prescaler;
@@ -1188,7 +1210,7 @@ void st_prep_buffer()
 				prep_segment->n_step <<= prep_segment->amass_level;
 			}
 			if (cycles < (1UL << 16)) { prep_segment->cycles_per_tick = cycles; } // < 65536 (4.1ms @ 16MHz)
-			else { prep_segment->cycles_per_tick = 0xffff; } // Just set the slowest speed possible.
+			else { prep_segment->cycles_per_tick = cycles;}// 0xffff; } // Just set the slowest speed possible.
 		#else
 			// Compute step timing and timer prescalar for normal step generation.
 			if (cycles < (1UL << 16)) { // < 65536  (4.1ms @ 16MHz)
