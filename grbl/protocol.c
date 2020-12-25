@@ -260,7 +260,7 @@ void protocol_execute_realtime_limited()
 {
   //限制调用频率
   static uint32_t last_call_time = 0;
-  if((HAL_GetTick() - last_call_time) >= 10)
+  if((HAL_GetTick() - last_call_time) >= 200)
   {
     protocol_execute_realtime();
     last_call_time = HAL_GetTick();

@@ -301,7 +301,7 @@
 #endif
 
 #ifdef STM32F1
-#define ACCELERATION_TICKS_PER_SECOND 5000
+#define ACCELERATION_TICKS_PER_SECOND 500
 #endif
 #ifdef STM32F4
 #define ACCELERATION_TICKS_PER_SECOND 5000
@@ -314,7 +314,7 @@
 // frequencies below 10kHz, where the aliasing between axes of multi-axis motions can cause audible
 // noise and shake your machine. At even lower step frequencies, AMASS adapts and provides even better
 // step smoothing. See stepper.c for more details on the AMASS system works.
-//#define ADAPTIVE_MULTI_AXIS_STEP_SMOOTHING  // Default enabled. Comment to disable.
+#define ADAPTIVE_MULTI_AXIS_STEP_SMOOTHING  // Default enabled. Comment to disable.
 
 // Sets the maximum step rate allowed to be written as a Grbl setting. This option enables an error
 // check in the settings module to prevent settings values that will exceed this limitation. The maximum

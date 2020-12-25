@@ -89,9 +89,7 @@ int main(void)
   /*初始化所有用到的GPIO*/
   MX_GPIO_Init();
   /*初始化定时器1*/
-  MX_TIM1_Init();
-  MX_TIM2_Init();
-  MX_TIM3_Init();
+  MX_TIM_Init();
   /*USB初始化*/
   MX_USB_DEVICE_Init();
 
@@ -207,10 +205,10 @@ void SystemClock_Config(void)
 static void MX_NVIC_Init(void)
 {
   /* EXTI0_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(EXTI0_IRQn, 2, 2);
+  HAL_NVIC_SetPriority(EXTI0_IRQn, LIMIT_SWITCH_PR, 0);
   HAL_NVIC_EnableIRQ(EXTI0_IRQn);
   /* EXTI1_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(EXTI1_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(EXTI1_IRQn, LIMIT_SWITCH_PR, 0);
   HAL_NVIC_EnableIRQ(EXTI1_IRQn);
 }
 

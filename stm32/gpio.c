@@ -99,6 +99,9 @@ void MX_GPIO_Init(void)
 void Leds_Power(uint8_t onoff)
 {
 	LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
+	LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOC);
+    LL_GPIO_SetPinPull(GPIOC, LL_GPIO_PIN_13, LL_GPIO_PULL_UP);
+    LL_GPIO_SetPinMode(GPIOC, LL_GPIO_PIN_13, LL_GPIO_MODE_INPUT);
 #if !defined(ORTUR_CNC_MODE)
 	if(onoff)
 	{

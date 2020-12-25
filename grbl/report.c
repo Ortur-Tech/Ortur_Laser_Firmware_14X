@@ -394,7 +394,7 @@ void report_execute_startup_message(char *line, uint8_t status_code)
 // Prints build info line
 void report_build_info(char *line)
 {
-  printPgmString(PSTR("[AUTHOR: Owen"));
+  printPgmString(PSTR("[AUTHOR: ORTUR"));
   report_util_feedback_line_feed();
   printPgmString(PSTR("[MODEL: " ORTUR_MODEL_NAME ));
 	report_util_feedback_line_feed();
