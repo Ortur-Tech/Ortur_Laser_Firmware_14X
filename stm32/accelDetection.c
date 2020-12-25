@@ -220,14 +220,17 @@ void accel_detection()
 	{
         /*读取*/
 		Get_Acceleration(SC7A20_ADDR, 0X28,&accel_x,&accel_y,&accel_z);
-		accel_x = accel_x * 165 / 100; // * 1.65
-		accel_y = accel_y * 165 / 100;
-		accel_z = accel_z * 165 / 100;
+		accel_x = accel_x * 17 / 10; // * 1.65
+		accel_y = accel_y * 17 / 10;
+		accel_z = accel_z * 17 / 10;
 	}
 	else
 	{
 		//延时读取加速度情况
 		Get_Acceleration(BMA250_Addr, BMP_ACC_X_LSB,&accel_x,&accel_y,&accel_z);
+		accel_x = accel_x * 25 / 42; // * 1.65
+		accel_y = accel_y * 25 / 42;
+		accel_z = accel_z * 25 / 42;
 	}
 
 	if(accel_x != accel_x_old ||accel_y != accel_y_old ||accel_z != accel_z_old )
