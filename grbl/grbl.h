@@ -29,6 +29,16 @@
 #define ORTUR_VER_NUM 140
 #define ORTUR_VERSION "140"
 
+/*定义中断优先级*/
+
+#define STEP_SET_TIMER_PR      0
+#define STEP_RESET_TIMER_PR    0
+#define LIMIT_SWITCH_PR        2
+#define USB_PR				   3
+#define HWUART_PR              4
+#define SYSTICK_PR			   5
+
+
 //工作模式选择
 #define ORTUR_LASER_MODE //激光模式
 //#define ORTUR_PLOTTER_MODE //绘图模式
