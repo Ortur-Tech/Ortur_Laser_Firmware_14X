@@ -29,14 +29,15 @@
 
 #ifdef DEFAULTS_GRBL32
 
+#define MODE_OFFSET 8
 //机型选择
-#define OLM            1
-#define OLM_1          2
-#define OLM_2          3
-#define C40            4
-#define OLM_MODEL_180  5
-#define OLM_MODEL_210  6
-#define OLM_MODEL_400  7
+#define OLM            (1+MODE_OFFSET)
+#define OLM_1          (2+MODE_OFFSET)
+#define OLM_2          (3+MODE_OFFSET)
+#define C40            (4+MODE_OFFSET)
+#define OLM_MODEL_180  (5+MODE_OFFSET)
+#define OLM_MODEL_210  (6+MODE_OFFSET)
+#define OLM_MODEL_400  (7+MODE_OFFSET)
 
 //#define ORTUR_MODEL OLM_MODEL_400
 
@@ -91,7 +92,7 @@
 
 
   #define DEFAULT_STEP_PULSE_MICROSECONDS 	     2 // $0    Step pulse [microseconds]
-  #define DEFAULT_STEPPER_IDLE_LOCK_TIME        50 // $1    Step idle delay [milliseconds] (0-254, 255 keeps steppers enabled)
+  #define DEFAULT_STEPPER_IDLE_LOCK_TIME        25 // $1    Step idle delay [milliseconds] (0-254, 255 keeps steppers enabled)
   #define DEFAULT_STEPPING_INVERT_MASK 		   0b0 // $2    Step port invert [mask]
 #ifndef DEFAULT_DIRECTION_INVERT_MASK
   #define DEFAULT_DIRECTION_INVERT_MASK        0b0 // $3    Direction port invert [mask]
@@ -105,8 +106,8 @@
   #define DEFAULT_ARC_TOLERANCE             0.002f // $12   Arc tolerance [mm]
   #define DEFAULT_REPORT_INCHES                  0 // $13   Report inches [boolean]
 
-  #define DEFAULT_SOFT_LIMIT_ENABLE              0 // $20   Soft limits [boolean]
-  #define DEFAULT_HARD_LIMIT_ENABLE              0 // $21   Hard limits [boolean]
+  #define DEFAULT_SOFT_LIMIT_ENABLE              1 // $20   Soft limits [boolean]
+  #define DEFAULT_HARD_LIMIT_ENABLE              1 // $21   Hard limits [boolean]
 #ifndef DEFAULT_HOMING_ENABLE
   #define DEFAULT_HOMING_ENABLE                  1 // $22   Homing cycle [boolean]
 #endif
@@ -137,16 +138,16 @@
   #define DEFAULT_B_STEPS_PER_MM 		   3200.0f // $104
   #define DEFAULT_C_STEPS_PER_MM 		   3200.0f // $105
 
-  #define DEFAULT_X_MAX_RATE           (150*60.0f) // $110  X Max rate [mm/min]
-  #define DEFAULT_Y_MAX_RATE           (150*60.0f) // $111  Y Max rate [mm/min]
+  #define DEFAULT_X_MAX_RATE           (166*60.0f) // $110  X Max rate [mm/min]
+  #define DEFAULT_Y_MAX_RATE           (50*60.0f)  // $111  Y Max rate [mm/min]
   #define DEFAULT_Z_MAX_RATE            (20*60.0f) // $112  Z Max rate [mm/min]
   #define DEFAULT_A_MAX_RATE           (150*60.0f) // $113  A Max rate [mm/min]
   #define DEFAULT_B_MAX_RATE           (150*60.0f) // $114  B Max rate [mm/min]
   #define DEFAULT_C_MAX_RATE           (150*60.0f) // $115  C Max rate [mm/min]
 
-  #define DEFAULT_X_ACCELERATION   (1500.0f*60*60) // $120  X Acceleration [mm/sec^2]
-  #define DEFAULT_Y_ACCELERATION   (1500.0f*60*60) // $121  Y Acceleration [mm/sec^2]
-  #define DEFAULT_Z_ACCELERATION   (1000.0f*60*60) // $122  Z Acceleration [mm/sec^2]
+  #define DEFAULT_X_ACCELERATION   (2000.0f*60*60) // $120  X Acceleration [mm/sec^2]
+  #define DEFAULT_Y_ACCELERATION   (1200.0f*60*60) // $121  Y Acceleration [mm/sec^2]
+  #define DEFAULT_Z_ACCELERATION   (1500.0f*60*60) // $122  Z Acceleration [mm/sec^2]
   #define DEFAULT_A_ACCELERATION   (1500.0f*60*60) // $123  A Acceleration [mm/sec^2]
   #define DEFAULT_B_ACCELERATION   (1500.0f*60*60) // $124  B Acceleration [mm/sec^2]
   #define DEFAULT_C_ACCELERATION   (1500.0f*60*60) // $125  C Acceleration [mm/sec^2]
