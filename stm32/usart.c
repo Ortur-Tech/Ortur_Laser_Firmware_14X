@@ -34,7 +34,7 @@ void MX_USART1_UART_Init(void)
 
   LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOA);
 
-  NVIC_SetPriority(USART1_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),1, 1));
+  NVIC_SetPriority(USART1_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),HWUART_PR, 0));
   NVIC_EnableIRQ(USART1_IRQn);
   /**USART1 GPIO Configuration
   PA9   ------> USART1_TX
