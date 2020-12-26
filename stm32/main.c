@@ -66,8 +66,10 @@ int main(void)
   __enable_irq();
   /*初始化系统时钟*/
   SystemClock_Config();
+#if USE_DOUBLE_SERIAL
   /*初始化串口1波特率115200*/
   MX_USART1_UART_Init();
+#endif
   /*IIC初始化*/
   IIC_Init();
   /*加速度传感器初始化*/
