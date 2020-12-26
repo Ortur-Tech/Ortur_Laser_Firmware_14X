@@ -105,7 +105,7 @@ void serial_init()
 #define USBCDC 1  //USB CDC VCP
 #define HWUART 2  //HW UART
 
-uint8_t last_steam = HWUART;
+uint8_t last_steam = USBCDC;
 uint8_t steamSwitchAble = 0;
 
 extern USBD_HandleTypeDef hUsbDeviceFS;
@@ -150,7 +150,7 @@ void serial_write(uint8_t data)
 {
 #ifdef STM32
 #ifdef USE_USB
-
+#if USE_DOUBLE_SERIAL
 	if(last_steam == USBCDC)
 	{
 		usb_serial_write(data);
@@ -159,6 +159,9 @@ void serial_write(uint8_t data)
 	{
 		uart_sendch(data);
 	}
+#else
+	usb_serial_write(data);
+#endif
 #else
 	uart_sendch(data);
 #endif
@@ -189,7 +192,9 @@ void serial_write(uint8_t data)
 void serial_write_all(uint8_t data)
 {
 	usb_serial_write(data);
+#if USE_DOUBLE_SERIAL
 	uart_sendch(data);
+#endif
 }
 #ifdef ATMEGA328P
 // Data Register Empty Interrupt handler
@@ -275,40 +280,44 @@ bool switchable_state(uint8_t state)
  */
 uint8_t serial_read()
 {
+#if USE_DOUBLE_SERIAL
 	int16_t c = SERIAL_NO_DATA;
-
-
-
-//	if(isUsbCDCConnected())
-//	{
-//		if(last_steam == USBCDC || (steamSwitchAble && switchable_state(sys.trust_state)) )
-//		{
+	if(isUsbCDCConnected())
+	{
+		if(last_steam == USBCDC || (steamSwitchAble && switchable_state(sys.trust_state)) )
+		{
 			c = usbGetC();
 			last_steam = USBCDC;
 			steamSwitchAble = (c == SERIAL_NO_DATA);
-//		}
-//	}
-//	else
-//	{
-//		if(last_steam == USBCDC) //在CDC已经断开连接的情况下,应该将steam指向转到 硬件串口 HWUART
-//		{
-//			last_steam = HWUART;
-//			c = '\n'; //强行补换行符防止命令被截断,或者污染后续的命令字符串
-//		}
-//	}
-//
-//	if(c == SERIAL_NO_DATA )
-//	{
-//		if(last_steam == HWUART
-//				||( steamSwitchAble && switchable_state(sys.trust_state)))
-//		{
-//			c = serialGetC();
-//			last_steam = HWUART;
-//			steamSwitchAble = (c == SERIAL_NO_DATA);
-//		}
-//	}
-	return c;
+		}
+	}
+	else
+	{
+		if(last_steam == USBCDC) //在CDC已经断开连接的情况下,应该将steam指向转到 硬件串口 HWUART
+		{
+			last_steam = HWUART;
+			c = '\n'; //强行补换行符防止命令被截断,或者污染后续的命令字符串
+		}
+	}
 
+	if(c == SERIAL_NO_DATA )
+	{
+		if(last_steam == HWUART
+				||( steamSwitchAble && switchable_state(sys.trust_state)))
+		{
+			c = serialGetC();
+			last_steam = HWUART;
+			steamSwitchAble = (c == SERIAL_NO_DATA);
+		}
+	}
+	return c;
+#else
+	int16_t c = SERIAL_NO_DATA;
+	c = usbGetC();
+	last_steam = USBCDC;
+	steamSwitchAble = (c == SERIAL_NO_DATA);
+	return c;
+#endif
 }
 
 #ifdef STM32
@@ -366,6 +375,7 @@ void HandleUartIT(uint8_t data,uint8_t steam)
       }
       else
       {
+#if USE_DOUBLE_SERIAL
     	if(steam==USBCDC)
     	{
 			// Write character to buffer
@@ -381,6 +391,7 @@ void HandleUartIT(uint8_t data,uint8_t steam)
     	}
     	else
     	{
+
     		// Write character to buffer
 			next_head = serial_rx_buffer_head + 1;
 			if (next_head == RX_RING_BUFFER) { next_head = 0; }
@@ -392,6 +403,18 @@ void HandleUartIT(uint8_t data,uint8_t steam)
 			  serial_rx_buffer_head = next_head;
 			}
     	}
+#else
+    	// Write character to buffer
+		next_head = usb_serial_rx_buffer_head + 1;
+		if (next_head == RX_RING_BUFFER) { next_head = 0; }
+
+		// Write data to buffer unless it is full.
+		if (next_head != usb_serial_rx_buffer_tail)
+		{
+			usb_serial_rx_buffer[usb_serial_rx_buffer_head] = data;
+			usb_serial_rx_buffer_head = next_head;
+		}
+#endif
       }
   }
 }
@@ -406,6 +429,7 @@ uint32_t last_steam_use_time=0;
  */
 void USART1_IRQHandler (void)
 {
+#if USE_DOUBLE_SERIAL
 	uint8_t data=0;
 
 	if(USART1->SR &(1<<5))  //接收到数据
@@ -413,7 +437,7 @@ void USART1_IRQHandler (void)
 		data = USART1->DR;
 		HandleUartIT(data,HWUART);
 	}
-
+#endif
 }
 
 #ifdef USE_USB
@@ -498,6 +522,8 @@ ISR(SERIAL_RX)
 
 void serial_reset_read_buffer()
 {
+#if USE_DOUBLE_SERIAL
   serial_rx_buffer_tail = serial_rx_buffer_head;
+#endif
   usb_serial_rx_buffer_tail = usb_serial_rx_buffer_head;
 }
