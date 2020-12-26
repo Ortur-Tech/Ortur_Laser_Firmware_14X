@@ -29,6 +29,8 @@
 
 #ifdef DEFAULTS_GRBL32
 
+#define USE_DOUBLE_SERIAL 0
+
 #define MODE_OFFSET 8
 //机型选择
 #define OLM            (1+MODE_OFFSET)
@@ -86,6 +88,10 @@
 	#define DEFAULT_Y_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Z_MAX_TRAVEL 100.0f // mm NOTE: Must be a positive value.	$132
  	#define DEFAULT_Z_STEPS_PER_MM 400.0f // $102
+	#define DEFAULT_Y_MAX_RATE           (50*60.0f)  // $111  Y Max rate [mm/min]
+	#define DEFAULT_X_ACCELERATION   (2000.0f*60*60) // $120  X Acceleration [mm/sec^2]
+    #define DEFAULT_Y_ACCELERATION   (1200.0f*60*60) // $121  Y Acceleration [mm/sec^2]
+    #define DEFAULT_Z_ACCELERATION   (1500.0f*60*60) // $122  Z Acceleration [mm/sec^2]
 #else
 	#error "Please select a machine model !"
 #endif
@@ -138,16 +144,25 @@
   #define DEFAULT_B_STEPS_PER_MM 		   3200.0f // $104
   #define DEFAULT_C_STEPS_PER_MM 		   3200.0f // $105
 
-  #define DEFAULT_X_MAX_RATE           (166*60.0f) // $110  X Max rate [mm/min]
-  #define DEFAULT_Y_MAX_RATE           (50*60.0f)  // $111  Y Max rate [mm/min]
+  #define DEFAULT_X_MAX_RATE           (150*60.0f) // $110  X Max rate [mm/min]
+#ifndef DEFAULT_Y_MAX_RATE
+  #define DEFAULT_Y_MAX_RATE           (150*60.0f)  // $111  Y Max rate [mm/min]
+#endif
   #define DEFAULT_Z_MAX_RATE            (20*60.0f) // $112  Z Max rate [mm/min]
   #define DEFAULT_A_MAX_RATE           (150*60.0f) // $113  A Max rate [mm/min]
   #define DEFAULT_B_MAX_RATE           (150*60.0f) // $114  B Max rate [mm/min]
   #define DEFAULT_C_MAX_RATE           (150*60.0f) // $115  C Max rate [mm/min]
 
-  #define DEFAULT_X_ACCELERATION   (2000.0f*60*60) // $120  X Acceleration [mm/sec^2]
-  #define DEFAULT_Y_ACCELERATION   (1200.0f*60*60) // $121  Y Acceleration [mm/sec^2]
+#ifndef DEFAULT_X_ACCELERATION
+  #define DEFAULT_X_ACCELERATION   (2200.0f*60*60) // $120  X Acceleration [mm/sec^2]
+#endif
+#ifndef DEFAULT_Y_ACCELERATION
+  #define DEFAULT_Y_ACCELERATION   (1800.0f*60*60) // $121  Y Acceleration [mm/sec^2]
+#endif
+#ifndef DEFAULT_Z_ACCELERATION
   #define DEFAULT_Z_ACCELERATION   (1500.0f*60*60) // $122  Z Acceleration [mm/sec^2]
+#endif
+
   #define DEFAULT_A_ACCELERATION   (1500.0f*60*60) // $123  A Acceleration [mm/sec^2]
   #define DEFAULT_B_ACCELERATION   (1500.0f*60*60) // $124  B Acceleration [mm/sec^2]
   #define DEFAULT_C_ACCELERATION   (1500.0f*60*60) // $125  C Acceleration [mm/sec^2]
