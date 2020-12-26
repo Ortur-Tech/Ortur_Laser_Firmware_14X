@@ -95,23 +95,28 @@ void MX_TIM_Init(void)
    }
 
     {
-      LL_TIM_InitTypeDef TIM_InitStruct = {0};
+//      LL_TIM_InitTypeDef TIM_InitStruct = {0};
 
       /* Peripheral clock enable */
-      LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM3);
+//      LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM3);
 
       /* TIM3 interrupt Init */
       NVIC_SetPriority(TIM3_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),STEP_RESET_TIMER_PR, 0));
-      NVIC_EnableIRQ(TIM3_IRQn);
+      RCC->APB1ENR|=1<<1;	//TIM3时钟使能
+	  TIM3->ARR=0;
+	  TIM3->PSC=0;
+	  TIM3->DIER|=1<<0;   //允许更新中断
+	  TIM3->CR1|=0x01;    //使能定时器3
+//      NVIC_EnableIRQ(TIM3_IRQn);
 
-      TIM_InitStruct.Prescaler = 0;
-      TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_UP;
-      TIM_InitStruct.Autoreload = 0;
-      TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
-      LL_TIM_Init(TIM3, &TIM_InitStruct);
-      LL_TIM_DisableARRPreload(TIM3);
-      LL_TIM_SetClockSource(TIM3, LL_TIM_CLOCKSOURCE_INTERNAL);
-      LL_TIM_SetTriggerOutput(TIM3, LL_TIM_TRGO_RESET);
-      LL_TIM_DisableMasterSlaveMode(TIM3);
+//      TIM_InitStruct.Prescaler = 0;
+//      TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_UP;
+//      TIM_InitStruct.Autoreload = 0;
+//      TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
+//      LL_TIM_Init(TIM3, &TIM_InitStruct);
+//      LL_TIM_DisableARRPreload(TIM3);
+//      LL_TIM_SetClockSource(TIM3, LL_TIM_CLOCKSOURCE_INTERNAL);
+//      LL_TIM_SetTriggerOutput(TIM3, LL_TIM_TRGO_RESET);
+//      LL_TIM_DisableMasterSlaveMode(TIM3);
     }
 }
