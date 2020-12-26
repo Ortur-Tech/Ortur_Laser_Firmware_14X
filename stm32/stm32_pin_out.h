@@ -87,7 +87,7 @@
 
 //  #define Spindle_Disable()           LL_TIM_DisableAllOutputs(SPINDLE_TIMER)
 //  #define Spindle_Enable()            LL_TIM_EnableAllOutputs(SPINDLE_TIMER)
-  #define Set_Spindle_Speed(pwmVal)   LL_TIM_OC_SetCompareCH1(SPINDLE_TIMER,pwmVal)
+  #define Set_Spindle_Speed(pwmVal)   {delay_stop_spindle_set(pwmVal);LL_TIM_OC_SetCompareCH1(SPINDLE_TIMER,pwmVal);}
 
 
   void Analog_Timer_Init(); //-- does nothing in STM32F1
