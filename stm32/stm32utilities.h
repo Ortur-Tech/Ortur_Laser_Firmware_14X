@@ -40,6 +40,8 @@
 #include "grbl.h"
 #include "nuts_bolts.h"
 
+void delay_stop_spindle_set(uint16_t pwm);
+uint8_t delay_stop_spindle(uint8_t status);
 
 extern const PIN_MASK step_pin_mask[N_AXIS];
 extern const PIN_MASK direction_pin_mask[N_AXIS];
@@ -47,7 +49,10 @@ extern const PIN_MASK limit_pin_mask[N_AXIS];
 extern uint32_t uTICKS_PER_MICROSECOND;
 extern float fTICKS_PER_MINUTE;
 
-
+//激光是否开启
+uint8_t isLaserOpen();
+//激光功率
+#define getLaserPower() spindle_get_speed()
 
 #ifdef STM32F13
 

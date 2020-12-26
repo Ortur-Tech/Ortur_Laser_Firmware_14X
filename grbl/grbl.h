@@ -44,10 +44,6 @@
 //#define ORTUR_PLOTTER_MODE //绘图模式
 //#define ORTUR_CNC_MODE //CNC模式
 
-//激光是否开启
-#define isLaserOpen() readSpindleEnable()
-//激光功率
-#define getLaserPower() spindle_get_speed()
 
 // Define standard libraries used by Grbl.
 #include <math.h>

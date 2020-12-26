@@ -26,11 +26,14 @@
   static float pwm_gradient; // Precalulated value to speed up rpm to PWM conversions.
 #endif
 
+//spindle speed value, pwm value
+static SPINDLE_PWM_TYPE spindle_speed = 0;
 
 void spindle_init()
 {
 #ifdef STM32
-  pwm_gradient = SPINDLE_PWM_RANGE / (settings.rpm_max - settings.rpm_min);
+	spindle_speed=0;
+    pwm_gradient = SPINDLE_PWM_RANGE / (settings.rpm_max - settings.rpm_min);
 	Spindle_Timer_Init();
 
 #elif ATMEGA328P
@@ -129,6 +132,7 @@ void spindle_stop()
 {
 #ifdef STM32
   #ifdef VARIABLE_SPINDLE
+	 spindle_speed=0;
       Spindle_Disable();
 
       #ifdef USE_SPINDLE_DIR_AS_ENABLE_PIN
@@ -168,8 +172,7 @@ void spindle_stop()
 
 
 #ifdef VARIABLE_SPINDLE
-//spindle speed value, pwm value
-static SPINDLE_PWM_TYPE spindle_speed = 0;
+
   // Sets spindle speed PWM output and enable pin, if configured. Called by spindle_set_state()
   // and stepper ISR. Keep routine small and efficient.
   void spindle_set_speed(SPINDLE_PWM_TYPE pwm_value)
@@ -197,7 +200,7 @@ static SPINDLE_PWM_TYPE spindle_speed = 0;
     #else
       if (pwm_value == SPINDLE_PWM_OFF_VALUE)
       {
-      	Spindle_Disable();
+      	//Spindle_Disable();
       }
       else
       {
@@ -321,7 +324,7 @@ static SPINDLE_PWM_TYPE spindle_speed = 0;
 {
   if (sys.abort) { return; } // Block during abort.
   if (state == SPINDLE_DISABLE) { // Halt or set spindle direction and rpm.
-  
+
     #ifdef VARIABLE_SPINDLE
       sys.spindle_speed = 0.0;
     #endif
