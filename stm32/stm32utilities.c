@@ -37,26 +37,40 @@ uint32_t stop_spindle_avg_pwm=0;
 
 uint8_t spindle_suspend_flag=0;
 
-/*设置挂起状态，用于挂起恢复是开激光使能*/
+
+/**
+ * @brief spindle_suspend_flag_set 设置挂起状态，用于挂起恢复是开激光使能
+ * @param status
+ */
 void spindle_suspend_flag_set(uint8_t status)
 {
 	spindle_suspend_flag=status;
 }
-
+/**
+ * @brief is_spindle_suspend_flag_set 读取挂起状态
+ * @return
+ */
 uint8_t is_spindle_suspend_flag_set(void)
 {
 	return spindle_suspend_flag;
 }
 
 
-
+/**
+ * @brief stop_spindle_disable_flag_set  grbl 层面关激光供电
+ * @param status
+ */
 void stop_spindle_disable_flag_set(uint8_t status)
 {
 	stop_spindle_timer=HAL_GetTick();
 	stop_spindle_disable_flag=status;
 }
 
-/*设置延时关激光器供电，主要是为了延迟风扇关闭的时间*/
+/**
+ * @brief delay_stop_spindle_set
+ * 设置延时关激光器供电，主要是为了延迟风扇关闭的时间
+ * @param pwm
+ */
 void delay_stop_spindle_set(uint16_t pwm)
 {
 	if(pwm>DELAY_SPINDLE_FAN_MIN_PWM)
@@ -73,7 +87,10 @@ void delay_stop_spindle_set(uint16_t pwm)
 		stop_spindle_timer=HAL_GetTick();
 	}
 }
-
+/**
+ * @brief delay_stop_spindle
+ * @return 1: 允许关激光 0：需要延时关激光
+ */
 uint8_t delay_stop_spindle(void)
 {
 	if((stop_spindle_pwm_flag==1)&&(stop_spindle_disable_flag==1))
