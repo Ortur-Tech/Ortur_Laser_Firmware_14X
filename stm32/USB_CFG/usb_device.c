@@ -28,41 +28,24 @@
 #include "usbd_cdc_if.h"
 
 USBD_HandleTypeDef hUsbDeviceFS;
+
+uint8_t usbPlugIn = 0;
+uint8_t usbCdcConnectFlag = 0;
+
 /**
- * @brief Reset_Usb 强制复位USB
+ * @brief 强制复位USB
  */
 void Reset_Usb()
 {
-	HAL_Delay(250);
 	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_12,GPIO_PIN_SET);
 	HAL_Delay(250);
-	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_12,GPIO_PIN_RESET);
-
+	HAL_Delay(250);
 }
-uint8_t usbPlugIn = 0;
-static uint8_t usbCdcConnectFlag=0;
-/**
- * @brief isUsbCDCConnected
- * @return 1：已连接 0：未连接
- */
+
 uint8_t isUsbCDCConnected(void)
 {
 	return usbPlugIn && usbCdcConnectFlag;
-}
-/**
- * @brief setUsbCDCConnected
- * @param status
- */
-void setUsbCDCConnected(uint8_t status)
-{
-	usbCdcConnectFlag=status;
-}
-
-
-uint8_t isUsbPlugIn(void)
-{
-	return usbPlugIn;
 }
 
 // Is usb cable plug in

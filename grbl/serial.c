@@ -108,8 +108,6 @@ void serial_init()
 uint8_t last_steam = USBCDC;
 uint8_t steamSwitchAble = 0;
 
-extern USBD_HandleTypeDef hUsbDeviceFS;
-
 /**
  * @brief usb_serial_write 写数据到USB
  * @param data
