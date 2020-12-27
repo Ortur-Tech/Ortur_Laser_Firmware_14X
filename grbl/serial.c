@@ -252,6 +252,7 @@ char serialGetC(void)
 	  }
 }
 
+#if USE_DOUBLE_SERIAL
 //
 // In what state we can switch input streams
 //
@@ -271,6 +272,7 @@ bool switchable_state(uint8_t state)
 					//| STATE_TOOL_CHANGE
 					)) ;
 }
+#endif
 
 /**
  * @brief Fetches the first byte in the serial read buffer.
