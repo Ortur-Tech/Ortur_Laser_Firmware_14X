@@ -35,8 +35,24 @@ uint32_t stop_spindle_timer=0;
 /*统计平均PWM值*/
 uint32_t stop_spindle_avg_pwm=0;
 
+uint8_t spindle_suspend_flag=0;
+
+/*设置挂起状态，用于挂起恢复是开激光使能*/
+void spindle_suspend_flag_set(uint8_t status)
+{
+	spindle_suspend_flag=status;
+}
+
+uint8_t is_spindle_suspend_flag_set(void)
+{
+	return spindle_suspend_flag;
+}
+
+
+
 void stop_spindle_disable_flag_set(uint8_t status)
 {
+	stop_spindle_timer=HAL_GetTick();
 	stop_spindle_disable_flag=status;
 }
 
@@ -58,7 +74,7 @@ void delay_stop_spindle_set(uint16_t pwm)
 	}
 }
 
-uint8_t delay_stop_spindle(uint8_t status)
+uint8_t delay_stop_spindle(void)
 {
 	if((stop_spindle_pwm_flag==1)&&(stop_spindle_disable_flag==1))
 	{
@@ -241,7 +257,7 @@ uint32_t spindle_disable_timer=0;
 void Spindle_Disable()
 {
 	stop_spindle_disable_flag_set(1);
-	if(delay_stop_spindle(0))
+	if(delay_stop_spindle())
 	{
 #ifdef VARIABLE_SPINDLE_ENABLE_PIN
   if (settings.spindle_enable_pin_mode == 1)
