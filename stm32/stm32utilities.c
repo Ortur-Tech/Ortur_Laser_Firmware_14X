@@ -23,113 +23,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define DELAY_SPINDLE_FAN_CLOSE_TIME (2*60*1000)
-#define DELAY_SPINDLE_FAN_MIN_PWM (100)
-
-
-/*M5停止激光命令*/
-uint8_t stop_spindle_pwm_flag=0;
-uint8_t stop_spindle_disable_flag=0;
-/*关电源计时*/
-uint32_t stop_spindle_timer=0;
-/*统计平均PWM值*/
-uint32_t stop_spindle_avg_pwm=0;
-
-uint8_t spindle_suspend_flag=0;
-
-
-/**
- * @brief spindle_suspend_flag_set 设置挂起状态，用于挂起恢复是开激光使能
- * @param status
- */
-void spindle_suspend_flag_set(uint8_t status)
-{
-	spindle_suspend_flag=status;
-}
-/**
- * @brief is_spindle_suspend_flag_set 读取挂起状态
- * @return
- */
-uint8_t is_spindle_suspend_flag_set(void)
-{
-	return spindle_suspend_flag;
-}
-
-
-/**
- * @brief stop_spindle_disable_flag_set  grbl 层面关激光供电
- * @param status
- */
-void stop_spindle_disable_flag_set(uint8_t status)
-{
-	stop_spindle_timer=HAL_GetTick();
-	stop_spindle_disable_flag=status;
-}
-
-/**
- * @brief delay_stop_spindle_set
- * 设置延时关激光器供电，主要是为了延迟风扇关闭的时间
- * @param pwm
- */
-void delay_stop_spindle_set(uint16_t pwm)
-{
-	if(pwm>DELAY_SPINDLE_FAN_MIN_PWM)
-	{
-		stop_spindle_pwm_flag=1;
-		if(stop_spindle_avg_pwm==0)
-		{
-			stop_spindle_avg_pwm=pwm;
-		}
-		else
-		{
-			stop_spindle_avg_pwm=(stop_spindle_avg_pwm+pwm)/2;
-		}
-		stop_spindle_timer=HAL_GetTick();
-	}
-}
-/**
- * @brief delay_stop_spindle
- * @return 1: 允许关激光 0：需要延时关激光
- */
-uint8_t delay_stop_spindle(void)
-{
-	if((stop_spindle_pwm_flag==1)&&(stop_spindle_disable_flag==1))
-	{
-		if((HAL_GetTick()-stop_spindle_timer)>(DELAY_SPINDLE_FAN_CLOSE_TIME*stop_spindle_avg_pwm/1000))
-		{
-			stop_spindle_avg_pwm=0;
-			stop_spindle_pwm_flag=0;
-			stop_spindle_disable_flag=0;
-			#ifdef VARIABLE_SPINDLE_ENABLE_PIN
-			  if (settings.spindle_enable_pin_mode == 1)
-				ResetSpindleEnablebit();
-			  else
-				SetSpindleEnablebit();
-			#endif
-			return 1;
-		}
-		else
-		{
-			return 0;
-		}
-	}
-	else
-	{
-		return 1;
-	}
-}
-//激光是否开启
-uint8_t isLaserOpen()
-{
-	if(readSpindleEnable()&&(spindle_get_speed()>0))
-	{
-		return 1;
-	}
-	return 0;
-}
-//激光功率
-#define getLaserPower() spindle_get_speed()
-
+#include "spindle_control.h"
 
 //-- Steps and Directions Pin Arrays --------------
 #if ( defined(STM32F1_3) || defined(STM32F4_3) )
@@ -265,15 +159,12 @@ void uart_sendch(uint8_t uC)
 
 #ifdef STM32F13
 
-uint8_t spindle_disable_flag=0;
-uint32_t spindle_disable_timer=0;
-
-
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 void Spindle_Disable()
 {
 	stop_spindle_disable_flag_set(1);
+
 	if(delay_stop_spindle())
 	{
 #ifdef VARIABLE_SPINDLE_ENABLE_PIN
@@ -289,6 +180,7 @@ void Spindle_Disable()
 void Spindle_Enable()
 {
 	stop_spindle_disable_flag_set(0);
+
 #ifdef VARIABLE_SPINDLE_ENABLE_PIN
   if (settings.spindle_enable_pin_mode == 1)
     SetSpindleEnablebit();
@@ -572,10 +464,10 @@ uint8_t ReadInputByte()
 
 #endif //STM32F46
 
+#ifdef STM32F46 //-- board specific hardware, SPI driven limits
 void spi_limits_init()
 {
-#ifdef STM32F46 //-- board specific hardware, SPI driven limits
 	SPIInit(&hspi3);
-#endif
 }
+#endif
 

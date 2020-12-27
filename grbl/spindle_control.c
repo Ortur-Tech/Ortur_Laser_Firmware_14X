@@ -21,13 +21,30 @@
 
 #include "grbl.h"
 
+#include "spindle_control.h"
 
 #ifdef VARIABLE_SPINDLE
   static float pwm_gradient; // Precalulated value to speed up rpm to PWM conversions.
+  //spindle speed value, pwm value
+  SPINDLE_PWM_TYPE spindle_speed = 0;
 #endif
 
-//spindle speed value, pwm value
-static SPINDLE_PWM_TYPE spindle_speed = 0;
+
+#define DELAY_SPINDLE_FAN_CLOSE_TIME (2*60*1000)
+#define DELAY_SPINDLE_FAN_MIN_PWM (100)
+
+#ifdef DELAY_OFF_SPINDLE
+  /*M5停止激光命令*/
+  uint8_t stop_spindle_pwm_flag = 0;
+  /* 主轴/激光 是否关闭的标识 */
+  uint8_t stop_spindle_disable_flag = 0;
+  /*关电源计时*/
+  uint32_t stop_spindle_timer = 0;
+  /*统计平均PWM值*/
+  uint32_t stop_spindle_avg_pwm = 0;
+  /* 主轴/激光 是否挂起的标识 */
+  uint8_t spindle_suspend_flag = 0;
+#endif
 
 void spindle_init()
 {
@@ -132,8 +149,8 @@ void spindle_stop()
 {
 #ifdef STM32
   #ifdef VARIABLE_SPINDLE
-	 spindle_speed=0;
-      Spindle_Disable();
+	 spindle_speed = 0;
+     Spindle_Disable();
 
       #ifdef USE_SPINDLE_DIR_AS_ENABLE_PIN
         #ifdef INVERT_SPINDLE_ENABLE_PIN
@@ -169,6 +186,12 @@ void spindle_stop()
   #endif
 #endif
 }
+
+uint8_t isLaserOpen()
+{
+  return readSpindleEnable() && (spindle_get_speed()>0);
+}
+
 
 
 #ifdef VARIABLE_SPINDLE
@@ -221,11 +244,6 @@ void spindle_stop()
       }
     #endif
   #endif
-  }
-
-  SPINDLE_PWM_TYPE spindle_get_speed()
-  {
-	  return spindle_speed;
   }
 
   #ifdef ENABLE_PIECEWISE_LINEAR_SPINDLE
@@ -374,4 +392,61 @@ void spindle_stop()
     protocol_buffer_synchronize(); // Empty planner buffer to ensure spindle is set when programmed.
     _spindle_set_state(state);
   }
+
+#endif
+
+
+#ifdef DELAY_OFF_SPINDLE
+
+  void delay_stop_spindle_set(uint16_t pwm)
+  {
+  	if( pwm > DELAY_SPINDLE_FAN_MIN_PWM )
+  	{
+  		stop_spindle_pwm_flag = 1;
+  		if(stop_spindle_avg_pwm == 0)
+  		{
+  			stop_spindle_avg_pwm = pwm;
+  		}
+  		else
+  		{
+  			stop_spindle_avg_pwm = (stop_spindle_avg_pwm + pwm ) / 2;
+  		}
+  		stop_spindle_timer = HAL_GetTick();
+  	}
+  }
+
+  uint8_t delay_stop_spindle(void)
+  {
+  	if( stop_spindle_pwm_flag && stop_spindle_disable_flag )
+  	{
+  		if(( HAL_GetTick() - stop_spindle_timer ) > ( DELAY_SPINDLE_FAN_CLOSE_TIME * stop_spindle_avg_pwm / 1000 ) )
+  		{
+  			stop_spindle_avg_pwm = 0;
+  			stop_spindle_pwm_flag = 0;
+  			stop_spindle_disable_flag = 0;
+  			#ifdef VARIABLE_SPINDLE_ENABLE_PIN
+  			  if (settings.spindle_enable_pin_mode == 1)
+  				ResetSpindleEnablebit();
+  			  else
+  				SetSpindleEnablebit();
+  			#endif
+  			return 1;
+  		}
+  		else
+  		{
+  			return 0;
+  		}
+  	}
+  	else
+  	{
+  		return 1;
+  	}
+  }
+
+  void stop_spindle_disable_flag_set(uint8_t status)
+  {
+  	stop_spindle_timer = HAL_GetTick();
+  	stop_spindle_disable_flag = status;
+  }
+
 #endif

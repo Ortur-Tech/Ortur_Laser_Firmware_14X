@@ -32,6 +32,9 @@
 #include "stm32f1xx_hal.h"
 #include "usbd_def.h"
 
+extern uint8_t usbPlugIn;
+extern uint8_t usbCdcConnectFlag;
+
 
 /** USB Device initialization function. */
 void MX_USB_DEVICE_Init(void);
@@ -42,11 +45,28 @@ void MX_USB_DEVICE_Init(void);
 /* USER CODE BEGIN FD */
 void Reset_Usb();
 
-uint8_t isUsbPlugIn(void);
-void setUsbPlugIn(uint8_t value);
-
+/**
+ * @brief isUsbCDCConnected
+ * @return 1：已连接 0：未连接
+ */
 uint8_t isUsbCDCConnected(void);
-void setUsbCDCConnected(uint8_t status);
+
+/**
+ * @brief setUsbCDCConnected
+ * @param status
+ */
+inline void setUsbCDCConnected(uint8_t status)
+{
+	usbCdcConnectFlag = status;
+}
+
+inline uint8_t isUsbPlugIn(void)
+{
+	return usbPlugIn;
+}
+
+// Is usb cable plug in
+void setUsbPlugIn(uint8_t value);
 
 /* USER CODE END FD */
 /**

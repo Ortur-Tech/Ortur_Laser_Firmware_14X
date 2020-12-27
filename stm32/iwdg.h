@@ -24,9 +24,6 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
-
-extern IWDG_HandleTypeDef hiwdg;
 
 void IWDG_Init(void);
 

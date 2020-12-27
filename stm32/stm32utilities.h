@@ -40,30 +40,17 @@
 #include "grbl.h"
 #include "nuts_bolts.h"
 
-void spindle_suspend_flag_set(uint8_t status);
-uint8_t is_spindle_suspend_flag_set(void);
-
-void delay_stop_spindle_set(uint16_t pwm);
-uint8_t delay_stop_spindle(void);
-
 extern const PIN_MASK step_pin_mask[N_AXIS];
 extern const PIN_MASK direction_pin_mask[N_AXIS];
 extern const PIN_MASK limit_pin_mask[N_AXIS];
 extern uint32_t uTICKS_PER_MICROSECOND;
 extern float fTICKS_PER_MINUTE;
 
-//激光是否开启
-uint8_t isLaserOpen();
-//激光功率
-#define getLaserPower() spindle_get_speed()
-
 #ifdef STM32F13
 
 void Spindle_Disable();
 void Spindle_Enable();
 #endif
-
-
 
 void timing_init();
 
@@ -76,14 +63,10 @@ void timing_init();
 void GPIO_ResetBits (GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin);
 void GPIO_SetBits	(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin);
 
-
 //-- UART
 void uart_init();
 void uart_sendstr(const char *pStr);
 void uart_sendch(uint8_t ch);
-
-
-
 
 #ifdef STM32F46   //-- board specific hardwares
 	enum IOExpChip {IOC0, IOC1};
@@ -132,8 +115,9 @@ void uart_sendch(uint8_t ch);
 
 #endif
 
-
+#ifdef STM32F46 //-- board specific hardware, SPI driven limits
 void spi_limits_init();
+#endif
 
 
 #ifdef __cplusplus
