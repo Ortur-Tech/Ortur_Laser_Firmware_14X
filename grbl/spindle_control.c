@@ -190,23 +190,14 @@ void spindle_stop()
       }
       else
       {
-        TIM_CtrlPWMOutputs(TIM1, ENABLE);
-        #ifdef INVERT_SPINDLE_ENABLE_PIN
-          ResetSpindleEnablebit();
-        #else
-          SetSpindleEnablebit();
-        #endif
-      }
-    #else
-      if (pwm_value == SPINDLE_PWM_OFF_VALUE)
-      {
-      	//Spindle_Disable();
-      }
-      else
-      {
-      	Spindle_Enable();
+    	  Spindle_Enable();
       }
     #endif
+      if(is_spindle_suspend_flag_set()&&(pwm_value>0))
+      {
+    	  spindle_suspend_flag_set(0);
+    	  Spindle_Enable();
+      }
 
   #elif ATMEGA328P
 
@@ -333,7 +324,8 @@ void spindle_stop()
   } else {
     
     #if !defined(USE_SPINDLE_DIR_AS_ENABLE_PIN) && !defined(ENABLE_DUAL_AXIS)
-      if (state == SPINDLE_ENABLE_CW) {
+
+	  if (state == SPINDLE_ENABLE_CW) {
         ResetSpindleDirectionBit();
       }
       else {
@@ -347,6 +339,7 @@ void spindle_stop()
         if (state == SPINDLE_ENABLE_CCW) { rpm = 0.0; } // TODO: May need to be rpm_min*(100/MAX_SPINDLE_SPEED_OVERRIDE);
       }
       spindle_set_speed(spindle_compute_pwm_value(rpm));
+      Spindle_Enable();
     #endif
     #if (defined(USE_SPINDLE_DIR_AS_ENABLE_PIN) && \
         !defined(SPINDLE_ENABLE_OFF_WITH_ZERO_SPEED)) || !defined(VARIABLE_SPINDLE)

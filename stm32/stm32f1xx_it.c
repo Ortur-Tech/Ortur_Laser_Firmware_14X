@@ -155,7 +155,7 @@ void SysTick_Handler(void)
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
-  delay_stop_spindle(0);
+  delay_stop_spindle();
 #ifdef USE_USB
     if(isUsbPlugIn())
     {

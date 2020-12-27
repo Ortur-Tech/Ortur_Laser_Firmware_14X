@@ -40,8 +40,11 @@
 #include "grbl.h"
 #include "nuts_bolts.h"
 
+void spindle_suspend_flag_set(uint8_t status);
+uint8_t is_spindle_suspend_flag_set(void);
+
 void delay_stop_spindle_set(uint16_t pwm);
-uint8_t delay_stop_spindle(uint8_t status);
+uint8_t delay_stop_spindle(void);
 
 extern const PIN_MASK step_pin_mask[N_AXIS];
 extern const PIN_MASK direction_pin_mask[N_AXIS];

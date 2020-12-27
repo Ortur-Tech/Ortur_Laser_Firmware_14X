@@ -790,6 +790,7 @@ static void protocol_exec_rt_suspend()
           if (sys.spindle_stop_ovr & SPINDLE_STOP_OVR_INITIATE) {
             if (gc_state.modal.spindle != SPINDLE_DISABLE) {
               spindle_set_state(SPINDLE_DISABLE,0.0); // De-energize
+              spindle_suspend_flag_set(1);//暂停标志位
               sys.spindle_stop_ovr = SPINDLE_STOP_OVR_ENABLED; // Set stop override state to enabled, if de-energized.
             } else {
               sys.spindle_stop_ovr = SPINDLE_STOP_OVR_DISABLED; // Clear stop override state
