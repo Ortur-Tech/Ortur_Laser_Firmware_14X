@@ -351,6 +351,10 @@
 // The hardware PWM output on pin D11 is required for variable spindle output voltages.
 #define VARIABLE_SPINDLE // Default enabled. Comment to disable.
 
+//Since the cooling fan on the laser module shares power with the laser,
+//we need to delay the power off in order to better heat dissipation.
+#define DELAY_OFF_SPINDLE // For better cooling, delay turn off the laser power.
+
 // Used by variable spindle output only. This forces the PWM output to a minimum duty cycle when enabled.
 // The PWM pin will still read 0V when the spindle is disabled. Most users will not need this option, but
 // it may be useful in certain scenarios. This minimum PWM settings coincides with the spindle rpm minimum
