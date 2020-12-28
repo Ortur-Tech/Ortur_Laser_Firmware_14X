@@ -6,7 +6,9 @@
 #define BMA250_DEVICE 0X03
 #define BMA253_DEVICE 0XFA
 
-#define _ABS(x) (x<0? -x:x)
+#ifndef ABS
+  #define ABS(x) (x<0?-x:x)
+#endif
 
 int16_t accel_x,accel_y, accel_z;
 float accel_x_g,accel_y_g, accel_z_g;
@@ -17,7 +19,7 @@ uint8_t accel_reverse = 0; //是否有加速度反向
 uint8_t accel_mutation = 0; //是否有加速度突变
 uint8_t shake_detected = 0; //是否检测到震动
 uint32_t accel_check_interval_ms = 100; //250毫秒检测一次
-uint64_t last_accel_check_ms = 0;
+uint32_t last_accel_check_ms = 0;
 uint32_t detection_count = 0; //开始检测
 
 
@@ -274,84 +276,65 @@ void Get_Acceleration(uint8_t devAddr ,uint8_t firstAddr,short *gx, short *gy, s
 void accel_detection()
 {
 	if(GsensorDeviceType==SC7A20_DEVICE)
-	{
-        /*读取*/
 		Get_Acceleration(SC7A20_ADDR, 0X28,&accel_x,&accel_y,&accel_z);
-		accel_x = accel_x * 17 / 10; // * 1.65
-		accel_y = accel_y * 17 / 10;
-		accel_z = accel_z * 17 / 10;
-	}
 	else
-	{
-		//延时读取加速度情况
 		Get_Acceleration(BMA250_Addr, BMP_ACC_X_LSB,&accel_x,&accel_y,&accel_z);
-		accel_x = accel_x * 25 / 40; // * 1.65
-		accel_y = accel_y * 25 / 40;
-		accel_z = accel_z * 25 / 40;
-	}
 
-	if(accel_x != accel_x_old ||accel_y != accel_y_old ||accel_z != accel_z_old )
+	mprintf(LOG_INFO,"xValue:%d. yValue:%d. zValue:%d.\r\n",accel_x,accel_y,accel_z);
+
+	//计算加速度斜率(加加速度)突变
+	//如果加速度突变,就表明有较大的震动或位移,这样雕刻会错位,无法继续
+	//至少记录2次值以上加速度值
+	if(detection_count > 2)
 	{
-		 mprintf(LOG_INFO,"xValue:%d. yValue:%d. zValue:%d.\r\n",accel_x,accel_y,accel_z);
-		//仅在雕刻模式下起作用
-		//如果数据突变,就表明有较大的震动或位移,这样雕刻会错位,无法继续
+		//计算加速度变化
+		accel_x_diff = accel_x - accel_x_old;
+		accel_y_diff = accel_y - accel_y_old;
+		accel_z_diff = accel_z - accel_z_old;
 
-		//至少积累5次参考值
-		if(detection_count > 2)
+		//雕刻时,不允许加速度突变
+		accel_diff = ( ABS(accel_x - accel_x_old) + ABS(accel_y - accel_y_old) + ABS(accel_z - accel_z_old) ) / (HAL_GetTick() - last_accel_check_ms);
+		mprintf(LOG_INFO,"accel_diff:%d.\r\n",accel_diff);
+
+		if( accel_diff >= settings.accel_sensitivity )
 		{
-			//计算加速度变化
-			accel_x_diff = accel_x - accel_x_old;
-			accel_y_diff = accel_y - accel_y_old;
-			accel_z_diff = accel_z - accel_z_old;
-
-			//雕刻时,不允许加速度突变
-			accel_diff = _ABS(accel_x_diff) + _ABS(accel_y_diff) + _ABS(accel_z_diff);
-
-			mprintf(LOG_INFO,"accel_diff:%d.\r\n",accel_diff);
-			if( accel_diff > settings.accel_sensitivity )
-			{
-				mprintf(LOG_INFO,"xValue:%d. yValue:%d. zValue:%d.\r\n",accel_x_old,accel_y_old,accel_z_old);
-				mprintf(LOG_INFO,"xValue:%d. yValue:%d. zValue:%d.\r\n",accel_x,accel_y,accel_z);
-				shake_detected = 1;
-			}
+			mprintf(LOG_INFO,"xValue:%d. yValue:%d. zValue:%d.\r\n",accel_x_old,accel_y_old,accel_z_old);
+			mprintf(LOG_INFO,"xValue:%d. yValue:%d. zValue:%d.\r\n",accel_x,accel_y,accel_z);
+			shake_detected = 1;
 		}
-
-		if(shake_detected)
-		{
-			shake_detected = 0;
-
-			//进入警告状态,终止雕刻
-			if(sys.trust_state == STATE_CYCLE)
-			{
-				if(GsensorDeviceType==SC7A20_DEVICE)
-				{
-					printStringAll("SC7A20.\r\n");
-				}
-				else if(GsensorDeviceType==BMA250_DEVICE)
-				{
-					printStringAll("BMA250.\r\n");
-				}
-				else if(GsensorDeviceType==BMA253_DEVICE)
-				{
-					printStringAll("BMA253.\r\n");
-				}
-				else
-				{
-					printStringAll("unkown chip.\r\n");
-				}
-				printStringAll("Shock and Movement detected! (");
-				print_uint32_base10_all(accel_diff);
-				printStringAll(")\r\n");
-				sys.state = STATE_ALARM;
-				sys.abort = 1;
-			}
-		}
-
-		//计算均值
-		accel_x_old = (accel_x_old + accel_x) / 2;
-		accel_y_old = (accel_y_old + accel_y) / 2;
-		accel_z_old = (accel_z_old + accel_z) / 2;
 	}
+
+	if(shake_detected)
+	{
+		shake_detected = 0;
+
+		//进入警告状态,终止雕刻
+		if(sys.trust_state == STATE_CYCLE)
+		{
+
+			switch(GsensorDeviceType)
+			{
+			case SC7A20_DEVICE :
+					printStringAll("[SC7A20:");
+			case BMA250_DEVICE :
+					printStringAll("[BMA250:");
+			case BMA253_DEVICE :
+					printStringAll("[BMA253:");
+			default:
+				printStringAll("[UKNW:");
+			}
+			print_uint32_base10_all(accel_diff);
+
+			printStringAll("Shock and Movement detected!]\r\n");
+			sys.state = STATE_ALARM;
+			sys.abort = 1;
+		}
+	}
+
+	//计算均值
+	accel_x_old = accel_x;
+	accel_y_old = accel_y;
+	accel_z_old = accel_z;
 
 	++detection_count;//统计检测次数
 }
