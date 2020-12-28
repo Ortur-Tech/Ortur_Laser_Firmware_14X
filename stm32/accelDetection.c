@@ -7,17 +7,17 @@
 #define BMA253_DEVICE 0XFA
 
 #ifndef ABS
-  #define ABS(x) (x<0?-x:x)
+  #define ABS(x) ((x)<0?-(x):(x))
 #endif
 
 int16_t accel_x,accel_y, accel_z;
 int16_t accel_x_old,accel_y_old,accel_z_old;
 uint16_t accel_slope;
 uint8_t shake_detected = 0; //是否检测到震动
-uint32_t accel_check_interval_ms = 100; //250毫秒检测一次
+#define  accel_check_interval_ms 100 //100毫秒检测一次
 uint32_t last_accel_check_ms = 0;
 uint32_t detection_count = 0; //开始检测
-
+int16_t gsensor_extern_scale = 1;;
 
 uint8_t Check_BMA250_ID(void);
 void BMA250_Get_Acceleration(short *gx, short *gy, short *gz);
@@ -180,11 +180,13 @@ void Gsensor_Init(void)
 	if(GsensorDeviceType==SC7A20_DEVICE)
 	{
 		Sc7a20_Init();
+		gsensor_extern_scale = 5;
 	}
 	else
 	{
 		GsensorDeviceType=Check_BMA250_ID();
 		BMA250_Init();
+		gsensor_extern_scale = 1;
 	}
 }
 
@@ -249,21 +251,11 @@ void Get_Acceleration(uint8_t devAddr ,uint8_t firstAddr,short *gx, short *gy, s
     *gy=(short)((y_h8<<8)|y_l8);
     *gz=(short)((z_h8<<8)|z_l8);
 
-	if(GsensorDeviceType==BMA253_DEVICE)
-	{
-		*gx=(*gx)>>4;
-		*gy=(*gy)>>4;
-		*gz=(*gz)>>4;
-	}
-	else
-	{
-		*gx=(*gx)>>6;
-		*gy=(*gy)>>6;
-		*gz=(*gz)>>6;
-	}
+	*gx=(*gx)>>6;
+	*gy=(*gy)>>6;
+	*gz=(*gz)>>6;
 }
 
-//TODO:检测10秒内的加速度值
 
 //初始化并读取加速度计数据
 /**
@@ -271,6 +263,7 @@ void Get_Acceleration(uint8_t devAddr ,uint8_t firstAddr,short *gx, short *gy, s
  */
 void accel_detection()
 {
+	// 3.91mg
 	if(GsensorDeviceType==SC7A20_DEVICE)
 		Get_Acceleration(SC7A20_ADDR, 0X28,&accel_x,&accel_y,&accel_z);
 	else
@@ -284,13 +277,12 @@ void accel_detection()
 	if(detection_count > 2)
 	{
 		//计算加速度变化,雕刻时,不允许加速度突变
-		accel_slope = ( ABS(accel_x - accel_x_old) + ABS(accel_y - accel_y_old) + ABS(accel_z - accel_z_old) ) / (HAL_GetTick() - last_accel_check_ms);
+		// 3.91mg   g==10m/s
+        #define G2MS(g) (g*10) // g 转 mm/s
+        #define MG2G(mg) (mg*1000/391) // mg 转 g
+        #define GS_K  1000  * 10 / 391 / accel_check_interval_ms //计算斜率的常数K
+		accel_slope = ( ABS(accel_x - accel_x_old) + ABS(accel_y - accel_y_old) + ABS(accel_z - accel_z_old) ) * GS_K * gsensor_extern_scale;
 		mprintf(LOG_INFO,"accel_slope:%d.\r\n",accel_slope);
-
-		//测试代码
-		printStringAll("accel_slope:");
-		print_uint32_base10_all(accel_slope);
-		printStringAll("\r\n");
 
 		if( accel_slope >= settings.accel_sensitivity )
 		{
@@ -307,15 +299,17 @@ void accel_detection()
 		//进入警告状态,终止雕刻
 		if(sys.trust_state == STATE_CYCLE)
 		{
-
 			switch(GsensorDeviceType)
 			{
 			case SC7A20_DEVICE :
-					printStringAll("[SC7A20:(");
+				printStringAll("[SC7A20:(");
+				break;
 			case BMA250_DEVICE :
-					printStringAll("[BMA250:(");
+				printStringAll("[BMA250:(");
+				break;
 			case BMA253_DEVICE :
-					printStringAll("[BMA253:(");
+				printStringAll("[BMA253:(");
+				break;
 			default:
 				printStringAll("[UKNW:");
 			}
