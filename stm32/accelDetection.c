@@ -3,8 +3,10 @@
 #include "sc7a20.h"
 //#include "timer.h"
 
+#define BMA250_DEVICE 0X03
+#define BMA253_DEVICE 0XFA
 
-#define _ABS(x) (x<0?-x:x)
+#define _ABS(x) (x<0? -x:x)
 
 int16_t accel_x,accel_y, accel_z;
 float accel_x_g,accel_y_g, accel_z_g;
@@ -48,6 +50,51 @@ void BMA250_Get_Acceleration(short *gx, short *gy, short *gz);
 #define BMP_AS_SLEEPPHASE 2
 
 uint8_t GsensorDeviceType=0;    //!<gsensor芯片类型
+
+
+//void bma_test(void)
+//{
+//	uint32_t timer1=0;
+//	uint8_t temp=0;
+//
+//	LL_GPIO_SetPinPull(GPIOB, LL_GPIO_PIN_1, LL_GPIO_PULL_UP);
+//	LL_GPIO_SetPinMode(GPIOB, LL_GPIO_PIN_1, LL_GPIO_MODE_INPUT);
+//
+//	Write_One_Byte_iicaddr(BMA250_Addr, BMP_GRANGE, 0x03);  // Set measurement range
+//	Write_One_Byte_iicaddr(BMA250_Addr, BMP_BWD, 0x08);        // Set filter bandwidth
+//	Write_One_Byte_iicaddr(BMA250_Addr, BMP_PM, 0x4e);       // Set filter bandwidth
+//	Write_One_Byte_iicaddr(BMA250_Addr, BMP_SCR, 0x80);
+//
+//	mprintf(LOG_INFO,"CHIP ID:%x.\r\n",Check_BMA250_ID());
+//
+//	Write_One_Byte_iicaddr(BMA250_Addr, 0x17, 0b111);//使能xyz加速度过高中断
+//	Write_One_Byte_iicaddr(BMA250_Addr, 0x19, 0b10);//中断配置到int1脚
+//	Write_One_Byte_iicaddr(BMA250_Addr, 0x25, 0x05);//过高时间10ms
+//	Write_One_Byte_iicaddr(BMA250_Addr, 0x26, 155);//过高阈值
+//
+//	delay_ms(20);
+//	while(1)
+//	{
+//		if(LL_GPIO_IsInputPinSet(GPIOB,LL_GPIO_PIN_1))
+//		{
+//			temp=Read_One_Byte(BMA250_Addr, 0x09);
+//			if(temp&0x02)
+//			{
+//				//延时读取加速度情况
+//			   Get_Acceleration(BMA250_Addr, BMP_ACC_X_LSB,&accel_x,&accel_y,&accel_z);
+//			   mprintf(LOG_INFO,"CHECKED xValue:%d. yValue:%d. zValue:%d.\r\n",accel_x,accel_y,accel_z);
+//			   Write_One_Byte_iicaddr(BMA250_Addr, 0x09, 0);
+//			}
+//		}
+//		if((HAL_GetTick()-timer1)>300)
+//		{
+//			timer1=HAL_GetTick();
+//			//延时读取加速度情况
+//		   Get_Acceleration(BMA250_Addr, BMP_ACC_X_LSB,&accel_x,&accel_y,&accel_z);
+//		   mprintf(LOG_INFO,"xValue:%d. yValue:%d. zValue:%d.\r\n",accel_x,accel_y,accel_z);
+//		}
+//	}
+//}
 
 /**
  * @brief BMA250_Init
@@ -138,6 +185,7 @@ void Gsensor_Init(void)
 	}
 	else
 	{
+		GsensorDeviceType=Check_BMA250_ID();
 		BMA250_Init();
 	}
 }
@@ -203,9 +251,18 @@ void Get_Acceleration(uint8_t devAddr ,uint8_t firstAddr,short *gx, short *gy, s
     *gy=(short)((y_h8<<8)|y_l8);
     *gz=(short)((z_h8<<8)|z_l8);
 
-    *gx=(*gx)>>6;
-    *gy=(*gy)>>6;
-    *gz=(*gz)>>6;
+	if(GsensorDeviceType==BMA253_DEVICE)
+	{
+		*gx=(*gx)>>4;
+		*gy=(*gy)>>4;
+		*gz=(*gz)>>4;
+	}
+	else
+	{
+		*gx=(*gx)>>6;
+		*gy=(*gy)>>6;
+		*gz=(*gz)>>6;
+	}
 }
 
 //TODO:检测10秒内的加速度值
@@ -228,9 +285,9 @@ void accel_detection()
 	{
 		//延时读取加速度情况
 		Get_Acceleration(BMA250_Addr, BMP_ACC_X_LSB,&accel_x,&accel_y,&accel_z);
-		accel_x = accel_x * 25 / 42; // * 1.65
-		accel_y = accel_y * 25 / 42;
-		accel_z = accel_z * 25 / 42;
+		accel_x = accel_x * 25 / 40; // * 1.65
+		accel_y = accel_y * 25 / 40;
+		accel_z = accel_z * 25 / 40;
 	}
 
 	if(accel_x != accel_x_old ||accel_y != accel_y_old ||accel_z != accel_z_old )
@@ -266,6 +323,22 @@ void accel_detection()
 			//进入警告状态,终止雕刻
 			if(sys.trust_state == STATE_CYCLE)
 			{
+				if(GsensorDeviceType==SC7A20_DEVICE)
+				{
+					printStringAll("SC7A20.\r\n");
+				}
+				else if(GsensorDeviceType==BMA250_DEVICE)
+				{
+					printStringAll("BMA250.\r\n");
+				}
+				else if(GsensorDeviceType==BMA253_DEVICE)
+				{
+					printStringAll("BMA253.\r\n");
+				}
+				else
+				{
+					printStringAll("unkown chip.\r\n");
+				}
 				printStringAll("Shock and Movement detected! (");
 				print_uint32_base10_all(accel_diff);
 				printStringAll(")\r\n");
