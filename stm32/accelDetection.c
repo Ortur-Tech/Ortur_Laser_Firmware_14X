@@ -11,12 +11,8 @@
 #endif
 
 int16_t accel_x,accel_y, accel_z;
-float accel_x_g,accel_y_g, accel_z_g;
 int16_t accel_x_old,accel_y_old,accel_z_old;
-int16_t accel_x_diff,accel_y_diff,accel_z_diff,accel_diff;
-//uint16_t max_mutation_value = 300;
-uint8_t accel_reverse = 0; //是否有加速度反向
-uint8_t accel_mutation = 0; //是否有加速度突变
+uint16_t accel_slope;
 uint8_t shake_detected = 0; //是否检测到震动
 uint32_t accel_check_interval_ms = 100; //250毫秒检测一次
 uint32_t last_accel_check_ms = 0;
@@ -287,16 +283,16 @@ void accel_detection()
 	//至少记录2次值以上加速度值
 	if(detection_count > 2)
 	{
-		//计算加速度变化
-		accel_x_diff = accel_x - accel_x_old;
-		accel_y_diff = accel_y - accel_y_old;
-		accel_z_diff = accel_z - accel_z_old;
+		//计算加速度变化,雕刻时,不允许加速度突变
+		accel_slope = ( ABS(accel_x - accel_x_old) + ABS(accel_y - accel_y_old) + ABS(accel_z - accel_z_old) ) / (HAL_GetTick() - last_accel_check_ms);
+		mprintf(LOG_INFO,"accel_slope:%d.\r\n",accel_slope);
 
-		//雕刻时,不允许加速度突变
-		accel_diff = ( ABS(accel_x - accel_x_old) + ABS(accel_y - accel_y_old) + ABS(accel_z - accel_z_old) ) / (HAL_GetTick() - last_accel_check_ms);
-		mprintf(LOG_INFO,"accel_diff:%d.\r\n",accel_diff);
+		//测试代码
+		printStringAll("accel_slope:");
+		print_uint32_base10_all(accel_slope);
+		printStringAll("\r\n");
 
-		if( accel_diff >= settings.accel_sensitivity )
+		if( accel_slope >= settings.accel_sensitivity )
 		{
 			mprintf(LOG_INFO,"xValue:%d. yValue:%d. zValue:%d.\r\n",accel_x_old,accel_y_old,accel_z_old);
 			mprintf(LOG_INFO,"xValue:%d. yValue:%d. zValue:%d.\r\n",accel_x,accel_y,accel_z);
@@ -315,17 +311,17 @@ void accel_detection()
 			switch(GsensorDeviceType)
 			{
 			case SC7A20_DEVICE :
-					printStringAll("[SC7A20:");
+					printStringAll("[SC7A20:(");
 			case BMA250_DEVICE :
-					printStringAll("[BMA250:");
+					printStringAll("[BMA250:(");
 			case BMA253_DEVICE :
-					printStringAll("[BMA253:");
+					printStringAll("[BMA253:(");
 			default:
 				printStringAll("[UKNW:");
 			}
-			print_uint32_base10_all(accel_diff);
+			print_uint32_base10_all(accel_slope);
 
-			printStringAll("Shock and Movement detected!]\r\n");
+			printStringAll(") Shock and Movement detected!]\r\n");
 			sys.state = STATE_ALARM;
 			sys.abort = 1;
 		}
