@@ -40,6 +40,7 @@
 #define OLM_MODEL_180  (5+MODE_OFFSET)
 #define OLM_MODEL_210  (6+MODE_OFFSET)
 #define OLM_MODEL_400  (7+MODE_OFFSET)
+#define OLM_2_PRO	   (8+MODE_OFFSET)
 
 //#define ORTUR_MODEL OLM_MODEL_400
 
@@ -130,7 +131,7 @@
     #define DEFAULT_Y_ACCELERATION   (1800.0f*60*60) // $121  Y Acceleration [mm/sec^2]
     #define DEFAULT_Z_ACCELERATION   (1200.0f*60*60) // $122  Z Acceleration [mm/sec^2]
 #elif ORTUR_MODEL==OLM_2_PRO
-	#define ORTUR_MODEL_NAME "Ortur Laser Master 2"
+	#define ORTUR_MODEL_NAME "Ortur Laser Master 2 Pro"
 	#define DEFAULT_DIRECTION_INVERT_MASK 1
 	#define DEFAULT_X_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Y_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.
