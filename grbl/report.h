@@ -89,6 +89,9 @@
 #define MESSAGE_RESTORE_DEFAULTS 9
 #define MESSAGE_SPINDLE_RESTORE 10
 #define MESSAGE_SLEEP_MODE 11
+/*添加两个用于判断是否有插12V电的宏*/
+#define MESSAGE_MAIN_POWER_ON 12
+#define MESSAGE_MAIN_POWER_OFF 13
 
 // Prints system status messages.
 void report_status_message(uint8_t status_code);
