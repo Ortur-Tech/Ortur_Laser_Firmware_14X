@@ -70,6 +70,9 @@ int main(void)
   /*初始化串口1波特率115200*/
   MX_USART1_UART_Init();
 #endif
+
+  /*初始化所有用到的GPIO*/
+  MX_GPIO_Init();
   /*IIC初始化*/
   IIC_Init();
   /*加速度传感器初始化*/
@@ -88,8 +91,6 @@ int main(void)
 #endif
   //开启电源指示灯
   PowerLed_On();
-  /*初始化所有用到的GPIO*/
-  MX_GPIO_Init();
   /*初始化定时器1*/
   MX_TIM_Init();
   /*USB初始化*/
