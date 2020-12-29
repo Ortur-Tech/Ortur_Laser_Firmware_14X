@@ -350,6 +350,11 @@ uint8_t gc_execute_line(char *line)
 				break;
 			case 3:
 			case 4:
+				if(!IsMainPowrIn())
+				 {
+					reportPowerFlag=MESSAGE_NO_POWER_SUPPLIED;
+					 //report_feedback_message(MESSAGE_MAIN_POWER_OFF);
+				 }
 			case 5:
 				word_bit = MODAL_GROUP_M7;
 				switch (int_value)
