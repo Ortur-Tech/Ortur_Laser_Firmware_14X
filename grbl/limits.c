@@ -327,6 +327,10 @@ void limits_go_home(uint8_t cycle_mask)
   uint8_t limit_state, n_active_axis;
   uint16_t axislock;
 
+  if(!IsMainPowrIn())
+	{
+	  report_feedback_message(MESSAGE_MAIN_POWER_OFF);
+	}
   do {
 
     system_convert_array_steps_to_mpos(target,sys_position);
