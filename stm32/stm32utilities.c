@@ -192,6 +192,10 @@ void Spindle_Enable()
 }
 #endif
 
+static uint8_t lastPowerFlag=0;
+/**
+ *掉电去抖
+ */
 uint8_t IsMainPowrIn(void)
 {
 	if(IsMainPowrBitSet())
@@ -199,24 +203,36 @@ uint8_t IsMainPowrIn(void)
 		delay_ms(10);
 		if(IsMainPowrBitSet())
 		{
+			lastPowerFlag=1;
 			return 1;
 		}
 	}
 	return 0;
 }
-
+/**
+ * 检测主电源状态
+ */
 void Main_PowerCheck(void)
 {
-	static uint8_t lastPowerFlag=0;
-	if(IsMainPowrIn()&&(!lastPowerFlag))
+	if(lastPowerFlag==0)
 	{
-		lastPowerFlag=1;
-		report_feedback_message(MESSAGE_MAIN_POWER_ON);
+		if(IsMainPowrIn())
+		{
+			report_feedback_message(MESSAGE_MAIN_POWER_ON);
+		}
 	}
-	if((!IsMainPowrIn())&&(lastPowerFlag))
+	else
 	{
-		lastPowerFlag=0;
-		report_feedback_message(MESSAGE_MAIN_POWER_OFF);
+		/*掉电去抖*/
+		if(!IsMainPowrBitSet())
+		{
+			delay_ms(10);
+			if(!IsMainPowrBitSet())
+			{
+				lastPowerFlag=0;
+				report_feedback_message(MESSAGE_MAIN_POWER_OFF);
+			}
+		}
 	}
 }
     //------------------------------------------------------------------------
