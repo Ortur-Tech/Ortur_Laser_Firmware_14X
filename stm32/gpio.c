@@ -41,16 +41,6 @@ void MX_GPIO_Init(void)
 	LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOC);
 	LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOD);
 
-	/*Configure GPIO pin Output Level */
-	LL_GPIO_SetOutputPin(GPIOB, LL_GPIO_PIN_12|LL_GPIO_PIN_13|LL_GPIO_PIN_4|LL_GPIO_PIN_7);
-
-	/*Configure GPIO pin Output Level */
-	LL_GPIO_ResetOutputPin(GPIOB, LL_GPIO_PIN_14|LL_GPIO_PIN_15|LL_GPIO_PIN_3|LL_GPIO_PIN_5
-						  |LL_GPIO_PIN_6|LL_GPIO_PIN_8|LL_GPIO_PIN_9);
-
-	/*Configure GPIO pin Output Level */
-	LL_GPIO_ResetOutputPin(STATUS_LED_GPIO_Port, LL_GPIO_PIN_15);
-
 	/*Configure GPIO pin : PtPin */
 	LL_GPIO_SetPinPull(KEY_GPIO_Port, LL_GPIO_PIN_13, LL_GPIO_PULL_UP);
 	LL_GPIO_SetPinMode(KEY_GPIO_Port, LL_GPIO_PIN_13, LL_GPIO_MODE_INPUT);
@@ -62,6 +52,8 @@ void MX_GPIO_Init(void)
 	LL_GPIO_SetPinMode(GPIOA, LL_GPIO_PIN_1, LL_GPIO_MODE_INPUT);
 	LL_GPIO_SetPinPull(GPIOA, LL_GPIO_PIN_2, LL_GPIO_PULL_UP);
 	LL_GPIO_SetPinMode(GPIOA, LL_GPIO_PIN_2, LL_GPIO_MODE_INPUT);
+	LL_GPIO_SetPinPull(GPIOA, LL_GPIO_PIN_3, LL_GPIO_PULL_UP);
+	LL_GPIO_SetPinMode(GPIOA, LL_GPIO_PIN_3, LL_GPIO_MODE_INPUT);
 
 	/*Configure GPIO pin : PtPin */
 	LL_GPIO_SetPinPull(AMIN_GPIO_Port, LL_GPIO_PIN_4, LL_GPIO_PULL_UP);
@@ -87,6 +79,15 @@ void MX_GPIO_Init(void)
 	GPIO_InitStruct.Pin = LL_GPIO_PIN_5;
 	LL_GPIO_Init(STEP_X_GPIO_Port, &GPIO_InitStruct);
 
+	/*Configure GPIO pin Output Level */
+	LL_GPIO_SetOutputPin(GPIOB, LL_GPIO_PIN_12|LL_GPIO_PIN_13|LL_GPIO_PIN_4|LL_GPIO_PIN_7);
+
+	/*Configure GPIO pin Output Level */
+	LL_GPIO_ResetOutputPin(GPIOB, LL_GPIO_PIN_14|LL_GPIO_PIN_15|LL_GPIO_PIN_3|LL_GPIO_PIN_5
+						  |LL_GPIO_PIN_6|LL_GPIO_PIN_8|LL_GPIO_PIN_9);
+
+	/*Configure GPIO pin Output Level */
+	LL_GPIO_ResetOutputPin(STATUS_LED_GPIO_Port, LL_GPIO_PIN_15);
 
 }
 
@@ -152,21 +153,21 @@ void Leds_Power(uint8_t onoff)
  */
 void PowerLed_Blink(void)
 {
-	LL_GPIO_TogglePin(POWER_LED_GPIO_Port, LL_GPIO_PIN_3);
+	LL_GPIO_TogglePin(GPIOA, LL_GPIO_PIN_15);
 }
 /**
  * @brief PowerLed_On
  */
 void PowerLed_On(void)
 {
-	LL_GPIO_SetOutputPin(POWER_LED_GPIO_Port, LL_GPIO_PIN_3);
+	LL_GPIO_SetOutputPin(GPIOA, LL_GPIO_PIN_15);
 }
 /**
  * @brief PowerLed_Off
  */
 void PowerLed_Off(void)
 {
-	LL_GPIO_ResetOutputPin(POWER_LED_GPIO_Port, LL_GPIO_PIN_3);
+	LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_15);
 }
 
 /**
@@ -174,21 +175,21 @@ void PowerLed_Off(void)
  */
 void StatusLed_On(void)
 {
-	LL_GPIO_SetOutputPin(STATUS_LED_GPIO_Port, LL_GPIO_PIN_15);
+	LL_GPIO_SetOutputPin(GPIOB, LL_GPIO_PIN_3);
 }
 /**
  * @brief StatusLed_Off
  */
 void StatusLed_Off(void)
 {
-	LL_GPIO_ResetOutputPin(STATUS_LED_GPIO_Port, LL_GPIO_PIN_15);
+	LL_GPIO_ResetOutputPin(GPIOB, LL_GPIO_PIN_3);
 }
 /**
  * @brief StatusLed_Blink
  */
 void StatusLed_Blink(void)
 {
-	LL_GPIO_TogglePin(STATUS_LED_GPIO_Port, LL_GPIO_PIN_15);
+	LL_GPIO_TogglePin(GPIOB, LL_GPIO_PIN_3);
 }
 /**
  * @brief Key_Scan

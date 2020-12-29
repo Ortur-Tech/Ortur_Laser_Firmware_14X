@@ -118,13 +118,22 @@ void protocol_main_loop()
         } else if (line[0] == '$') {
           // Grbl '$' system command
           report_status_message(system_execute_line(line));
+          if(reportPowerFlag)
+          {
+        	  report_feedback_message(reportPowerFlag);
+        	  reportPowerFlag=0;
+          }
         } else if (sys.state & (STATE_ALARM | STATE_JOG)) {
           // Everything else is gcode. Block if in alarm or jog mode.
           report_status_message(STATUS_SYSTEM_GC_LOCK);
         } else {
           // Parse and execute g-code block.
-
         	report_status_message(gc_execute_line(line));
+            if(reportPowerFlag)
+			{
+			  report_feedback_message(reportPowerFlag);
+			  reportPowerFlag=0;
+			}
         }
 
         // Reset tracking data for next line.
@@ -189,7 +198,7 @@ void protocol_main_loop()
     else
     	StatusLed_Off();
 #endif
-
+    Main_PowerCheck();
 #ifndef ORTUR_CNC_MODE
     //检查关机操作
     PowerClose_Check();

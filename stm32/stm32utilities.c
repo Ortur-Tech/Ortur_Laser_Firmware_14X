@@ -192,6 +192,53 @@ void Spindle_Enable()
 }
 #endif
 
+uint8_t reportPowerFlag=0;
+
+static uint8_t lastPowerFlag=0;
+
+
+/**
+ *掉电去抖
+ */
+uint8_t IsMainPowrIn(void)
+{
+	if(IsMainPowrBitSet())
+	{
+		delay_ms(10);
+		if(IsMainPowrBitSet())
+		{
+			lastPowerFlag=1;
+			return 1;
+		}
+	}
+	return 0;
+}
+/**
+ * 检测主电源状态
+ */
+void Main_PowerCheck(void)
+{
+	if(lastPowerFlag==0)
+	{
+		if(IsMainPowrIn())
+		{
+			report_feedback_message(MESSAGE_POWER_SUPPLIED);
+		}
+	}
+	else
+	{
+		/*掉电去抖*/
+		if(!IsMainPowrBitSet())
+		{
+			delay_ms(10);
+			if(!IsMainPowrBitSet())
+			{
+				lastPowerFlag=0;
+				report_feedback_message(MESSAGE_NO_POWER_SUPPLIED);
+			}
+		}
+	}
+}
     //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 //-- Pin based calls, need to use HAL since LL pins and HAL pins are incompatible for F1
