@@ -29,6 +29,11 @@
 #define ORTUR_VER_NUM 140
 #define ORTUR_VERSION "140"
 
+/*旧主板(pro以及小于=1.3的主板）不支持电源检测功能，强行使用可能导致误报（1.2主板）*/
+#define MAIN_BOARD_IS_NEW      0
+
+
+
 /*定义中断优先级*/
 
 #define STEP_SET_TIMER_PR      0

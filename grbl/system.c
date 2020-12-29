@@ -189,11 +189,13 @@ uint8_t system_execute_line(char *line)
         case 'H' : // Perform homing cycle [IDLE/ALARM]
           if (bit_isfalse(settings.flags,BITFLAG_HOMING_ENABLE)) {return(STATUS_SETTING_DISABLED); }
           if (system_check_safety_door_ajar()) { return(STATUS_CHECK_DOOR); } // Block if safety door is ajar.
+#if MAIN_BOARD_IS_NEW
           if(!IsMainPowrIn())
           {
         	  reportPowerFlag=MESSAGE_NO_POWER_SUPPLIED;
         	  //report_feedback_message(MESSAGE_MAIN_POWER_OFF);
           }
+#endif
           sys.state = STATE_HOMING; // Set system state variable
           if (line[2] == 0) {
             mc_homing_cycle(HOMING_CYCLE_ALL);
