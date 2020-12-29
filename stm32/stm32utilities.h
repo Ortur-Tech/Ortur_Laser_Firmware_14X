@@ -52,6 +52,7 @@ void Spindle_Disable();
 void Spindle_Enable();
 #endif
 
+extern uint8_t reportPowerFlag;
 uint8_t IsMainPowrIn(void);
 void Main_PowerCheck(void);
 void timing_init();

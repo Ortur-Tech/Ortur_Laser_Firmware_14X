@@ -192,7 +192,11 @@ void Spindle_Enable()
 }
 #endif
 
+uint8_t reportPowerFlag=0;
+
 static uint8_t lastPowerFlag=0;
+
+
 /**
  *掉电去抖
  */
@@ -218,7 +222,7 @@ void Main_PowerCheck(void)
 	{
 		if(IsMainPowrIn())
 		{
-			report_feedback_message(MESSAGE_MAIN_POWER_ON);
+			report_feedback_message(MESSAGE_POWER_SUPPLIED);
 		}
 	}
 	else
@@ -230,7 +234,7 @@ void Main_PowerCheck(void)
 			if(!IsMainPowrBitSet())
 			{
 				lastPowerFlag=0;
-				report_feedback_message(MESSAGE_MAIN_POWER_OFF);
+				report_feedback_message(MESSAGE_NO_POWER_SUPPLIED);
 			}
 		}
 	}
