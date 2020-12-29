@@ -49,24 +49,57 @@
 	#define DEFAULT_X_MAX_TRAVEL 160.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Y_MAX_TRAVEL 150.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Z_MAX_TRAVEL 1.0f // mm NOTE: Must be a positive value.	$132
+
+    #define DEFAULT_X_MAX_RATE           (50*60.0f)  // $110  X Max rate [mm/min]
+	#define DEFAULT_Y_MAX_RATE           (50*60.0f)  // $111  Y Max rate [mm/min]
+	#define DEFAULT_Z_MAX_RATE           (20*60.0f)  // $112  Z Max rate [mm/min]
+
+	#define DEFAULT_X_ACCELERATION   (1200.0f*60*60) // $120  X Acceleration [mm/sec^2]
+    #define DEFAULT_Y_ACCELERATION   (1200.0f*60*60) // $121  Y Acceleration [mm/sec^2]
+    #define DEFAULT_Z_ACCELERATION   (1200.0f*60*60) // $122  Z Acceleration [mm/sec^2]
+
 #elif ORTUR_MODEL==OLM_MODEL_180
 	#define ORTUR_MODEL_NAME "Ortur Laser Master Model 180"
 	#define DEFAULT_DIRECTION_INVERT_MASK 1 // INVERT X
 	#define DEFAULT_X_MAX_TRAVEL 180.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Y_MAX_TRAVEL 180.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Z_MAX_TRAVEL 1.0f // mm NOTE: Must be a positive value.	$132
+
+	#define DEFAULT_X_MAX_RATE           (50*60.0f)  // $110  X Max rate [mm/min]
+	#define DEFAULT_Y_MAX_RATE           (50*60.0f)  // $111  Y Max rate [mm/min]
+	#define DEFAULT_Z_MAX_RATE           (20*60.0f)  // $112  Z Max rate [mm/min]
+
+	#define DEFAULT_X_ACCELERATION   (1200.0f*60*60) // $120  X Acceleration [mm/sec^2]
+    #define DEFAULT_Y_ACCELERATION   (1200.0f*60*60) // $121  Y Acceleration [mm/sec^2]
+    #define DEFAULT_Z_ACCELERATION   (1200.0f*60*60) // $122  Z Acceleration [mm/sec^2]
 #elif ORTUR_MODEL==OLM_1
 	#define ORTUR_MODEL_NAME "Ortur Laser Master 1"
 	#define DEFAULT_DIRECTION_INVERT_MASK 1 // INVERT X
 	#define DEFAULT_X_MAX_TRAVEL 210.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Y_MAX_TRAVEL 210.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Z_MAX_TRAVEL 1.0f // mm NOTE: Must be a positive value.	$132
+
+    #define DEFAULT_X_MAX_RATE           (3500.0f)  // $110  X Max rate [mm/min]
+	#define DEFAULT_Y_MAX_RATE           (3500.0f)  // $111  Y Max rate [mm/min]
+	#define DEFAULT_Z_MAX_RATE           (20*60.0f)  // $112  Z Max rate [mm/min]
+
+	#define DEFAULT_X_ACCELERATION   (1500.0f*60*60) // $120  X Acceleration [mm/sec^2]
+    #define DEFAULT_Y_ACCELERATION   (1200.0f*60*60) // $121  Y Acceleration [mm/sec^2]
+    #define DEFAULT_Z_ACCELERATION   (1200.0f*60*60) // $122  Z Acceleration [mm/sec^2]
 #elif ORTUR_MODEL==OLM_MODEL_210
 	#define ORTUR_MODEL_NAME "Ortur Laser Master Model 210"
 	#define DEFAULT_DIRECTION_INVERT_MASK 1 // INVERT X
 	#define DEFAULT_X_MAX_TRAVEL 210.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Y_MAX_TRAVEL 210.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Z_MAX_TRAVEL 1.0f // mm NOTE: Must be a positive value.	$132
+
+    #define DEFAULT_X_MAX_RATE           (3500.0f)  // $110  X Max rate [mm/min]
+	#define DEFAULT_Y_MAX_RATE           (3500.0f)  // $111  Y Max rate [mm/min]
+	#define DEFAULT_Z_MAX_RATE           (20*60.0f)  // $112  Z Max rate [mm/min]
+
+	#define DEFAULT_X_ACCELERATION   (1500.0f*60*60) // $120  X Acceleration [mm/sec^2]
+    #define DEFAULT_Y_ACCELERATION   (1200.0f*60*60) // $121  Y Acceleration [mm/sec^2]
+    #define DEFAULT_Z_ACCELERATION   (1200.0f*60*60) // $122  Z Acceleration [mm/sec^2]
 #elif ORTUR_MODEL==C40
 	#define ORTUR_MODEL_NAME "C40"
   	#define DEFAULT_HOMING_ENABLE                 0 // $22   Homing cycle [boolean]
@@ -74,12 +107,42 @@
 	#define DEFAULT_X_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Y_MAX_TRAVEL 300.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Z_MAX_TRAVEL 1.0f // mm NOTE: Must be a positive value.	$132
+
+	#define DEFAULT_X_MAX_RATE           (75*60.0f)  // $110  X Max rate [mm/min]
+	#define DEFAULT_Y_MAX_RATE           (75*60.0f)  // $111  Y Max rate [mm/min]
+	#define DEFAULT_Z_MAX_RATE           (20*60.0f)  // $112  Z Max rate [mm/min]
+
+	#define DEFAULT_X_ACCELERATION   (2000.0f*60*60) // $120  X Acceleration [mm/sec^2]
+    #define DEFAULT_Y_ACCELERATION   (1800.0f*60*60) // $121  Y Acceleration [mm/sec^2]
+    #define DEFAULT_Z_ACCELERATION   (1200.0f*60*60) // $122  Z Acceleration [mm/sec^2]
 #elif ORTUR_MODEL==OLM_2
 	#define ORTUR_MODEL_NAME "Ortur Laser Master 2"
 	#define DEFAULT_DIRECTION_INVERT_MASK 0
 	#define DEFAULT_X_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Y_MAX_TRAVEL 430.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Z_MAX_TRAVEL 1.0f // mm NOTE: Must be a positive value.	$132
+
+    #define DEFAULT_X_MAX_RATE           (75*60.0f)  // $110  X Max rate [mm/min]
+	#define DEFAULT_Y_MAX_RATE           (75*60.0f)  // $111  Y Max rate [mm/min]
+	#define DEFAULT_Z_MAX_RATE           (20*60.0f)  // $112  Z Max rate [mm/min]
+
+	#define DEFAULT_X_ACCELERATION   (2000.0f*60*60) // $120  X Acceleration [mm/sec^2]
+    #define DEFAULT_Y_ACCELERATION   (1800.0f*60*60) // $121  Y Acceleration [mm/sec^2]
+    #define DEFAULT_Z_ACCELERATION   (1200.0f*60*60) // $122  Z Acceleration [mm/sec^2]
+#elif ORTUR_MODEL==OLM_2_PRO
+	#define ORTUR_MODEL_NAME "Ortur Laser Master 2"
+	#define DEFAULT_DIRECTION_INVERT_MASK 0
+	#define DEFAULT_X_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.
+	#define DEFAULT_Y_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.
+	#define DEFAULT_Z_MAX_TRAVEL 1.0f // mm NOTE: Must be a positive value.	$132
+
+    #define DEFAULT_X_MAX_RATE           (75*60.0f)  // $110  X Max rate [mm/min]
+	#define DEFAULT_Y_MAX_RATE           (75*60.0f)  // $111  Y Max rate [mm/min]
+	#define DEFAULT_Z_MAX_RATE           (20*60.0f)  // $112  Z Max rate [mm/min]
+
+	#define DEFAULT_X_ACCELERATION   (2000.0f*60*60) // $120  X Acceleration [mm/sec^2]
+    #define DEFAULT_Y_ACCELERATION   (1800.0f*60*60) // $121  Y Acceleration [mm/sec^2]
+    #define DEFAULT_Z_ACCELERATION   (1200.0f*60*60) // $122  Z Acceleration [mm/sec^2]
 #elif ORTUR_MODEL==OLM_MODEL_400
 	#define ORTUR_MODEL_NAME "Ortur Laser Master Model 400"
 	#define DEFAULT_HOMING_DIR_MASK       0b11 // $23   Homing dir invert [mask]
@@ -88,7 +151,11 @@
 	#define DEFAULT_Y_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Z_MAX_TRAVEL 100.0f // mm NOTE: Must be a positive value.	$132
  	#define DEFAULT_Z_STEPS_PER_MM 400.0f // $102
+
+    #define DEFAULT_X_MAX_RATE           (5000.0f) // $110  X Max rate [mm/min]
 	#define DEFAULT_Y_MAX_RATE           (50*60.0f)  // $111  Y Max rate [mm/min]
+	#define DEFAULT_Z_MAX_RATE           (20*60.0f)  // $112  Z Max rate [mm/min]
+
 	#define DEFAULT_X_ACCELERATION   (2000.0f*60*60) // $120  X Acceleration [mm/sec^2]
     #define DEFAULT_Y_ACCELERATION   (1200.0f*60*60) // $121  Y Acceleration [mm/sec^2]
     #define DEFAULT_Z_ACCELERATION   (1500.0f*60*60) // $122  Z Acceleration [mm/sec^2]
@@ -144,38 +211,15 @@
   #define DEFAULT_B_STEPS_PER_MM 		   3200.0f // $104
   #define DEFAULT_C_STEPS_PER_MM 		   3200.0f // $105
 
-  #define DEFAULT_X_MAX_RATE           (150*60.0f) // $110  X Max rate [mm/min]
-#ifndef DEFAULT_Y_MAX_RATE
-  #define DEFAULT_Y_MAX_RATE           (150*60.0f)  // $111  Y Max rate [mm/min]
-#endif
-  #define DEFAULT_Z_MAX_RATE            (20*60.0f) // $112  Z Max rate [mm/min]
+
   #define DEFAULT_A_MAX_RATE           (150*60.0f) // $113  A Max rate [mm/min]
   #define DEFAULT_B_MAX_RATE           (150*60.0f) // $114  B Max rate [mm/min]
   #define DEFAULT_C_MAX_RATE           (150*60.0f) // $115  C Max rate [mm/min]
-
-#ifndef DEFAULT_X_ACCELERATION
-  #define DEFAULT_X_ACCELERATION   (2200.0f*60*60) // $120  X Acceleration [mm/sec^2]
-#endif
-#ifndef DEFAULT_Y_ACCELERATION
-  #define DEFAULT_Y_ACCELERATION   (1800.0f*60*60) // $121  Y Acceleration [mm/sec^2]
-#endif
-#ifndef DEFAULT_Z_ACCELERATION
-  #define DEFAULT_Z_ACCELERATION   (1500.0f*60*60) // $122  Z Acceleration [mm/sec^2]
-#endif
 
   #define DEFAULT_A_ACCELERATION   (1500.0f*60*60) // $123  A Acceleration [mm/sec^2]
   #define DEFAULT_B_ACCELERATION   (1500.0f*60*60) // $124  B Acceleration [mm/sec^2]
   #define DEFAULT_C_ACCELERATION   (1500.0f*60*60) // $125  C Acceleration [mm/sec^2]
 
-#ifndef DEFAULT_X_MAX_TRAVEL
-  #define DEFAULT_X_MAX_TRAVEL              160.0f // $130  X Max travel [mm] NOTE: Must be a positive value.
-#endif
-#ifndef DEFAULT_Y_MAX_TRAVEL
-  #define DEFAULT_Y_MAX_TRAVEL              150.0f // $131  Y Max travel [mm] NOTE: Must be a positive value.
-#endif
-#ifndef DEFAULT_Z_MAX_TRAVEL
-  #define DEFAULT_Z_MAX_TRAVEL              100.0f // $132  Z Max travel [mm] NOTE: Must be a positive value.
-#endif
   #define DEFAULT_A_MAX_TRAVEL              150.0f // $133  A Max travel [mm] NOTE: Must be a positive value.
   #define DEFAULT_B_MAX_TRAVEL              150.0f // $134  B Max travel [mm] NOTE: Must be a positive value.
   #define DEFAULT_C_MAX_TRAVEL              150.0f // $135  C Max travel [mm] NOTE: Must be a positive value.
