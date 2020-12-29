@@ -171,10 +171,10 @@ void report_feedback_message(uint8_t message_code)
       printPgmStringAll(PSTR("Restoring spindle")); break;
     case MESSAGE_SLEEP_MODE:
       printPgmStringAll(PSTR("Sleeping")); break;
-    case MESSAGE_MAIN_POWER_ON:
-      printPgmStringAll(PSTR("Main Power In")); break;
-    case MESSAGE_MAIN_POWER_OFF:
-      printPgmStringAll(PSTR("No Main Power")); break;
+    case MESSAGE_POWER_SUPPLIED:
+      printPgmStringAll(PSTR("Power Supplied")); break;
+    case MESSAGE_NO_POWER_SUPPLIED:
+      printPgmStringAll(PSTR("No Power Supply")); break;
   }
   report_util_feedback_line_feed_all();
 }
