@@ -131,7 +131,7 @@
     #define DEFAULT_Z_ACCELERATION   (1200.0f*60*60) // $122  Z Acceleration [mm/sec^2]
 #elif ORTUR_MODEL==OLM_2_PRO
 	#define ORTUR_MODEL_NAME "Ortur Laser Master 2"
-	#define DEFAULT_DIRECTION_INVERT_MASK 0
+	#define DEFAULT_DIRECTION_INVERT_MASK 1
 	#define DEFAULT_X_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Y_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.
 	#define DEFAULT_Z_MAX_TRAVEL 1.0f // mm NOTE: Must be a positive value.	$132
