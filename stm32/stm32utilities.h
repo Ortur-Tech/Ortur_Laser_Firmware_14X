@@ -52,6 +52,8 @@ void Spindle_Disable();
 void Spindle_Enable();
 #endif
 
+uint8_t IsMainPowrIn(void);
+void Main_PowerCheck(void);
 void timing_init();
 
 //-- PIN IO, to replace legacy SPL calls to LL and HAL
