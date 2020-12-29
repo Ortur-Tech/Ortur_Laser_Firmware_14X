@@ -189,7 +189,7 @@ void protocol_main_loop()
     else
     	StatusLed_Off();
 #endif
-
+    Main_PowerCheck();
 #ifndef ORTUR_CNC_MODE
     //检查关机操作
     PowerClose_Check();
