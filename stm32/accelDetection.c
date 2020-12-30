@@ -186,7 +186,7 @@ void Gsensor_Init(void)
 	{
 		GsensorDeviceType=Check_BMA250_ID();
 		BMA250_Init();
-		gsensor_extern_scale = 1.5;
+		gsensor_extern_scale = 1;
 	}
 }
 
