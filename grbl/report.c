@@ -173,7 +173,7 @@ void report_feedback_message(uint8_t message_code)
       printPgmStringAll(PSTR("Sleeping")); break;
     case MESSAGE_POWER_SUPPLIED:
       printPgmStringAll(PSTR("Power Supplied")); break;
-    case MESSAGE_NO_POWER_SUPPLIED:
+    case MESSAGE_NO_POWER_SUPPLY:
       printPgmStringAll(PSTR("No Power Supply")); break;
   }
   report_util_feedback_line_feed_all();

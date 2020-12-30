@@ -119,10 +119,10 @@ void protocol_main_loop()
           // Grbl '$' system command
           report_status_message(system_execute_line(line));
 #if MAIN_BOARD_IS_NEW
-          if(reportPowerFlag)
+          if(report_power_flag)
           {
-        	  report_feedback_message(reportPowerFlag);
-        	  reportPowerFlag=0;
+        	  report_feedback_message(report_power_flag);
+        	  report_power_flag=0;
           }
 #endif
         } else if (sys.state & (STATE_ALARM | STATE_JOG)) {
@@ -132,10 +132,10 @@ void protocol_main_loop()
           // Parse and execute g-code block.
         	report_status_message(gc_execute_line(line));
 #if MAIN_BOARD_IS_NEW
-            if(reportPowerFlag)
+            if(report_power_flag)
 			{
-			  report_feedback_message(reportPowerFlag);
-			  reportPowerFlag=0;
+			  report_feedback_message(report_power_flag);
+			  report_power_flag=0;
 			}
 #endif
         }
