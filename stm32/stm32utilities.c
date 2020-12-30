@@ -192,9 +192,9 @@ void Spindle_Enable()
 }
 #endif
 
-uint8_t reportPowerFlag=0;
+uint8_t report_power_flag = 0;
 
-static uint8_t lastPowerFlag=0;
+static uint8_t last_power_flag=0;
 
 
 /**
@@ -207,7 +207,7 @@ uint8_t IsMainPowrIn(void)
 		delay_ms(10);
 		if(IsMainPowrBitSet())
 		{
-			lastPowerFlag=1;
+			last_power_flag=1;
 			return 1;
 		}
 	}
@@ -218,7 +218,7 @@ uint8_t IsMainPowrIn(void)
  */
 void Main_PowerCheck(void)
 {
-	if(lastPowerFlag==0)
+	if(last_power_flag==0)
 	{
 		if(IsMainPowrIn())
 		{
@@ -233,8 +233,8 @@ void Main_PowerCheck(void)
 			delay_ms(10);
 			if(!IsMainPowrBitSet())
 			{
-				lastPowerFlag=0;
-				report_feedback_message(MESSAGE_NO_POWER_SUPPLIED);
+				last_power_flag=0;
+				report_feedback_message(MESSAGE_NO_POWER_SUPPLY);
 			}
 		}
 	}

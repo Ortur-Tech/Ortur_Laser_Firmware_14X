@@ -91,7 +91,7 @@
 #define MESSAGE_SLEEP_MODE 11
 /*添加两个用于判断是否有插12V电的宏*/
 #define MESSAGE_POWER_SUPPLIED 12
-#define MESSAGE_NO_POWER_SUPPLIED 13
+#define MESSAGE_NO_POWER_SUPPLY 13
 
 void report_util_line_feed();
 void report_util_line_feed_all();
