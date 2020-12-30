@@ -2,6 +2,7 @@
 #include "iic.h"
 #include "sc7a20.h"
 //#include "timer.h"
+#include "report.h"
 
 #define BMA250_DEVICE 0X03
 #define BMA253_DEVICE 0XFA
@@ -17,7 +18,7 @@ uint8_t shake_detected = 0; //是否检测到震动
 #define  accel_check_interval_ms 100 //100毫秒检测一次
 uint32_t last_accel_check_ms = 0;
 uint32_t detection_count = 0; //开始检测
-int16_t gsensor_extern_scale = 1;;
+int16_t gsensor_extern_scale = 1;
 
 uint8_t Check_BMA250_ID(void);
 void BMA250_Get_Acceleration(short *gx, short *gy, short *gz);
@@ -48,51 +49,6 @@ void BMA250_Get_Acceleration(short *gx, short *gy, short *gz);
 #define BMP_AS_SLEEPPHASE 2
 
 uint8_t GsensorDeviceType=0;    //!<gsensor芯片类型
-
-
-//void bma_test(void)
-//{
-//	uint32_t timer1=0;
-//	uint8_t temp=0;
-//
-//	LL_GPIO_SetPinPull(GPIOB, LL_GPIO_PIN_1, LL_GPIO_PULL_UP);
-//	LL_GPIO_SetPinMode(GPIOB, LL_GPIO_PIN_1, LL_GPIO_MODE_INPUT);
-//
-//	Write_One_Byte_iicaddr(BMA250_Addr, BMP_GRANGE, 0x03);  // Set measurement range
-//	Write_One_Byte_iicaddr(BMA250_Addr, BMP_BWD, 0x08);        // Set filter bandwidth
-//	Write_One_Byte_iicaddr(BMA250_Addr, BMP_PM, 0x4e);       // Set filter bandwidth
-//	Write_One_Byte_iicaddr(BMA250_Addr, BMP_SCR, 0x80);
-//
-//	mprintf(LOG_INFO,"CHIP ID:%x.\r\n",Check_BMA250_ID());
-//
-//	Write_One_Byte_iicaddr(BMA250_Addr, 0x17, 0b111);//使能xyz加速度过高中断
-//	Write_One_Byte_iicaddr(BMA250_Addr, 0x19, 0b10);//中断配置到int1脚
-//	Write_One_Byte_iicaddr(BMA250_Addr, 0x25, 0x05);//过高时间10ms
-//	Write_One_Byte_iicaddr(BMA250_Addr, 0x26, 155);//过高阈值
-//
-//	delay_ms(20);
-//	while(1)
-//	{
-//		if(LL_GPIO_IsInputPinSet(GPIOB,LL_GPIO_PIN_1))
-//		{
-//			temp=Read_One_Byte(BMA250_Addr, 0x09);
-//			if(temp&0x02)
-//			{
-//				//延时读取加速度情况
-//			   Get_Acceleration(BMA250_Addr, BMP_ACC_X_LSB,&accel_x,&accel_y,&accel_z);
-//			   mprintf(LOG_INFO,"CHECKED xValue:%d. yValue:%d. zValue:%d.\r\n",accel_x,accel_y,accel_z);
-//			   Write_One_Byte_iicaddr(BMA250_Addr, 0x09, 0);
-//			}
-//		}
-//		if((HAL_GetTick()-timer1)>300)
-//		{
-//			timer1=HAL_GetTick();
-//			//延时读取加速度情况
-//		   Get_Acceleration(BMA250_Addr, BMP_ACC_X_LSB,&accel_x,&accel_y,&accel_z);
-//		   mprintf(LOG_INFO,"xValue:%d. yValue:%d. zValue:%d.\r\n",accel_x,accel_y,accel_z);
-//		}
-//	}
-//}
 
 /**
  * @brief BMA250_Init
@@ -311,11 +267,11 @@ void accel_detection()
 				printStringAll("[BMA253:(");
 				break;
 			default:
-				printStringAll("[UKNW:");
+				printStringAll("[UKNW:(");
 			}
 			print_uint32_base10_all(accel_slope);
-
-			printStringAll(") Shock and Movement detected!]\r\n");
+			printStringAll(") Shock and Movement detected!]");
+			report_util_line_feed_all();
 			sys.state = STATE_ALARM;
 			sys.abort = 1;
 		}

@@ -31,8 +31,8 @@
 
 // Internal report utilities to reduce flash with repetitive tasks turned into functions.
 void report_util_setting_prefix(uint8_t n) { serial_write('$'); print_uint8_base10(n); serial_write('='); }
-static void report_util_line_feed() { printPgmString(PSTR("\r\n")); }
-static void report_util_line_feed_all() { printPgmStringAll(PSTR("\r\n")); }
+void report_util_line_feed() { printPgmString(PSTR("\r\n")); }
+void report_util_line_feed_all() { printPgmStringAll(PSTR("\r\n")); }
 static void report_util_feedback_line_feed() { serial_write(']'); report_util_line_feed(); }
 static void report_util_feedback_line_feed_all() { serial_write_all(']'); report_util_line_feed_all(); }
 static void report_util_gcode_modes_G() { printPgmString(PSTR(" G")); }
@@ -122,7 +122,9 @@ void report_status_message(uint8_t status_code)
 {
   switch(status_code) {
     case STATUS_OK: // STATUS_OK
-      printPgmString(PSTR("ok\r\n")); break;
+      printPgmString(PSTR("ok"));
+      report_util_line_feed();
+      break;
     default:
       printPgmString(PSTR("error:"));
       print_uint8_base10(status_code);
@@ -183,14 +185,19 @@ void report_feedback_message(uint8_t message_code)
 // Welcome message
 void report_init_message()
 {
-  printPgmStringAll(PSTR(ORTUR_MODEL_NAME " Ready!\r\n"));
-  printPgmStringAll(PSTR("OLF " ORTUR_VERSION ".\r\n"));
-  printPgmStringAll(PSTR("\r\nGrbl " GRBL_VERSION " ['$' for help]\r\n"));
+  report_util_line_feed_all();
+  printPgmStringAll(PSTR(ORTUR_MODEL_NAME " Ready!"));
+  report_util_line_feed_all();
+  printPgmStringAll(PSTR("OLF " ORTUR_VERSION "."));
+  report_util_line_feed_all();
+  printPgmStringAll(PSTR("Grbl " GRBL_VERSION " ['$' for help]"));
+  report_util_line_feed_all();
 }
 
 // Grbl help message
 void report_grbl_help() {
-  printPgmString(PSTR("[HLP:$$ $# $G $I $N $x=val $Nx=line $J=line $SLP $C $X $H ~ ! ? ctrl-x]\r\n"));    
+  printPgmString(PSTR("[HLP:$$ $# $G $I $N $x=val $Nx=line $J=line $SLP $C $X $H ~ ! ? ctrl-x]"));
+  report_util_line_feed();
 }
 
 

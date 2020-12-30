@@ -93,6 +93,9 @@
 #define MESSAGE_POWER_SUPPLIED 12
 #define MESSAGE_NO_POWER_SUPPLIED 13
 
+void report_util_line_feed();
+void report_util_line_feed_all();
+
 // Prints system status messages.
 void report_status_message(uint8_t status_code);
 

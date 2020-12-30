@@ -29,21 +29,27 @@
   SPINDLE_PWM_TYPE spindle_speed = 0;
 #endif
 
-
-#define DELAY_SPINDLE_FAN_CLOSE_TIME (2*60*1000)
-#define DELAY_SPINDLE_FAN_MIN_PWM (100)
-
 #ifdef DELAY_OFF_SPINDLE
-  /*M5停止激光命令*/
-  uint8_t stop_spindle_pwm_flag = 0;
+
+#ifndef _MAX
+  #define _MAX(a,b) ((a)>(b)?(a):(b))
+#endif
+
+#ifndef _MIN
+  #define _MIN(a,b) ((a)<(b)?(a):(b))
+#endif
+
   /* 主轴/激光 是否关闭的标识 */
-  uint8_t stop_spindle_disable_flag = 0;
-  /*关电源计时*/
-  uint32_t stop_spindle_timer = 0;
-  /*统计平均PWM值*/
-  uint32_t stop_spindle_avg_pwm = 0;
+  uint8_t spindle_disable_by_grbl = 0;
+  /* 主轴/激光 被关闭的时间 */
+  uint32_t spindle_disabled_time = 0;
+  /* 主轴/激光 累积热量*/
+  uint32_t spindle_cumulative_heat = 0;
   /* 主轴/激光 是否挂起的标识 */
   uint8_t spindle_suspend_flag = 0;
+  /* 主轴/激光 风扇延时时间*/
+  uint32_t spindle_fan_delay_time = 0;
+
 #endif
 
 void spindle_init()
@@ -187,9 +193,9 @@ void spindle_stop()
 #endif
 }
 
-uint8_t isLaserOpen()
+uint8_t is_spindle_Open()
 {
-  return readSpindleEnable() && (spindle_get_speed()>0);
+  return readSpindleEnable() && (spindle_get_speed());
 }
 
 
@@ -204,7 +210,11 @@ uint8_t isLaserOpen()
 	//get speed value
     spindle_speed = pwm_value;
 
-  	Set_Spindle_Speed(pwm_value);
+    Set_Spindle_Speed(pwm_value);
+
+#ifdef DELAY_OFF_SPINDLE
+  	spindle_disabled_time = HAL_GetTick();
+#endif
 
     #ifdef SPINDLE_ENABLE_OFF_WITH_ZERO_SPEED
       if (pwm_value == SPINDLE_PWM_OFF_VALUE)
@@ -398,55 +408,65 @@ uint8_t isLaserOpen()
 
 #ifdef DELAY_OFF_SPINDLE
 
-  void delay_stop_spindle_set(uint16_t pwm)
+  uint8_t spindle_delay_stop(void)
   {
-  	if( pwm > DELAY_SPINDLE_FAN_MIN_PWM )
+  	if(spindle_disable_by_grbl)
   	{
-  		stop_spindle_pwm_flag = 1;
-  		if(stop_spindle_avg_pwm == 0)
+  		if(( HAL_GetTick() - spindle_disabled_time ) > spindle_fan_delay_time)
   		{
-  			stop_spindle_avg_pwm = pwm;
+  			spindle_disable_by_grbl = 0;
+  			spindle_cumulative_heat = 0;
+			if (settings.spindle_enable_pin_mode == 1)
+				ResetSpindleEnablebit();
+			else
+				SetSpindleEnablebit();
   		}
   		else
-  		{
-  			stop_spindle_avg_pwm = (stop_spindle_avg_pwm + pwm ) / 2;
-  		}
-  		stop_spindle_timer = HAL_GetTick();
-  	}
-  }
-
-  uint8_t delay_stop_spindle(void)
-  {
-  	if( stop_spindle_pwm_flag && stop_spindle_disable_flag )
-  	{
-  		if(( HAL_GetTick() - stop_spindle_timer ) > ( DELAY_SPINDLE_FAN_CLOSE_TIME * stop_spindle_avg_pwm / 1000 ) )
-  		{
-  			stop_spindle_avg_pwm = 0;
-  			stop_spindle_pwm_flag = 0;
-  			stop_spindle_disable_flag = 0;
-  			#ifdef VARIABLE_SPINDLE_ENABLE_PIN
-  			  if (settings.spindle_enable_pin_mode == 1)
-  				ResetSpindleEnablebit();
-  			  else
-  				SetSpindleEnablebit();
-  			#endif
-  			return 1;
-  		}
-  		else
-  		{
   			return 0;
-  		}
   	}
-  	else
-  	{
-  		return 1;
-  	}
+
+  	return 1;
   }
 
-  void stop_spindle_disable_flag_set(uint8_t status)
+  void spindle_disable_by_grbl_set(uint8_t status)
   {
-  	stop_spindle_timer = HAL_GetTick();
-  	stop_spindle_disable_flag = status;
+	spindle_disable_by_grbl = status;
+	spindle_disabled_time = HAL_GetTick();
+	if(status)
+	{
+		spindle_fan_delay_time = (spindle_cumulative_heat / FAN_HEAT_DISSIPATION_PER_SECOND) * 1000;
+		spindle_fan_delay_time = _MAX(spindle_fan_delay_time,MIN_SPINDLE_FAN_TIME);
+		spindle_fan_delay_time = _MIN(MAX_SPINDLE_FAN_TIME,spindle_fan_delay_time);
+	}
+  }
+
+  void spindle_calculate_heat()
+  {
+	  static uint32_t last_time = 0;
+	  static uint32_t equivalent_power = 0;
+	  if(HAL_GetTick() - last_time >= 1000)
+	  {
+		  //电源开启
+		  if(readSpindleEnable())
+		  {
+			  //计算每秒产生的热量和丧失的热量
+			  if(spindle_cumulative_heat < MAX_SPINDLE_HEAT)
+				  spindle_cumulative_heat += equivalent_power / 1000;
+			  if(spindle_cumulative_heat >= FAN_HEAT_DISSIPATION_PER_SECOND)
+				  spindle_cumulative_heat -= FAN_HEAT_DISSIPATION_PER_SECOND ;
+		  }
+		  else
+		  {
+			  if(spindle_cumulative_heat >= AIR_HEAT_DISSIPATION_PER_SECOND)
+				  spindle_cumulative_heat -= AIR_HEAT_DISSIPATION_PER_SECOND ;
+		  }
+		  equivalent_power = 0;
+		  last_time = HAL_GetTick();
+	  }
+	  else
+	  {
+		  equivalent_power += spindle_speed;
+	  }
   }
 
 #endif

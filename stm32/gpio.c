@@ -138,59 +138,13 @@ void Leds_Power(uint8_t onoff)
 	    LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 
-		//关闭限位开关指示灯
-	    LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_0); //Y
-	    LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_1); //X
-	    LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_2); //Z
-	    LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_4); //A
+		//关闭限位开关指示灯          Y               X               Z               A
+	    LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_0 | LL_GPIO_PIN_1 | LL_GPIO_PIN_2 | LL_GPIO_PIN_4);
 	}
 
 #endif
 }
 
-/**
- * @brief PowerLed_Blink
- */
-void PowerLed_Blink(void)
-{
-	LL_GPIO_TogglePin(GPIOA, LL_GPIO_PIN_15);
-}
-/**
- * @brief PowerLed_On
- */
-void PowerLed_On(void)
-{
-	LL_GPIO_SetOutputPin(GPIOA, LL_GPIO_PIN_15);
-}
-/**
- * @brief PowerLed_Off
- */
-void PowerLed_Off(void)
-{
-	LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_15);
-}
-
-/**
- * @brief StatusLed_On
- */
-void StatusLed_On(void)
-{
-	LL_GPIO_SetOutputPin(GPIOB, LL_GPIO_PIN_3);
-}
-/**
- * @brief StatusLed_Off
- */
-void StatusLed_Off(void)
-{
-	LL_GPIO_ResetOutputPin(GPIOB, LL_GPIO_PIN_3);
-}
-/**
- * @brief StatusLed_Blink
- */
-void StatusLed_Blink(void)
-{
-	LL_GPIO_TogglePin(GPIOB, LL_GPIO_PIN_3);
-}
 /**
  * @brief Key_Scan
  * @return 1:没有按键按下 0：有按键按下

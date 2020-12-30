@@ -47,7 +47,7 @@ volatile uint8_t serial_rx_buffer_tail = 0;
 /*虚拟usb串口接收缓冲区*/
 uint8_t usb_serial_rx_buffer[RX_RING_BUFFER];
 uint8_t usb_serial_rx_buffer_head = 0;
-volatile uint8_t usb_serial_rx_buffer_tail = 0;
+uint8_t usb_serial_rx_buffer_tail = 0;
 
 uint8_t serial_tx_buffer[TX_RING_BUFFER];
 uint8_t serial_tx_buffer_head = 0;
@@ -520,10 +520,3 @@ ISR(SERIAL_RX)
 }
 #endif
 
-void serial_reset_read_buffer()
-{
-#if USE_DOUBLE_SERIAL
-  serial_rx_buffer_tail = serial_rx_buffer_head;
-#endif
-  usb_serial_rx_buffer_tail = usb_serial_rx_buffer_head;
-}

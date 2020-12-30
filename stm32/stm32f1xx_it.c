@@ -33,6 +33,9 @@ extern PCD_HandleTypeDef hpcd_USB_FS;
 /******************************************************************************/
 /*           Cortex-M3 Processor Interruption and Exception Handlers          */
 /******************************************************************************/
+
+#if 0
+
 /**
   * @brief This function handles Non maskable interrupt.
   */
@@ -145,6 +148,8 @@ void PendSV_Handler(void)
   /* USER CODE END PendSV_IRQn 1 */
 }
 
+#endif
+
 /**
   * @brief This function handles System tick timer.
   */
@@ -155,13 +160,17 @@ void SysTick_Handler(void)
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
-  delay_stop_spindle();
+
+  spindle_calculate_heat();
+  spindle_delay_stop();
+
 #ifdef USE_USB
     if(isUsbPlugIn())
     {
         setUsbPlugIn(isUsbPlugIn() - 1);
     }
 #endif
+
   extern void accel_detection_limit();
   accel_detection_limit();
 

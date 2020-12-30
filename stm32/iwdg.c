@@ -23,6 +23,7 @@
 #include "main.h"
 #include "system.h"
 #include "usb_device.h"
+#include "report.h"
 
 //激光功率
 #define getLaserPower() spindle_get_speed()
@@ -32,17 +33,17 @@
 
 int32_t last_sys_position[N_AXIS]; 		// 最后一次检测位置
 uint64_t last_check_timestamp = 0; 		// 最后一次检测时间
-uint32_t max_exposure_time = 60;		// 最长曝光时间 100s
-uint32_t min_exposure_time = 10;		//最短曝光时间
-uint32_t max_weak_time = 100;			//最长弱光时间
+#define  max_exposure_time 60		// 最长曝光时间 100s
+#define  min_exposure_time 10		//最短曝光时间
+#define  max_weak_time     100			//最长弱光时间
 
 uint32_t curr_laser_power;//当前激光功率
 
 uint32_t allow_laser_time;//允许激光静态开启时间
 
-uint32_t max_laser_power = SPINDLE_PWM_MAX_VALUE; ///< 激光最大功率
-uint32_t weak_laser_power = 20;//弱光功率
-uint32_t off_laser_power = SPINDLE_PWM_OFF_VALUE;//认为激光关闭的功率
+#define max_laser_power  SPINDLE_PWM_MAX_VALUE ///< 激光最大功率
+#define weak_laser_power 20//弱光功率
+#define off_laser_power  SPINDLE_PWM_OFF_VALUE//认为激光关闭的功率
 
 #endif
 
@@ -79,7 +80,7 @@ void IWDG_Feed(void)
 	}
 
 	//注意,激光已经开启
-	if(isLaserOpen())
+	if(is_spindle_Open())
 	{
 		//激光功率过大且长时间未移动
 		curr_laser_power = getLaserPower();
@@ -104,7 +105,8 @@ void IWDG_Feed(void)
 
 			if((HAL_GetTick()/1000) - last_check_timestamp >= allow_laser_time)
 			{
-				printStringAll("Laser exposure timeout!\r\n");
+				printStringAll("[MSG:Laser exposure timeout!]");
+				report_util_line_feed_all();
 				sys.state = STATE_ALARM;
 				sys.abort = 1;
 			}

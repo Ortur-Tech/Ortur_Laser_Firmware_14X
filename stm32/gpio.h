@@ -38,12 +38,58 @@
 void MX_GPIO_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-void PowerLed_Blink(void);
-void PowerLed_On(void);
-void PowerLed_Off(void);
-void StatusLed_On(void);
-void StatusLed_Off(void);
-void StatusLed_Blink(void);
+//void PowerLed_Blink(void);
+//void PowerLed_On(void);
+//void PowerLed_Off(void);
+//void StatusLed_On(void);
+//void StatusLed_Off(void);
+//void StatusLed_Blink(void);
+
+
+/**
+ * @brief PowerLed_Blink
+ */
+static inline void PowerLed_Blink(void)
+{
+	LL_GPIO_TogglePin(GPIOA, LL_GPIO_PIN_15);
+}
+/**
+ * @brief PowerLed_On
+ */
+static inline void PowerLed_On(void)
+{
+	LL_GPIO_SetOutputPin(GPIOA, LL_GPIO_PIN_15);
+}
+/**
+ * @brief PowerLed_Off
+ */
+static inline void PowerLed_Off(void)
+{
+	LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_15);
+}
+
+/**
+ * @brief StatusLed_On
+ */
+static inline void StatusLed_On(void)
+{
+	LL_GPIO_SetOutputPin(GPIOB, LL_GPIO_PIN_3);
+}
+/**
+ * @brief StatusLed_Off
+ */
+static inline void StatusLed_Off(void)
+{
+	LL_GPIO_ResetOutputPin(GPIOB, LL_GPIO_PIN_3);
+}
+/**
+ * @brief StatusLed_Blink
+ */
+static inline void StatusLed_Blink(void)
+{
+	LL_GPIO_TogglePin(GPIOB, LL_GPIO_PIN_3);
+}
+
 void Leds_Power(uint8_t onoff);
 uint8_t Key_Scan(void);
 void PowerOpen_Loop();

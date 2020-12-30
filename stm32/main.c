@@ -84,7 +84,6 @@ int main(void)
   Leds_Power(0); //关信号灯供电
 
   //阻塞,直到电源开启
-  //BUG: PowerOpen_Loop会造成后续代码出错
   PowerOpen_Loop();
   //NOTE:第一批主板灯的逻辑有问题,就先不亮了
   Leds_Power(1); //给信号灯供电

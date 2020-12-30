@@ -11,7 +11,7 @@
 **
 **  Environment : System Workbench for MCU
 **
-**  Distribution: The file is distributed “as is,” without any warranty
+**  Distribution: The file is distributed ï¿½as is,ï¿½ without any warranty
 **                of any kind.
 **
 *****************************************************************************
@@ -43,6 +43,8 @@
 *****************************************************************************
 */
 
+#if 0
+
 /* Includes */
 #include <sys/stat.h>
 #include <stdlib.h>
@@ -52,6 +54,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <sys/times.h>
+
 
 
 /* Variables */
@@ -202,3 +205,5 @@ int _execve(char *name, char **argv, char **env)
 	errno = ENOMEM;
 	return -1;
 }
+
+#endif
