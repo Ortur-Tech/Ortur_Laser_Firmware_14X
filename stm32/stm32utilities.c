@@ -163,9 +163,9 @@ void uart_sendch(uint8_t uC)
 //------------------------------------------------------------------------
 void Spindle_Disable()
 {
-	stop_spindle_disable_flag_set(1);
+	spindle_disable_by_grbl_set(1);
 
-	if(delay_stop_spindle())
+	if(spindle_delay_stop())
 	{
 #ifdef VARIABLE_SPINDLE_ENABLE_PIN
   if (settings.spindle_enable_pin_mode == 1)
@@ -179,7 +179,7 @@ void Spindle_Disable()
 
 void Spindle_Enable()
 {
-	stop_spindle_disable_flag_set(0);
+	spindle_disable_by_grbl_set(0);
 
 #ifdef VARIABLE_SPINDLE_ENABLE_PIN
   if (settings.spindle_enable_pin_mode == 1)

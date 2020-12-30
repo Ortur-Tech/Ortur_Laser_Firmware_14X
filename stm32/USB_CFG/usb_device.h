@@ -43,7 +43,16 @@ void MX_USB_DEVICE_Init(void);
  * -- Insert functions declaration here --
  */
 /* USER CODE BEGIN FD */
-void Reset_Usb();
+/**
+ * @brief 强制复位USB
+ */
+static inline void Reset_Usb()
+{
+	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_12,GPIO_PIN_SET);
+	HAL_Delay(250);
+	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_12,GPIO_PIN_RESET);
+	HAL_Delay(250);
+}
 
 /**
  * @brief isUsbCDCConnected

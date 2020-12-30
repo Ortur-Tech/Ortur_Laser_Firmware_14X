@@ -181,7 +181,7 @@ void usbRxCancel (void)
 //
 // Writes current buffer to the USB output stream, swaps buffers
 //
-static inline bool usb_write (void)
+bool usb_write (void)
 {
     static uint8_t dummy = 0;
 

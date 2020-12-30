@@ -24,6 +24,9 @@
 #define serial_h
 
 
+extern uint8_t usb_serial_rx_buffer_head ;
+extern uint8_t usb_serial_rx_buffer_tail ;
+
 #ifdef STM32
 	#define RX_BUFFER_SIZE 254
 	#define TX_BUFFER_SIZE 254
@@ -56,7 +59,13 @@ void serial_write_all(uint8_t data);
 uint8_t serial_read();
 
 // Reset and empty data in read buffer. Used by e-stop and reset.
-void serial_reset_read_buffer();
+static inline void serial_reset_read_buffer()
+{
+#if USE_DOUBLE_SERIAL
+  serial_rx_buffer_tail = serial_rx_buffer_head;
+#endif
+  usb_serial_rx_buffer_tail = usb_serial_rx_buffer_head;
+}
 
 // Returns the number of bytes available in the RX serial buffer.
 uint8_t serial_get_rx_buffer_available();

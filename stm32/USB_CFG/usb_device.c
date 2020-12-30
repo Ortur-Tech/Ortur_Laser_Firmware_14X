@@ -32,17 +32,6 @@ USBD_HandleTypeDef hUsbDeviceFS;
 uint8_t usbPlugIn = 0;
 uint8_t usbCdcConnectFlag = 0;
 
-/**
- * @brief 强制复位USB
- */
-void Reset_Usb()
-{
-	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_12,GPIO_PIN_SET);
-	HAL_Delay(250);
-	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_12,GPIO_PIN_RESET);
-	HAL_Delay(250);
-}
-
 uint8_t isUsbCDCConnected(void)
 {
 	return usbPlugIn && usbCdcConnectFlag;

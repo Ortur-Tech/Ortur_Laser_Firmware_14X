@@ -11,9 +11,9 @@
 #include "iic.h"
 #include "main.h"
 
-#define SC7A20_ADDR		0x30 //0x30
+#define SC7A20_ADDR	  0x30 //0x30
 #define SC7A20_DEVICE 0X11
-#define OTHER_DEVICE 0X03
+#define OTHER_DEVICE  0X03
 
  void Gsensor_Init(void);//!< 传感器初始化
  void Sc7a20_Init(void);

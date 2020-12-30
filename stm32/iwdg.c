@@ -23,6 +23,7 @@
 #include "main.h"
 #include "system.h"
 #include "usb_device.h"
+#include "report.h"
 
 //激光功率
 #define getLaserPower() spindle_get_speed()
@@ -79,7 +80,7 @@ void IWDG_Feed(void)
 	}
 
 	//注意,激光已经开启
-	if(isLaserOpen())
+	if(is_spindle_Open())
 	{
 		//激光功率过大且长时间未移动
 		curr_laser_power = getLaserPower();
@@ -104,7 +105,8 @@ void IWDG_Feed(void)
 
 			if((HAL_GetTick()/1000) - last_check_timestamp >= allow_laser_time)
 			{
-				printStringAll("Laser exposure timeout!\r\n");
+				printStringAll("[MSG:Laser exposure timeout!]");
+				report_util_line_feed_all();
 				sys.state = STATE_ALARM;
 				sys.abort = 1;
 			}

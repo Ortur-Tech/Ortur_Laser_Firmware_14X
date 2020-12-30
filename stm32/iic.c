@@ -96,7 +96,6 @@ void IIC_Init(void)
 
 	IIC_SCL=1;
 	IIC_SDA=1;
-
 }
 
 /**

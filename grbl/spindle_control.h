@@ -42,16 +42,29 @@
 #endif
 
 #ifdef DELAY_OFF_SPINDLE
-  /*M5停止激光命令*/
-  extern uint8_t stop_spindle_pwm_flag;
+
+  #define MAX_SPINDLE_FAN_TIME (2*60*1000) //最大的风扇冷却时间
+  #define MIN_SPINDLE_FAN_TIME (20*1000)   //最小的风扇冷却时间
+
+  //假定散热和发热都是线性关系
+  //激光器全工作超过30分钟风扇延时工作120秒，确保激光器冷却
+  #define FAN_HEAT_DISSIPATION_PER_SECOND  940  //风扇辅助每秒散热量
+  #define AIR_HEAT_DISSIPATION_PER_SECOND  100  //自然空冷每秒散热量
+  #define LASER_CALORIFIC_PER_SECOND      1000  //激光每秒发热量
+
+  //最大发热量
+  #define MAX_SPINDLE_HEAT   ( MAX_SPINDLE_FAN_TIME / 1000 * FAN_HEAT_DISSIPATION_PER_SECOND)
+
   /* 主轴/激光 是否关闭的标识 */
-  extern uint8_t stop_spindle_disable_flag;
-  /*关电源计时*/
-  extern uint32_t stop_spindle_timer;
-  /*统计平均PWM值*/
-  extern uint32_t stop_spindle_avg_pwm;
+  extern uint8_t spindle_disable_by_grbl;
+  /* 主轴/激光 被关闭的时间 */
+  extern uint32_t spindle_disabled_time;
+  /* 主轴/激光 累积热量*/
+  extern uint32_t spindle_cumulative_heat;
   /* 主轴/激光 是否挂起的标识 */
   extern uint8_t spindle_suspend_flag;
+  /* 主轴/激光 风扇延时时间*/
+  extern uint32_t spindle_fan_delay_time;
 #endif
 
 // Initializes spindle pins and hardware PWM, if enabled.
@@ -59,6 +72,7 @@ void spindle_init();
 
 // Returns current spindle output state. Overrides may alter it from programmed states.
 uint8_t spindle_get_state();
+
 
 // Called by g-code parser when setting spindle state and requires a buffer sync.
 // Immediately sets spindle running state with direction and spindle rpm via PWM, if enabled.
@@ -100,7 +114,7 @@ uint8_t spindle_get_state();
 void spindle_stop();
 
 //激光是否开启
-uint8_t isLaserOpen();
+uint8_t is_spindle_Open();
 
 #ifdef DELAY_OFF_SPINDLE
 
@@ -126,19 +140,18 @@ uint8_t isLaserOpen();
    * @brief grbl 层面关激光供电
    * @param status
    */
-  void stop_spindle_disable_flag_set(uint8_t status);
-
-  /**
-   * @brief 设置延时关激光器供电，主要是为了延迟风扇关闭的时间
-   * @param pwm
-   */
-  void delay_stop_spindle_set(uint16_t pwm);
+  void spindle_disable_by_grbl_set(uint8_t status);
 
   /**
    * @brief delay_stop_spindle
    * @return 1: 允许关激光 0：需要延时关激光
    */
-  uint8_t delay_stop_spindle(void);
+  uint8_t spindle_delay_stop(void);
+
+  /**
+   * @brief 计算主轴热量累积
+   */
+  void spindle_calculate_heat();
 
 #endif
 
