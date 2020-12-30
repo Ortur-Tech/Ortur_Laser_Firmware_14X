@@ -210,6 +210,8 @@ uint8_t is_spindle_Open()
 	//get speed value
     spindle_speed = pwm_value;
 
+    Set_Spindle_Speed(pwm_value);
+
 #ifdef DELAY_OFF_SPINDLE
   	spindle_disabled_time = HAL_GetTick();
 #endif
