@@ -33,6 +33,9 @@ extern PCD_HandleTypeDef hpcd_USB_FS;
 /******************************************************************************/
 /*           Cortex-M3 Processor Interruption and Exception Handlers          */
 /******************************************************************************/
+
+#if 0
+
 /**
   * @brief This function handles Non maskable interrupt.
   */
@@ -144,6 +147,8 @@ void PendSV_Handler(void)
 
   /* USER CODE END PendSV_IRQn 1 */
 }
+
+#endif
 
 /**
   * @brief This function handles System tick timer.

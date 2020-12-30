@@ -33,17 +33,17 @@
 
 int32_t last_sys_position[N_AXIS]; 		// 最后一次检测位置
 uint64_t last_check_timestamp = 0; 		// 最后一次检测时间
-uint32_t max_exposure_time = 60;		// 最长曝光时间 100s
-uint32_t min_exposure_time = 10;		//最短曝光时间
-uint32_t max_weak_time = 100;			//最长弱光时间
+#define  max_exposure_time 60		// 最长曝光时间 100s
+#define  min_exposure_time 10		//最短曝光时间
+#define  max_weak_time     100			//最长弱光时间
 
 uint32_t curr_laser_power;//当前激光功率
 
 uint32_t allow_laser_time;//允许激光静态开启时间
 
-uint32_t max_laser_power = SPINDLE_PWM_MAX_VALUE; ///< 激光最大功率
-uint32_t weak_laser_power = 20;//弱光功率
-uint32_t off_laser_power = SPINDLE_PWM_OFF_VALUE;//认为激光关闭的功率
+#define max_laser_power  SPINDLE_PWM_MAX_VALUE ///< 激光最大功率
+#define weak_laser_power 20//弱光功率
+#define off_laser_power  SPINDLE_PWM_OFF_VALUE//认为激光关闭的功率
 
 #endif
 

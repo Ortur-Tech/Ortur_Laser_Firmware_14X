@@ -416,12 +416,10 @@ uint8_t is_spindle_Open()
   		{
   			spindle_disable_by_grbl = 0;
   			spindle_cumulative_heat = 0;
-  			#ifdef VARIABLE_SPINDLE_ENABLE_PIN
-  			  if (settings.spindle_enable_pin_mode == 1)
-  				ResetSpindleEnablebit();
-  			  else
-  				SetSpindleEnablebit();
-  			#endif
+			if (settings.spindle_enable_pin_mode == 1)
+				ResetSpindleEnablebit();
+			else
+				SetSpindleEnablebit();
   		}
   		else
   			return 0;
@@ -436,7 +434,7 @@ uint8_t is_spindle_Open()
 	spindle_disabled_time = HAL_GetTick();
 	if(status)
 	{
-		spindle_fan_delay_time = spindle_cumulative_heat / FAN_HEAT_DISSIPATION_PER_SECOND;
+		spindle_fan_delay_time = (spindle_cumulative_heat / FAN_HEAT_DISSIPATION_PER_SECOND) * 1000;
 		spindle_fan_delay_time = _MAX(spindle_fan_delay_time,MIN_SPINDLE_FAN_TIME);
 		spindle_fan_delay_time = _MIN(MAX_SPINDLE_FAN_TIME,spindle_fan_delay_time);
 	}
@@ -445,6 +443,7 @@ uint8_t is_spindle_Open()
   void spindle_calculate_heat()
   {
 	  static uint32_t last_time = 0;
+	  static uint32_t equivalent_power = 0;
 	  if(HAL_GetTick() - last_time >= 1000)
 	  {
 		  //电源开启
@@ -452,7 +451,7 @@ uint8_t is_spindle_Open()
 		  {
 			  //计算每秒产生的热量和丧失的热量
 			  if(spindle_cumulative_heat < MAX_SPINDLE_HEAT)
-				  spindle_cumulative_heat += spindle_speed;
+				  spindle_cumulative_heat += equivalent_power / 1000;
 			  if(spindle_cumulative_heat >= FAN_HEAT_DISSIPATION_PER_SECOND)
 				  spindle_cumulative_heat -= FAN_HEAT_DISSIPATION_PER_SECOND ;
 		  }
@@ -461,7 +460,12 @@ uint8_t is_spindle_Open()
 			  if(spindle_cumulative_heat >= AIR_HEAT_DISSIPATION_PER_SECOND)
 				  spindle_cumulative_heat -= AIR_HEAT_DISSIPATION_PER_SECOND ;
 		  }
+		  equivalent_power = 0;
 		  last_time = HAL_GetTick();
+	  }
+	  else
+	  {
+		  equivalent_power += spindle_speed;
 	  }
   }
 

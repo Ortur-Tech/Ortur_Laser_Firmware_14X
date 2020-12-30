@@ -44,11 +44,11 @@
 #ifdef DELAY_OFF_SPINDLE
 
   #define MAX_SPINDLE_FAN_TIME (2*60*1000) //最大的风扇冷却时间
-  #define MIN_SPINDLE_FAN_TIME (20*1000)   //最小的风扇冷却时间
+  #define MIN_SPINDLE_FAN_TIME (30*1000)   //最小的风扇冷却时间
 
   //假定散热和发热都是线性关系
   //激光器全工作超过30分钟风扇延时工作120秒，确保激光器冷却
-  #define FAN_HEAT_DISSIPATION_PER_SECOND  940  //风扇辅助每秒散热量
+  #define FAN_HEAT_DISSIPATION_PER_SECOND  400  //风扇辅助每秒散热量
   #define AIR_HEAT_DISSIPATION_PER_SECOND  100  //自然空冷每秒散热量
   #define LASER_CALORIFIC_PER_SECOND      1000  //激光每秒发热量
 
