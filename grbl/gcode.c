@@ -353,7 +353,7 @@ uint8_t gc_execute_line(char *line)
 #if MAIN_BOARD_IS_NEW
 				if(!IsMainPowrIn())
 				 {
-					report_power_flag=MESSAGE_NO_POWER_SUPPLIED;
+					report_power_flag = MESSAGE_NO_POWER_SUPPLY;
 					 //report_feedback_message(MESSAGE_MAIN_POWER_OFF);
 				 }
 #endif
