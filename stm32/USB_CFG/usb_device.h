@@ -38,7 +38,7 @@ extern uint8_t usbCdcConnectFlag;
 
 /** USB Device initialization function. */
 void MX_USB_DEVICE_Init(void);
-
+void UsbCDCDisconnectStopEngrave(void);
 /*
  * -- Insert functions declaration here --
  */

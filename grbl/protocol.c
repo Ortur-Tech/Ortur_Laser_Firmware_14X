@@ -202,9 +202,11 @@ void protocol_main_loop()
     else
     	StatusLed_Off();
 #endif
+    UsbCDCDisconnectStopEngrave();
 #if MAIN_BOARD_IS_NEW
     Main_PowerCheck();
 #endif
+
 #ifndef ORTUR_CNC_MODE
     //检查关机操作
     PowerClose_Check();
