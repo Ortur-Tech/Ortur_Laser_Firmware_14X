@@ -53,24 +53,17 @@ void setUsbPlugIn(uint8_t value)
  */
 void UsbCDCDisconnectStopEngrave(void)
 {
-	static uint8_t preState=0;
-	if((preState==1)&&(!isUsbCDCConnected())&&((sys.trust_state == STATE_CYCLE)))
+	static uint8_t preState  = 0;
+	uint8_t is_connect_flag = 0;
+	is_connect_flag=isUsbCDCConnected();
+
+	if( preState && (!is_connect_flag) )
 	{
 		sys.state = STATE_ALARM;
 		sys.abort = 1;
-		//printStringAll("Disconnect stop engrave!");
+		preState = 0;
 	}
-	else
-	{
-		if(isUsbCDCConnected())
-		{
-			preState=1;
-		}
-		else
-		{
-			preState=0;
-		}
-	}
+	preState = is_connect_flag;
 }
 /**
   * @brief Init USB device Library, add supported class and start the library
