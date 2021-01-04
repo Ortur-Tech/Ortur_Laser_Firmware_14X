@@ -42,7 +42,7 @@
 
 uint8_t serial_rx_buffer[RX_RING_BUFFER];
 uint8_t serial_rx_buffer_head = 0;
-volatile uint8_t serial_rx_buffer_tail = 0;
+uint8_t serial_rx_buffer_tail = 0;
 
 /*虚拟usb串口接收缓冲区*/
 uint8_t usb_serial_rx_buffer[RX_RING_BUFFER];
@@ -57,9 +57,12 @@ volatile uint8_t serial_tx_buffer_tail = 0;
 // Returns the number of bytes available in the RX serial buffer.
 uint8_t serial_get_rx_buffer_available()
 {
-  uint8_t rtail = serial_rx_buffer_tail; // Copy to limit multiple calls to volatile
-  if (serial_rx_buffer_head >= rtail) { return(RX_BUFFER_SIZE - (serial_rx_buffer_head-rtail)); }
-  return((rtail-serial_rx_buffer_head-1));
+	uint8_t rtail = usb_serial_rx_buffer_tail; // Copy to limit multiple calls to volatile
+	if (usb_serial_rx_buffer_head >= rtail) { return(RX_BUFFER_SIZE - (usb_serial_rx_buffer_head-rtail)); }
+	return((rtail-usb_serial_rx_buffer_head-1));
+//  uint8_t rtail = serial_rx_buffer_tail; // Copy to limit multiple calls to volatile
+//  if (serial_rx_buffer_head >= rtail) { return(RX_BUFFER_SIZE - (serial_rx_buffer_head-rtail)); }
+//  return((rtail-serial_rx_buffer_head-1));
 }
 
 
@@ -67,9 +70,12 @@ uint8_t serial_get_rx_buffer_available()
 // NOTE: Deprecated. Not used unless classic status reports are enabled in config.h.
 uint8_t serial_get_rx_buffer_count()
 {
-  uint8_t rtail = serial_rx_buffer_tail; // Copy to limit multiple calls to volatile
-  if (serial_rx_buffer_head >= rtail) { return(serial_rx_buffer_head-rtail); }
-  return (RX_BUFFER_SIZE - (rtail-serial_rx_buffer_head));
+	uint8_t rtail = usb_serial_rx_buffer_tail; // Copy to limit multiple calls to volatile
+	if (usb_serial_rx_buffer_head >= rtail) { return(usb_serial_rx_buffer_head-rtail); }
+	return (RX_BUFFER_SIZE - (rtail-usb_serial_rx_buffer_head));
+//  uint8_t rtail = serial_rx_buffer_tail; // Copy to limit multiple calls to volatile
+//  if (serial_rx_buffer_head >= rtail) { return(serial_rx_buffer_head-rtail); }
+//  return (RX_BUFFER_SIZE - (rtail-serial_rx_buffer_head));
 }
 
 
@@ -77,9 +83,10 @@ uint8_t serial_get_rx_buffer_count()
 // NOTE: Not used except for debugging and ensuring no TX bottlenecks.
 uint8_t serial_get_tx_buffer_count()
 {
-  uint8_t ttail = serial_tx_buffer_tail; // Copy to limit multiple calls to volatile
-  if (serial_tx_buffer_head >= ttail) { return(serial_tx_buffer_head-ttail); }
-  return (TX_RING_BUFFER - (ttail-serial_tx_buffer_head));
+
+	uint8_t ttail = serial_tx_buffer_tail; // Copy to limit multiple calls to volatile
+	if (serial_tx_buffer_head >= ttail) { return(serial_tx_buffer_head-ttail); }
+	return (TX_RING_BUFFER - (ttail-serial_tx_buffer_head));
 }
 
 void serial_init()
