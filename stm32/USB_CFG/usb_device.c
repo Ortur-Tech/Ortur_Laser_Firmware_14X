@@ -31,7 +31,10 @@ USBD_HandleTypeDef hUsbDeviceFS;
 
 uint8_t usbPlugIn = 0;
 uint8_t usbCdcConnectFlag = 0;
-
+/**
+ * @brief isUsbCDCConnected
+ * @return 1:connected 0:disconnect
+ */
 uint8_t isUsbCDCConnected(void)
 {
 	return usbPlugIn && usbCdcConnectFlag;
@@ -44,7 +47,31 @@ void setUsbPlugIn(uint8_t value)
 	if(usbPlugIn == 0)
 		usbCdcConnectFlag = 0;
 }
-
+/**
+ * @brief UsbCDCDisconnectStopEngrave
+ * 雕刻过程中USB连接断开则强制停止雕刻
+ */
+void UsbCDCDisconnectStopEngrave(void)
+{
+	static uint8_t preState=0;
+	if((preState==1)&&(!isUsbCDCConnected())&&((sys.trust_state == STATE_CYCLE)))
+	{
+		sys.state = STATE_ALARM;
+		sys.abort = 1;
+		//printStringAll("Disconnect stop engrave!");
+	}
+	else
+	{
+		if(isUsbCDCConnected())
+		{
+			preState=1;
+		}
+		else
+		{
+			preState=0;
+		}
+	}
+}
 /**
   * @brief Init USB device Library, add supported class and start the library
   * @retval None

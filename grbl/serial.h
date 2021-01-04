@@ -24,6 +24,9 @@
 #define serial_h
 
 
+extern uint8_t serial_rx_buffer_head ;
+extern uint8_t serial_rx_buffer_tail ;
+
 extern uint8_t usb_serial_rx_buffer_head ;
 extern uint8_t usb_serial_rx_buffer_tail ;
 
