@@ -259,28 +259,6 @@ char serialGetC(void)
 	  }
 }
 
-#if USE_DOUBLE_SERIAL
-//
-// In what state we can switch input streams
-//
-bool switchable_state(uint8_t state)
-{
-	return state == STATE_IDLE
-			|| (state & (
-					  STATE_ALARM
-					| STATE_CHECK_MODE
-					| STATE_HOMING
-					//| STATE_CYCLE
-					//| STATE_HOLD
-					| STATE_JOG
-					| STATE_SAFETY_DOOR
-					| STATE_SLEEP
-					//| STATE_ESTOP
-					//| STATE_TOOL_CHANGE
-					)) ;
-}
-#endif
-
 /**
  * @brief Fetches the first byte in the serial read buffer.
  * @return
@@ -289,32 +267,34 @@ uint8_t serial_read()
 {
 #if USE_DOUBLE_SERIAL
 	int16_t c = SERIAL_NO_DATA;
+
 	if(isUsbCDCConnected())
 	{
-		if(last_steam == USBCDC || (steamSwitchAble && switchable_state(sys.trust_state)) )
+		if(last_steam == USBCDC || steamSwitchAble )
 		{
 			c = usbGetC();
-			last_steam = USBCDC;
-			steamSwitchAble = (c == SERIAL_NO_DATA);
+			if(last_steam != USBCDC && (c != SERIAL_NO_DATA) )
+			{
+				last_steam = USBCDC;
+			}
 		}
 	}
-	else
+	else if(last_steam == USBCDC) //在CDC已经断开连接的情况下,应该将steam指向转到 硬件串口 HWUART
 	{
-		if(last_steam == USBCDC) //在CDC已经断开连接的情况下,应该将steam指向转到 硬件串口 HWUART
-		{
-			last_steam = HWUART;
-			c = '\n'; //强行补换行符防止命令被截断,或者污染后续的命令字符串
-		}
+		steamSwitchAble = true;
+		last_steam = HWUART;
+		c = '\n'; //强行补换行符防止命令被截断,或者污染后续的命令字符串
 	}
 
 	if(c == SERIAL_NO_DATA )
 	{
-		if(last_steam == HWUART
-				||( steamSwitchAble && switchable_state(sys.trust_state)))
+		if(last_steam == HWUART || steamSwitchAble )
 		{
 			c = serialGetC();
-			last_steam = HWUART;
-			steamSwitchAble = (c == SERIAL_NO_DATA);
+			if(last_steam != HWUART && (c != SERIAL_NO_DATA))
+			{
+				last_steam = HWUART;
+			}
 		}
 	}
 	return c;
