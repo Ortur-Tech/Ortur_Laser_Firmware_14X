@@ -308,6 +308,14 @@ uint8_t serial_read()
 }
 
 #ifdef STM32
+
+void mcu_reboot()
+{
+	//reboot
+	__set_FAULTMASK(1);
+	NVIC_SystemReset();
+}
+
 /**
  * @brief 串口接收中断处理函数
  * @param data 从串口传过来的数据
@@ -323,6 +331,7 @@ void HandleUartIT(uint8_t data,uint8_t steam)
     case CMD_STATUS_REPORT: system_set_exec_state_flag(EXEC_STATUS_REPORT); break; // Set as true
     case CMD_CYCLE_START:   system_set_exec_state_flag(EXEC_CYCLE_START); break; // Set as true
     case CMD_FEED_HOLD:     system_set_exec_state_flag(EXEC_FEED_HOLD); break; // Set as true
+    case CMD_REBOOT:        mcu_reboot(); break; // Reboot
     default :
       if (data > 0x7F) { // Real-time control characters are extended ACSII only.
         switch(data) {

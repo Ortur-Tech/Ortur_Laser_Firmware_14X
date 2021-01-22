@@ -249,7 +249,7 @@ uint8_t system_execute_line(char *line)
           }
           break;
         case 'R' : // Restore defaults [IDLE/ALARM]
-          if ((line[2] != 'S') || (line[3] != 'T') || (line[4] != '=') || (line[6] != 0)) { return(STATUS_INVALID_STATEMENT); }
+          if ((line[2] == 'S') && (line[3] == 'T') && (line[4] == '=') && (line[6] == 0)){
           switch (line[5]) {
             #ifdef ENABLE_RESTORE_EEPROM_DEFAULT_SETTINGS
               case '$': settings_restore(SETTINGS_RESTORE_DEFAULTS); break;
@@ -264,6 +264,15 @@ uint8_t system_execute_line(char *line)
           }
           report_feedback_message(MESSAGE_RESTORE_DEFAULTS);
           mc_reset(); // Force reset to ensure settings are initialized correctly.
+          }
+          else if ((line[2] == 'B') && (line[3] == 'T')){
+        	  //reboot
+        	  __set_FAULTMASK(1);
+        	   NVIC_SystemReset();
+          }
+          else {
+        	return(STATUS_INVALID_STATEMENT);
+		}
           break;
         case 'N' : // Startup lines. [IDLE/ALARM]
           if ( line[++char_counter] == 0 ) { // Print startup lines
