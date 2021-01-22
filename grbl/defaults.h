@@ -29,8 +29,6 @@
 
 #ifdef DEFAULTS_GRBL32
 
-#define USE_DOUBLE_SERIAL 0
-
 #define MODE_OFFSET 8
 //机型选择
 #define OLM            (1+MODE_OFFSET)
@@ -40,9 +38,17 @@
 #define OLM_MODEL_180  (5+MODE_OFFSET)
 #define OLM_MODEL_210  (6+MODE_OFFSET)
 #define OLM_MODEL_400  (7+MODE_OFFSET)
-#define OLM_2_PRO	   (8+MODE_OFFSET)
+#define OLM_2_PRO	    (8+MODE_OFFSET)
 
 //#define ORTUR_MODEL OLM_MODEL_400
+
+
+#if ORTUR_MODEL==OLM_2_PRO //OLM2_PRO使用手柄控制
+	#define USE_DOUBLE_SERIAL 1
+#else
+	#define USE_DOUBLE_SERIAL 0
+#endif
+
 
 #if ORTUR_MODEL==OLM
 	#define ORTUR_MODEL_NAME "Ortur Laser Master"
@@ -131,9 +137,6 @@
     #define DEFAULT_Y_ACCELERATION   (1800.0f*60*60) // $121  Y Acceleration [mm/sec^2]
     #define DEFAULT_Z_ACCELERATION   (2500.0f*60*60) // $122  Z Acceleration [mm/sec^2]
 #elif ORTUR_MODEL==OLM_2_PRO
-//	#define ORTUR_MODEL_NAME "Ortur Laser Master 2 M400"
-//	#define DEFAULT_DIRECTION_INVERT_MASK 0
-
 	#define ORTUR_MODEL_NAME "Ortur Laser Master 2 Pro"
 	#define DEFAULT_DIRECTION_INVERT_MASK 1
 	#define DEFAULT_X_MAX_TRAVEL 400.0f // mm NOTE: Must be a positive value.
