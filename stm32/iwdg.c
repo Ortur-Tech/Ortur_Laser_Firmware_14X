@@ -69,6 +69,10 @@ void IWDG_Init(void)
  */
 void IWDG_Feed(void)
 {
+#ifndef DEBUG
+	IWDG->KR=0XAAAA;//reload
+#endif
+
 #ifdef ORTUR_LASER_MODE
     //检查xyz位置是否变化
 	if(sys_position[0] != last_sys_position[0] ||
@@ -86,13 +90,6 @@ void IWDG_Feed(void)
 		curr_laser_power = getLaserPower();
 		if(curr_laser_power > off_laser_power )
 		{
-#ifdef USEUSB
-			//usb线未连接
-			if(!isUsbPlugIn())
-			{
-				return;
-			}
-#endif
 			if(curr_laser_power > max_weak_time )
 			{
 				allow_laser_time = min_exposure_time + (max_exposure_time - min_exposure_time) *
@@ -116,9 +113,6 @@ void IWDG_Feed(void)
 	{
 		last_check_timestamp = HAL_GetTick()/1000;
 	}
-#endif
-#ifndef DEBUG
-	IWDG->KR=0XAAAA;//reload
 #endif
 }
 /* USER CODE END 1 */
