@@ -121,6 +121,9 @@ uint8_t steamSwitchAble = 0;
  */
 void usb_serial_write(uint8_t data)
 {
+    uint32_t start_write_time = HAL_GetTick();
+    #define MAX_WRITE_TIME 500 //500ms
+
 	//usb串口未连接时,不发送任何数据
 	if(isUsbCDCConnected())
 	{
@@ -134,7 +137,14 @@ void usb_serial_write(uint8_t data)
 			{
 				if(!isUsbCDCConnected())
 				{
-					break;
+					return;
+				}
+
+				//Avoid death waiting
+				if(start_write_time + MAX_WRITE_TIME < HAL_GetTick())
+				{
+					setUsbCDCConnected(0);
+					return;
 				}
 			}
             /*64字节的整数倍需要外加一个空trans否则主机收不到这包数据*/
