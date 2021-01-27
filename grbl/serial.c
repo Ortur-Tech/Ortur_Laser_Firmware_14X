@@ -41,52 +41,92 @@
 #endif
 
 uint8_t serial_rx_buffer[RX_RING_BUFFER];
-uint8_t serial_rx_buffer_head = 0;
-uint8_t serial_rx_buffer_tail = 0;
+uint32_t serial_rx_buffer_head = 0;
+uint32_t serial_rx_buffer_tail = 0;
 
 /*虚拟usb串口接收缓冲区*/
 uint8_t usb_serial_rx_buffer[RX_RING_BUFFER];
-uint8_t usb_serial_rx_buffer_head = 0;
-uint8_t usb_serial_rx_buffer_tail = 0;
+uint32_t usb_serial_rx_buffer_head = 0;
+uint32_t usb_serial_rx_buffer_tail = 0;
 
 uint8_t serial_tx_buffer[TX_RING_BUFFER];
-uint8_t serial_tx_buffer_head = 0;
-volatile uint8_t serial_tx_buffer_tail = 0;
+uint32_t serial_tx_buffer_head = 0;
+uint32_t serial_tx_buffer_tail = 0;
+
+
+#define USBCDC 1  //USB CDC VCP
+#define HWUART 2  //HW UART
+
+uint8_t last_steam = USBCDC;
+uint8_t steamSwitchAble = 0;
 
 
 // Returns the number of bytes available in the RX serial buffer.
-uint8_t serial_get_rx_buffer_available()
+uint32_t serial_get_rx_buffer_available()
 {
-	uint8_t rtail = usb_serial_rx_buffer_tail; // Copy to limit multiple calls to volatile
-	if (usb_serial_rx_buffer_head >= rtail) { return(RX_BUFFER_SIZE - (usb_serial_rx_buffer_head-rtail)); }
-	return((rtail-usb_serial_rx_buffer_head-1));
-//  uint8_t rtail = serial_rx_buffer_tail; // Copy to limit multiple calls to volatile
-//  if (serial_rx_buffer_head >= rtail) { return(RX_BUFFER_SIZE - (serial_rx_buffer_head-rtail)); }
-//  return((rtail-serial_rx_buffer_head-1));
+#if USE_DOUBLE_SERIAL
+	if(last_steam == HWUART)
+	{
+		if (serial_rx_buffer_head >= serial_rx_buffer_tail)
+			return(RX_BUFFER_SIZE - (serial_rx_buffer_head - serial_rx_buffer_tail));
+		else
+			return((serial_rx_buffer_tail - serial_rx_buffer_head - 1));
+
+	}
+	else
+#endif
+	{
+		if (usb_serial_rx_buffer_head >= usb_serial_rx_buffer_tail)
+			return( RX_BUFFER_SIZE - ( usb_serial_rx_buffer_head - usb_serial_rx_buffer_tail ));
+		else
+			return(usb_serial_rx_buffer_tail - usb_serial_rx_buffer_head - 1);
+	}
 }
 
 
 // Returns the number of bytes used in the RX serial buffer.
 // NOTE: Deprecated. Not used unless classic status reports are enabled in config.h.
-uint8_t serial_get_rx_buffer_count()
+uint32_t serial_get_rx_buffer_count()
 {
-	uint8_t rtail = usb_serial_rx_buffer_tail; // Copy to limit multiple calls to volatile
-	if (usb_serial_rx_buffer_head >= rtail) { return(usb_serial_rx_buffer_head-rtail); }
-	return (RX_BUFFER_SIZE - (rtail-usb_serial_rx_buffer_head));
-//  uint8_t rtail = serial_rx_buffer_tail; // Copy to limit multiple calls to volatile
-//  if (serial_rx_buffer_head >= rtail) { return(serial_rx_buffer_head-rtail); }
-//  return (RX_BUFFER_SIZE - (rtail-serial_rx_buffer_head));
+#if USE_DOUBLE_SERIAL
+	if(last_steam == HWUART)
+	{
+		if (serial_rx_buffer_head >= serial_rx_buffer_tail)
+			return(serial_rx_buffer_head - serial_rx_buffer_tail);
+		else
+			return (RX_BUFFER_SIZE - (serial_rx_buffer_tail - serial_rx_buffer_head));
+	}
+	else
+#endif
+	{
+		if (usb_serial_rx_buffer_head >= usb_serial_rx_buffer_tail)
+			return (usb_serial_rx_buffer_head - usb_serial_rx_buffer_tail);
+		else
+			return (RX_BUFFER_SIZE - (usb_serial_rx_buffer_tail - usb_serial_rx_buffer_head));
+	}
 }
 
 
 // Returns the number of bytes used in the TX serial buffer.
 // NOTE: Not used except for debugging and ensuring no TX bottlenecks.
-uint8_t serial_get_tx_buffer_count()
+uint32_t serial_get_tx_buffer_count()
 {
-
-	uint8_t ttail = serial_tx_buffer_tail; // Copy to limit multiple calls to volatile
-	if (serial_tx_buffer_head >= ttail) { return(serial_tx_buffer_head-ttail); }
-	return (TX_RING_BUFFER - (ttail-serial_tx_buffer_head));
+#if USE_DOUBLE_SERIAL
+	if(last_steam == HWUART)
+	{
+		if (serial_tx_buffer_head >= serial_tx_buffer_tail)
+			return(serial_tx_buffer_head - serial_tx_buffer_tail);
+		else
+			return (TX_RING_BUFFER - (serial_tx_buffer_tail - serial_tx_buffer_head));
+	}
+	else
+#endif
+	{
+		if (usb_serial_rx_buffer_head >= usb_serial_rx_buffer_tail)
+			return(usb_serial_rx_buffer_head - usb_serial_rx_buffer_tail);
+		else
+			return (TX_RING_BUFFER - (usb_serial_rx_buffer_tail - usb_serial_rx_buffer_head));
+	}
 }
 
 void serial_init()
@@ -109,11 +149,6 @@ void serial_init()
   // defaults to 8-bit, no parity, 1 stop bit
 #endif
 }
-#define USBCDC 1  //USB CDC VCP
-#define HWUART 2  //HW UART
-
-uint8_t last_steam = USBCDC;
-uint8_t steamSwitchAble = 0;
 
 /**
  * @brief usb_serial_write 写数据到USB
