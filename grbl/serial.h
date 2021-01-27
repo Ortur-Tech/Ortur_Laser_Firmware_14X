@@ -82,7 +82,7 @@ uint32_t serial_get_rx_buffer_count();
 uint32_t serial_get_tx_buffer_count();
 
 extern uint8_t steamSwitchAble;
-void OnUsbDataRx(uint8_t* dataIn, uint8_t length);
+void OnUsbDataRx(uint8_t* dataIn, uint32_t length);
 #ifdef STM32
 void HandleUartIT(uint8_t data ,uint8_t steam);
 #endif

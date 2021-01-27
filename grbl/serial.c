@@ -271,7 +271,7 @@ ISR(SERIAL_UDRE)
  */
 char usbGetC(void)
 {
-	  uint8_t tail = usb_serial_rx_buffer_tail; // Temporary serial_rx_buffer_tail (to optimize for volatile)
+	  uint32_t tail = usb_serial_rx_buffer_tail; // Temporary serial_rx_buffer_tail (to optimize for volatile)
 	  if (usb_serial_rx_buffer_head == tail) {
 	    return SERIAL_NO_DATA;
 	  } else {
@@ -290,7 +290,7 @@ char usbGetC(void)
  */
 char serialGetC(void)
 {
-	  uint8_t tail = serial_rx_buffer_tail; // Temporary serial_rx_buffer_tail (to optimize for volatile)
+	  uint32_t tail = serial_rx_buffer_tail; // Temporary serial_rx_buffer_tail (to optimize for volatile)
 	  if (serial_rx_buffer_head == tail) {
 	    return SERIAL_NO_DATA;
 	  } else {
@@ -368,7 +368,7 @@ void mcu_reboot()
  */
 void HandleUartIT(uint8_t data,uint8_t steam)
 {
-	uint8_t next_head;
+	uint32_t next_head;
   // Pick off realtime command characters directly from the serial stream. These characters are
   // not passed into the main buffer, but these set system state flag bits for realtime execution.
 	switch (data) {
@@ -487,7 +487,7 @@ void USART1_IRQHandler (void)
  * @param dataIn 数据指针
  * @param length 数据长度
  */
-void OnUsbDataRx(uint8_t* dataIn, uint8_t length)
+void OnUsbDataRx(uint8_t* dataIn, uint32_t length)
 {
     uint8_t data;
 
