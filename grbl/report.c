@@ -489,9 +489,9 @@ void report_build_info(char *line)
 
   // NOTE: Compiled values, like override increments/max/min values, may be added at some point later.
   serial_write(',');
-  print_uint8_base10(BLOCK_BUFFER_SIZE-1);
+  print_uint32_base10(BLOCK_BUFFER_SIZE-1);
   serial_write(',');
-  print_uint8_base10(RX_BUFFER_SIZE);
+  print_uint32_base10(RX_BUFFER_SIZE);
 
   report_util_feedback_line_feed();
 }
@@ -584,7 +584,7 @@ void report_realtime_status()
     	printPgmStringAll(PSTR("|Bf:"));
       print_uint8_base10_all(plan_get_block_buffer_available());
       serial_write_all(',');
-      print_uint8_base10_all(serial_get_rx_buffer_available());
+      print_uint32_base10_all(serial_get_rx_buffer_available());
     }
   #endif
 
